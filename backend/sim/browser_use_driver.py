@@ -1,127 +1,369 @@
+"""H3 real-mode driver: autonomous browser-use agents, one per persona.
+
+Design (agreed in the H3 grill-me session — diverges from the written PRD 03):
+
+- Each agent is an autonomous ``browser_use.Agent`` driven by ``ChatOpenAI``.
+- The persona is baked into the task prompt (sourced from ``sim.agents.PERSONAS``);
+  the agent decides buy/bail/objection ITSELF. H4's probabilistic ``decide()`` is
+  only used in mock mode.
+- The agent is constrained to a fixed menu of custom ``Tools`` that mirror the
+  funnel (look_at_photos / read_reviews / check_price / add_to_cart / checkout /
+  confirm_purchase / bail). Each action clicks the matching ``data-action``
+  selector, screenshots, and emits the contract ``AgentEvent`` LIVE so H1's strip
+  updates as the agent moves. The final ``AgentTrace`` is built from the action
+  log (no structured-output LLM round-trip).
+- One isolated headless browser per agent → one independent screenshot stream per
+  agent → the "7 monitors" in the agent strip.
+
+browser-use imports are kept inside methods so mock mode / tests / fixtures never
+require Chromium or browser-use to be installed.
+
+VERIFY against your installed browser-use 0.9.x (these are the only runtime
+touchpoints I could not execute here):
+  * ``ChatOpenAI(model=...)``                         — OpenAI LLM wrapper
+  * ``Browser(headless=...)``                         — per-agent session + close()
+  * ``Tools()`` + ``@tools.action(description=...)``  — custom action registry
+  * action arg ``browser_session: BrowserSession``    — exact name required
+  * ``await browser_session.must_get_current_page()`` then
+    ``await page.get_elements_by_css_selector(sel)`` / ``element.click()``
+  * ``await browser_session.take_screenshot()``       — returns base64 PNG
+If a method name differs in your version, the fix is localized to ``_click`` /
+``_screenshot_bytes`` / ``_make_browser`` / ``_close`` below.
+"""
+
 from __future__ import annotations
 
+import asyncio
+import base64
+import binascii
+import os
 import time
-from typing import Literal
+from dataclasses import dataclass, field
+from typing import Awaitable, Callable
 
-from pydantic import BaseModel, Field
-
-from contracts import GATE_ORDER, AgentTrace, GateStage, ListingConfig, PersonaId, StageTrace
+from contracts import (
+    AgentBailedEvent,
+    AgentBoughtEvent,
+    AgentTrace,
+    BrowserFrameEvent,
+    GateStage,
+    ListingConfig,
+    ObjectionEvent,
+    PersonaId,
+    StageEnterEvent,
+    StageTrace,
+)
 from sim.agents import PERSONAS
+from sim.screenshots import save_thumbnail
+
+EmitFn = Callable[[object], Awaitable[None]]
+
+# Funnel gate -> the H2 data-action selector that advances into it (OVERVIEW §5.6).
+GATE_ACTION: dict[GateStage, str] = {
+    "photos": "scroll-gallery",
+    "reviews": "open-reviews",
+    "price": "select-variant",
+    "cart": "add-to-cart",
+    "checkout": "checkout",
+}
+CONFIRM_ACTION = "confirm-order"
+_GATE_INDEX = ["land", "photos", "reviews", "price", "cart", "checkout"]
 
 
-class BrowserUseShopperOutput(BaseModel):
-    outcome: Literal["bought", "bailed"]
+def _now_ms() -> int:
+    return int(time.time() * 1000)
+
+
+def _scroll_pct(gate: GateStage) -> float:
+    return _GATE_INDEX.index(gate) / (len(_GATE_INDEX) - 1) if gate in _GATE_INDEX else 1.0
+
+
+@dataclass
+class _Journey:
+    """Per-agent mutable state; the action log we build the AgentTrace from."""
+
+    run_id: str
+    agent_id: str
+    name: str
+    archetype: PersonaId
+    listing: ListingConfig
+    emit: EmitFn
+    _start: float = field(default_factory=time.monotonic)
+    current_gate: GateStage | None = None
+    outcome: str | None = None  # None until the agent buys/bails
     bail_stage: GateStage | None = None
     objection: str | None = None
-    stages_seen: list[GateStage] = Field(default_factory=list)
+    _traces: list[StageTrace] = field(default_factory=list)
+
+    def elapsed(self) -> float:
+        return round(time.monotonic() - self._start, 2)
+
+    def record(self, gate: GateStage, screenshot_url: str | None) -> None:
+        self.current_gate = gate
+        self._traces.append(StageTrace(stage=gate, time_s=self.elapsed(), screenshot_url=screenshot_url))
+
+    def trace(self) -> AgentTrace:
+        outcome = self.outcome or "bailed"
+        return AgentTrace(
+            agent_id=self.agent_id,
+            name=self.name,
+            archetype=self.archetype,
+            outcome=outcome,  # type: ignore[arg-type]
+            bail_stage=self.bail_stage if outcome == "bailed" else None,
+            objection=self.objection if outcome == "bailed" else None,
+            retention_time_s=self.elapsed(),
+            stage_trace=list(self._traces) or [StageTrace(stage="land", time_s=self.elapsed())],
+        )
 
 
 class BrowserUseAgenticDriver:
-    """Optional real-mode adapter for Browser Use Agent runs.
+    """Real-mode ``AgenticJourneyDriver``: one autonomous browser-use agent per call."""
 
-    This file intentionally imports browser-use lazily inside `__init__` so H4's
-    deterministic mock runner, tests, and fixtures do not require Chromium or a
-    Browser Use API key.
-    """
-
-    def __init__(self, browser: object | None = None, llm: object | None = None, max_steps: int = 30) -> None:
-        try:
-            from browser_use import Browser, ChatBrowserUse
-        except ModuleNotFoundError as exc:
-            raise RuntimeError("Install browser-use to use BrowserUseAgenticDriver") from exc
-
-        self._agent_cls = self._load_agent()
-        self.browser = browser or Browser()
-        self.llm = llm or ChatBrowserUse()
+    def __init__(
+        self,
+        listing: ListingConfig,
+        *,
+        model: str = "gpt-4o",
+        max_steps: int = 15,
+        headless: bool = True,
+        base_url: str | None = None,
+    ) -> None:
+        self.listing = listing
+        self.model = model
         self.max_steps = max_steps
+        self.headless = headless
+        # The runner passes the listing *slug* (run.listing.id), not a URL, so we
+        # build the page URL from a configurable base. Default points at H3's local
+        # stub server; swap to H2's dev server via LISTING_BASE_URL (one-line swap).
+        self.base_url = (base_url or os.environ.get("LISTING_BASE_URL", "http://localhost:8080")).rstrip("/")
 
-    @staticmethod
-    def _load_agent() -> type:
-        from browser_use import Agent
-
-        return Agent
-
+    # ---- the seam the runner calls (emit-aware -> streams live) -----------------
     async def run_journey(
         self,
+        *,
         listing_url: str,
         agent_id: str,
         name: str,
         archetype: PersonaId,
         listing: ListingConfig,
         seed: int,
+        run_id: str,
+        emit: EmitFn,
     ) -> AgentTrace:
-        persona = PERSONAS[archetype]
-        task = self._task(listing_url, name, persona.display, persona.blurb, listing)
-        start = time.monotonic()
-        agent = self._agent_cls(
-            task=task,
-            llm=self.llm,
-            browser=self.browser,
-            output_model_schema=BrowserUseShopperOutput,
-            use_vision="auto",
-            max_failures=2,
-        )
-        history = await agent.run(max_steps=self.max_steps)
-        duration = round(time.monotonic() - start, 2)
-        structured = getattr(history, "structured_output", None)
-        output = structured if isinstance(structured, BrowserUseShopperOutput) else self._fallback_output(history)
-        screenshot_paths = self._screenshot_paths(history)
-        stages = output.stages_seen or (GATE_ORDER if output.outcome == "bought" else ["land", output.bail_stage or "checkout"])
-        stage_trace = [
-            StageTrace(
-                stage=stage,
-                time_s=round((index + 1) * duration / max(len(stages), 1), 2),
-                screenshot_url=screenshot_paths[min(index, len(screenshot_paths) - 1)] if screenshot_paths else None,
+        url = f"{self.base_url}/?listing={listing_url}"
+        ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit)
+
+        # land: emitted before the browser navigates, so no thumbnail yet (the first
+        # real thumbnail lands at the photos gate).
+        ctx.record("land", None)
+        await emit(StageEnterEvent(run_id=run_id, ts=_now_ms(), agent_id=agent_id, stage="land"))
+
+        browser = self._make_browser()
+        try:
+            tools = self._build_tools(ctx)
+            agent = self._make_agent(name, archetype, listing, url, tools, browser)
+            try:
+                await agent.run(max_steps=self.max_steps)
+            except Exception as exc:  # agent crash -> degrade to a clean bail
+                if ctx.outcome is None:
+                    await self._bail(ctx, ctx.current_gate or "land", f"(agent stopped) {str(exc)[:160]}")
+            if ctx.outcome is None:  # ran out of steps without deciding
+                await self._bail(ctx, ctx.current_gate or "land", "Browsed but never committed to buying.")
+            return ctx.trace()
+        finally:
+            await self._close(browser)
+
+    # ---- custom action registry (the constrained funnel vocabulary) ------------
+    def _build_tools(self, ctx: _Journey):
+        # NOTE: `browser_session` is injected by NAME by browser-use's Tools registry;
+        # it must be left UNANNOTATED (annotating it raises a type-conflict error).
+        from browser_use import ActionResult, Tools
+
+        tools = Tools()
+
+        async def gate(browser_session, name: GateStage):
+            if ctx.outcome is not None:
+                return ActionResult(extracted_content="Already finished.", is_done=True)
+            reached = await self._click(browser_session, GATE_ACTION[name])
+            if not reached:
+                await self._bail(ctx, name, f"Couldn't reach the {name} section — the page didn't respond.")
+                return ActionResult(extracted_content=f"{name} unavailable; left the listing.", is_done=True, success=False)
+            url = await self._capture(ctx, browser_session, name)
+            await self._enter(ctx, name, url)
+            return ActionResult(extracted_content=self._gate_summary(name, ctx.listing))
+
+        @tools.action(description="Scroll and study the product photo gallery.")
+        async def look_at_photos(browser_session):  # noqa: ANN001
+            return await gate(browser_session, "photos")
+
+        @tools.action(description="Open and read the customer ratings and reviews.")
+        async def read_reviews(browser_session):  # noqa: ANN001
+            return await gate(browser_session, "reviews")
+
+        @tools.action(description="Check the price and pick a variant.")
+        async def check_price(browser_session):  # noqa: ANN001
+            return await gate(browser_session, "price")
+
+        @tools.action(description="Add the item to the shopping cart.")
+        async def add_to_cart(browser_session):  # noqa: ANN001
+            return await gate(browser_session, "cart")
+
+        @tools.action(description="Proceed to the checkout page.")
+        async def checkout(browser_session):  # noqa: ANN001
+            return await gate(browser_session, "checkout")
+
+        @tools.action(description="Confirm and place the order. Only call this if you genuinely decide to buy.")
+        async def confirm_purchase(browser_session):  # noqa: ANN001
+            if ctx.outcome is not None:
+                return ActionResult(extracted_content="Already finished.", is_done=True)
+            await self._click(browser_session, CONFIRM_ACTION)
+            await self._capture(ctx, browser_session, "checkout")
+            ctx.outcome = "bought"
+            await ctx.emit(AgentBoughtEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, retention_time_s=ctx.elapsed()))
+            return ActionResult(extracted_content="Order confirmed — purchased.", is_done=True, success=True)
+
+        @tools.action(description="Leave the listing without buying. Give your exact in-character objection.")
+        async def bail(browser_session, objection: str):  # noqa: ANN001
+            await self._capture(ctx, browser_session, ctx.current_gate or "land")
+            await self._bail(ctx, ctx.current_gate or "land", objection)
+            return ActionResult(extracted_content=f"Left without buying: {objection}", is_done=True, success=True)
+
+        return tools
+
+    # ---- live emission helpers -------------------------------------------------
+    async def _enter(self, ctx: _Journey, gate: GateStage, thumbnail_url: str | None) -> None:
+        ctx.record(gate, thumbnail_url)
+        await ctx.emit(StageEnterEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, thumbnail_url=thumbnail_url))
+        if thumbnail_url:
+            await ctx.emit(
+                BrowserFrameEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, thumbnail_url=thumbnail_url, scroll_pct=_scroll_pct(gate))
             )
-            for index, stage in enumerate(stages)
-        ]
-        return AgentTrace(
-            agent_id=agent_id,
-            name=name,
-            archetype=archetype,
-            outcome=output.outcome,
-            bail_stage=output.bail_stage if output.outcome == "bailed" else None,
-            objection=output.objection,
-            retention_time_s=duration,
-            stage_trace=stage_trace,
+
+    async def _bail(self, ctx: _Journey, gate: GateStage, objection: str) -> None:
+        if ctx.outcome is not None:
+            return
+        ctx.outcome, ctx.bail_stage, ctx.objection = "bailed", gate, objection
+        await ctx.emit(ObjectionEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, text=objection))
+        await ctx.emit(AgentBailedEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, objection=objection, retention_time_s=ctx.elapsed()))
+
+    # ---- prompt assembly (reuses H4's PERSONAS) --------------------------------
+    def _make_agent(self, name: str, archetype: PersonaId, listing: ListingConfig, url: str, tools, browser):
+        from browser_use import Agent, ChatOpenAI
+
+        return Agent(task=self._task(name, archetype, listing, url), llm=ChatOpenAI(model=self.model), tools=tools, browser=browser)
+
+    def _task(self, name: str, archetype: PersonaId, listing: ListingConfig, url: str) -> str:
+        persona = PERSONAS[archetype]
+        examples = "; ".join(self._objection_examples(archetype))
+        return (
+            f"You are {name}, a {persona.display} shopper in Singapore ({persona.tag}).\n"
+            f"{persona.blurb}\n\n"
+            f"Shop this Shopee listing. Start by opening it: {url}\n\n"
+            f"What you can see about the listing:\n{self._facts(listing)}\n\n"
+            "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
+            "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
+            "  confirm_purchase — only if you genuinely decide to buy.\n"
+            "  bail — the moment something puts you off; state your exact objection in character.\n\n"
+            f"Stay fully in character. If you bail, phrase it like these Singlish lines: {examples}\n"
+            f"Decide the way {persona.display} really would for THIS listing."
         )
 
     @staticmethod
-    def _fallback_output(history: object) -> BrowserUseShopperOutput:
-        final_result = ""
-        if hasattr(history, "final_result"):
-            final_result = str(history.final_result() or "")
-        lower = final_result.lower()
-        outcome = "bought" if "bought" in lower or "purchase" in lower or "checkout complete" in lower else "bailed"
-        return BrowserUseShopperOutput(
-            outcome=outcome,
-            bail_stage=None if outcome == "bought" else "checkout",
-            objection=None if outcome == "bought" else final_result[:240] or "Browser Use agent did not return a clear objection.",
-            stages_seen=list(GATE_ORDER) if outcome == "bought" else ["land", "photos", "reviews", "price", "cart", "checkout"],
+    def _objection_examples(archetype: PersonaId) -> list[str]:
+        out: list[str] = []
+        for value in PERSONAS[archetype].objections.values():
+            # agents.py mixes tuples and the occasional bare string — handle both.
+            out.extend(value if isinstance(value, tuple) else (value,))
+        return out[:8]
+
+    @staticmethod
+    def _facts(listing: ListingConfig) -> str:
+        lifestyle = sum(1 for p in listing.photos if p.type == "lifestyle")
+        closeup = sum(1 for p in listing.photos if p.type == "closeup")
+        a = listing.authenticity
+        return (
+            f"- Price: S${listing.price:.2f} (usual S${listing.base_price:.2f}); shipping S${listing.shipping.fee:.2f}\n"
+            f"- Photos: {len(listing.photos)} ({lifestyle} lifestyle, {closeup} close-up)\n"
+            f"- Rating: {listing.rating.score}/5 from {listing.rating.count} reviews\n"
+            f"- Seller: {listing.seller.name}, verified={listing.seller.verified}, replies to {listing.seller.response_rate:.0f}% of reviews\n"
+            f"- Authenticity proof: certificate={a.certificate}, serial={a.serial}, unboxing={a.unboxing}"
         )
 
     @staticmethod
-    def _screenshot_paths(history: object) -> list[str]:
-        if hasattr(history, "screenshot_paths"):
-            return [path for path in history.screenshot_paths() if path]
-        return []
+    def _gate_summary(gate: GateStage, listing: ListingConfig) -> str:
+        a = listing.authenticity
+        total = listing.price + listing.shipping.fee
+        if gate == "photos":
+            lifestyle = sum(1 for p in listing.photos if p.type == "lifestyle")
+            closeup = sum(1 for p in listing.photos if p.type == "closeup")
+            return f"Photos: {len(listing.photos)} total, {lifestyle} lifestyle, {closeup} close-up."
+        if gate == "reviews":
+            return f"Rating {listing.rating.score}/5 from {listing.rating.count}; seller replies to {listing.seller.response_rate:.0f}%."
+        if gate == "price":
+            return f"Price S${listing.price:.2f} (usual S${listing.base_price:.2f}), + shipping S${listing.shipping.fee:.2f}."
+        if gate == "cart":
+            return f"In cart: S${listing.price:.2f} + S${listing.shipping.fee:.2f} shipping = S${total:.2f}."
+        return f"Checkout total ~S${total:.2f}. Authenticity proof: cert={a.certificate}, serial={a.serial}, unboxing={a.unboxing}."
+
+    # ---- browser-use runtime touchpoints (isolated; see VERIFY in module docstring)
+    def _make_browser(self):
+        from browser_use import Browser
+
+        return Browser(headless=self.headless)
+
+    async def _click(self, browser_session, action: str) -> bool:
+        selector = f'[data-action="{action}"]'
+        try:
+            page = await browser_session.must_get_current_page()
+            elements = await page.get_elements_by_css_selector(selector)
+            if not elements:
+                return False
+            await elements[0].click()
+            await asyncio.sleep(0.4)  # let the page settle before screenshotting
+            return True
+        except Exception:
+            return False
+
+    async def _capture(self, ctx: _Journey, browser_session, gate: GateStage) -> str | None:
+        try:
+            raw = await self._screenshot_bytes(browser_session)
+            if not raw:
+                return None
+            # Offload the Pillow resize/write so it never blocks the agent loop.
+            return await asyncio.to_thread(save_thumbnail, raw, ctx.agent_id, gate)
+        except Exception:
+            return None
+
+    async def _screenshot_bytes(self, browser_session) -> bytes | None:
+        if hasattr(browser_session, "take_screenshot"):
+            return self._decode(await browser_session.take_screenshot())
+        page = await browser_session.must_get_current_page()
+        if hasattr(page, "screenshot"):
+            return self._decode(await page.screenshot())
+        return None
 
     @staticmethod
-    def _task(listing_url: str, name: str, persona: str, blurb: str, listing: ListingConfig) -> str:
-        return f"""
-You are {name}, a {persona} Singapore shopper.
-{blurb}
+    def _decode(data) -> bytes | None:
+        if data is None:
+            return None
+        if isinstance(data, (bytes, bytearray)):
+            return bytes(data)
+        if isinstance(data, str):
+            try:
+                return base64.b64decode(data)
+            except (binascii.Error, ValueError):
+                return None
+        return None
 
-Browse this local Shopee-style listing: {listing_url}
-Listing context: {listing.title}, seller {listing.seller.name}, price S${listing.price:.2f}, shipping S${listing.shipping.fee:.2f}.
-
-Move through these shopping stages in order when possible:
-land, photos, reviews, price, cart, checkout.
-
-At the end, return structured output only:
-- outcome: "bought" or "bailed"
-- bail_stage: one of land/photos/reviews/price/cart/checkout, or null if bought
-- objection: exact in-character objection if bailed
-- stages_seen: stages you actually reached
-"""
-
+    async def _close(self, browser) -> None:
+        for name in ("kill", "stop", "close"):
+            fn = getattr(browser, name, None)
+            if fn is None:
+                continue
+            try:
+                result = fn()
+                if asyncio.iscoroutine(result):
+                    await result
+                return
+            except Exception:
+                continue

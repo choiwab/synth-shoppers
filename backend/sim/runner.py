@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import random
 import time
 import uuid
@@ -165,6 +166,22 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
     async def run_agent(agent: AgentProfile) -> AgentTrace:
         async with semaphore:
             if hasattr(driver, "run_journey"):
+                accepts_emit = "emit" in inspect.signature(driver.run_journey).parameters  # type: ignore[attr-defined]
+                if accepts_emit:
+                    # H3 real driver streams events live (stage_enter+browser_frame+
+                    # objection+agent_bailed/bought) from inside its custom actions,
+                    # so the runner does not replay them post-hoc.
+                    return await driver.run_journey(  # type: ignore[attr-defined]
+                        listing_url=run.listing.id,
+                        agent_id=agent.agent_id,
+                        name=agent.name,
+                        archetype=agent.archetype,
+                        listing=run.listing,
+                        seed=run.seed,
+                        run_id=run.run_id,
+                        emit=run.emit,
+                    )
+                # Legacy return-only drivers: replay the trace as events post-hoc.
                 trace = await driver.run_journey(  # type: ignore[attr-defined]
                     listing_url=run.listing.id,
                     agent_id=agent.agent_id,

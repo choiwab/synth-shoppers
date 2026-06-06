@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Awaitable, Callable, Protocol
 
 from contracts import AgentTrace, GateStage, ListingConfig, PersonaId
 
@@ -26,6 +26,13 @@ class BrowserDriver(Protocol):
 
 
 class AgenticJourneyDriver(Protocol):
+    """High-level per-agent seam: the runner calls ``run_journey`` once per agent.
+
+    If ``run_journey`` also accepts ``emit`` (and ``run_id``), the runner passes
+    them and the driver streams ``AgentEvent``s LIVE from inside its run (H3's real
+    driver). Otherwise the runner replays the returned trace post-hoc (legacy).
+    """
+
     async def run_journey(
         self,
         listing_url: str,
@@ -34,6 +41,8 @@ class AgenticJourneyDriver(Protocol):
         archetype: PersonaId,
         listing: ListingConfig,
         seed: int,
+        run_id: str = ...,
+        emit: Callable[[object], Awaitable[None]] | None = ...,
     ) -> AgentTrace: ...
 
 

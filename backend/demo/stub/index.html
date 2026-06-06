@@ -1,0 +1,97 @@
+<!doctype html>
+<!--
+  H3 throwaway dev stub for the Shopee listing. Carries the OVERVIEW §5.6 selector
+  contract (data-gate / data-action / data-field) so browser-use can navigate
+  deterministically. Deliberately "deck-stacked" (price above usual, unverified
+  seller, 0 lifestyle/closeup photos, thin reviews, no authenticity proof) so the
+  autonomous agents have real reasons to bail at photos / reviews / price /
+  checkout. Swaps for H2's real page via LISTING_BASE_URL with no driver change.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CozyKnit Ribbed Beanie — Shopee SG (stub)</title>
+  <style>
+    :root { --ee: #ee4d2d; --ink: #222; --mut: #777; --line: #eee; --warn: #d0021b; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, "Segoe UI", Roboto, sans-serif; margin: 0; color: var(--ink); background: #f5f5f5; }
+    header { background: var(--ee); color: #fff; padding: 10px 18px; font-weight: 700; position: sticky; top: 0; }
+    main { max-width: 720px; margin: 0 auto; background: #fff; }
+    section { padding: 22px 20px; border-bottom: 10px solid #f5f5f5; min-height: 70vh; }
+    h2 { margin: 0 0 12px; font-size: 15px; color: var(--mut); text-transform: uppercase; letter-spacing: .04em; }
+    .title { font-size: 22px; font-weight: 700; margin: 6px 0 10px; }
+    .price { font-size: 30px; color: var(--ee); font-weight: 800; }
+    .strike { color: var(--mut); text-decoration: line-through; font-size: 16px; margin-left: 8px; }
+    .row { display: flex; gap: 8px; align-items: center; color: var(--mut); font-size: 14px; margin: 6px 0; }
+    .gallery { display: flex; gap: 8px; }
+    .gallery div { width: 120px; height: 120px; background: linear-gradient(135deg,#ddd,#bbb); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #888; font-size: 12px; }
+    button { background: var(--ee); color: #fff; border: 0; padding: 12px 18px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button.ghost { background: #fff; color: var(--ee); border: 1px solid var(--ee); }
+    .review { border-top: 1px solid var(--line); padding: 10px 0; font-size: 14px; }
+    .warn { color: var(--warn); font-weight: 600; }
+    .pill { display: inline-block; background: #fdecec; color: var(--warn); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+  </style>
+</head>
+<body data-listing-id="matin_kim_beanie_sg">
+  <header>Shopee SG · listing stub</header>
+  <main>
+    <section data-gate="land">
+      <h2>Listing</h2>
+      <div class="title" data-field="title">CozyKnit Ribbed Merino Beanie — Unisex, 8 Colours</div>
+      <div class="row">Sold by <strong data-field="seller-name">Seoul Street SG</strong> · <span class="pill">not verified</span></div>
+      <div class="row">★ <span data-field="rating">4.3</span> · <span data-field="review-count">18</span> ratings</div>
+      <div class="price">S$<span data-field="price">36.90</span><span class="strike">S$29.90</span></div>
+      <p class="row">Korean-style ribbed beanie. Soft knit, unisex fit. Limited ready stock in Singapore.</p>
+      <button data-action="scroll-gallery">See photos</button>
+    </section>
+
+    <section data-gate="photos">
+      <h2>Photos</h2>
+      <div class="gallery">
+        <div>product</div><div>product</div><div>product</div>
+      </div>
+      <p class="row warn">3 plain product shots · no lifestyle / on-model / close-up photos.</p>
+      <button class="ghost" data-action="open-reviews">Read reviews</button>
+    </section>
+
+    <section data-gate="reviews">
+      <h2>Reviews</h2>
+      <div class="review">★★★★☆ buyer123 — “Looks okay but delivery took a bit long.”</div>
+      <div class="review">★★★★★ sgfashion — “Cute beanie, but photos don't show fit clearly.”</div>
+      <p class="row warn">Seller replies to only 42% of reviews · brand not well known.</p>
+      <button class="ghost" data-action="select-variant">Check price &amp; colour</button>
+    </section>
+
+    <section data-gate="price">
+      <h2>Price &amp; variant</h2>
+      <div class="price">S$<span>36.90</span><span class="strike">S$29.90</span></div>
+      <p class="row warn">S$7 above the usual price · +S$3.50 shipping (total S$40.40).</p>
+      <div class="row">Colour: <button class="ghost" data-action="select-variant">Black</button> Grey · Cream · Navy</div>
+      <button data-action="add-to-cart">Add to cart</button>
+    </section>
+
+    <section data-gate="cart">
+      <h2>Cart</h2>
+      <div class="row">CozyKnit Ribbed Beanie × 1 — S$36.90</div>
+      <div class="row">Shipping — S$3.50</div>
+      <div class="row"><strong>Total — S$40.40</strong></div>
+      <button data-action="checkout">Checkout</button>
+    </section>
+
+    <section data-gate="checkout">
+      <h2>Checkout</h2>
+      <div class="row">Pay S$40.40 · ships in 3–5 days</div>
+      <p class="row warn">No authenticity certificate, serial, or unboxing proof shown.</p>
+      <button data-action="confirm-order">Confirm order</button>
+    </section>
+  </main>
+  <script>
+    // Make each action scroll the next gate into view + flash, so per-gate
+    // screenshots visibly differ. The agent's decision still comes from the LLM.
+    function go(sel){ const el=document.querySelector(sel); if(el){ el.scrollIntoView({behavior:'instant',block:'start'}); el.style.outline='3px solid #ee4d2d'; setTimeout(()=>el.style.outline='',600);} }
+    const map={ 'scroll-gallery':'[data-gate="photos"]','open-reviews':'[data-gate="reviews"]','select-variant':'[data-gate="price"]','add-to-cart':'[data-gate="cart"]','checkout':'[data-gate="checkout"]','confirm-order':'[data-gate="checkout"]' };
+    document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>go(map[b.getAttribute('data-action')])));
+  </script>
+</body>
+</html>
