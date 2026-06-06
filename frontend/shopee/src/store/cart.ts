@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { scopedStorageKey } from '@/shopee/simSession'
 
 export interface CartItem {
   listingId: string
@@ -65,7 +66,7 @@ export const useCart = create<CartState>()(
         set((state) => ({ items: state.items.map((i) => ({ ...i, selected })) })),
       clear: () => set({ items: [] }),
     }),
-    { name: 'shopee-cart' },
+    { name: scopedStorageKey('shopee-cart') },
   ),
 )
 

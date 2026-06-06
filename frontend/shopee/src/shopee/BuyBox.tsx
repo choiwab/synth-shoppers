@@ -4,6 +4,7 @@ import { Minus, Plus, ShoppingCart, Truck, ShieldCheck, Tag } from 'lucide-react
 import type { ListingConfig } from '@/types/contracts'
 import { VariantPicker } from './VariantPicker'
 import { emitFunnelAction } from '@/shopee/funnel'
+import { withSimSession } from '@/shopee/simSession'
 import { useCart } from '@/store/cart'
 import { useToast } from '@/store/toast'
 import { Button } from '@/components/ui/button'
@@ -51,7 +52,7 @@ export function BuyBox({ config }: BuyBoxProps) {
 
   function buyNow() {
     addToCart()
-    navigate('/cart')
+    navigate(withSimSession('/cart'))
   }
 
   return (

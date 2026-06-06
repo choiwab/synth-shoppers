@@ -1,17 +1,18 @@
 import { memo } from "react";
 import clsx from "clsx";
 import { ARCHETYPE_HUE, GATE_LABELS } from "@/types/contracts";
-import { archetypeInitials, archetypeTag } from "@/lib/archetype";
+import { archetypeTag } from "@/lib/archetype";
 import { resolveAssetUrl } from "@/lib/assetUrl";
 import type { AgentState } from "@/store/simStore";
+import { ShopeeMonitorFrame } from "./ShopeeMonitorFrame";
 
 interface Props {
   agent: AgentState;
 }
 
 /**
- * One preview tile. Thumbnail mode when H3 supplies a frame; otherwise the
- * first-class fallback (avatar + name + stage + last action). Never blank.
+ * One preview tile. Thumbnail mode when H3 supplies a frame; otherwise render
+ * the Shopee interface each agent will browse. Never blank.
  * Memoized on the fields that affect render (PRD 01 §4.2 performance note).
  */
 function AgentTileBase({ agent }: Props) {
@@ -37,9 +38,8 @@ function AgentTileBase({ agent }: Props) {
         />
       ) : (
         <div className="tile-fallback">
-          <div className="tile-avatar">{archetypeInitials(agent.archetype)}</div>
-          <div className="tile-stage-label">{stageLabel}</div>
-          {agent.lastAction && <div className="tile-action">{agent.lastAction}</div>}
+          <ShopeeMonitorFrame agentId={agent.agent_id} persona={agent.archetype} label={stageLabel} />
+          {agent.lastAction && <div className="tile-action floating">{agent.lastAction}</div>}
         </div>
       )}
 

@@ -4,6 +4,7 @@ import type { ListingConfig } from '@/types/contracts'
 import { ProductImage } from './ProductImage'
 import { StarRating } from './StarRating'
 import { soldCount, sellerLocation, discountPct, MATINKIM_ID } from '@/shopee/config/loadConfig'
+import { withSimSession } from '@/shopee/simSession'
 import { sgd, compact, cn } from '@/lib/utils'
 
 interface ProductCardProps {
@@ -21,7 +22,7 @@ export function ProductCard({ config, highlightTarget = false }: ProductCardProp
 
   return (
     <Link
-      to={`/shopee/${config.id}`}
+      to={withSimSession(`/shopee/${config.id}`)}
       className={cn(
         'group relative flex flex-col overflow-hidden border border-transparent bg-white transition hover:-translate-y-px hover:border-shopee hover:shadow-md',
         highlightTarget && isTarget && 'ring-2 ring-shopee',

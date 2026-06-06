@@ -6,6 +6,7 @@ import { useDemoAction } from '@/lib/demoAction'
 import { Button } from '@/components/ui/button'
 import { useCart, lineKey, type CartItem } from '@/store/cart'
 import { emitFunnelAction } from '@/shopee/funnel'
+import { scopedStorageKey, withSimSession } from '@/shopee/simSession'
 import { sgd, cn } from '@/lib/utils'
 
 const SHIPPING_FEE = 1.99
@@ -35,17 +36,17 @@ export function CheckoutFlow() {
     emitFunnelAction('confirm_purchase', 'bought', target.listingId)
     const orderNo = makeOrderNo()
     try {
-      sessionStorage.setItem('shopee-last-order', JSON.stringify({ orderNo, total: orderTotal, itemCount }))
+      sessionStorage.setItem(scopedStorageKey('shopee-last-order'), JSON.stringify({ orderNo, total: orderTotal, itemCount }))
     } catch {
       /* ignore */
     }
     ordered.forEach((i) => removeItem(lineKey(i)))
-    navigate('/order-confirmed')
+    navigate(withSimSession('/order-confirmed'))
   }
 
   return (
     <div data-gate="checkout" className="mx-auto w-full max-w-[1000px] space-y-3 px-4 py-4">
-      <Link to="/cart" className="inline-flex items-center gap-1 text-sm text-ink-soft hover:text-shopee">
+      <Link to={withSimSession('/cart')} className="inline-flex items-center gap-1 text-sm text-ink-soft hover:text-shopee">
         <ArrowLeft size={15} /> Back to Cart
       </Link>
 

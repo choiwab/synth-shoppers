@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { soldCount } from '@/shopee/config/loadConfig'
 import { useCart, selectCount } from '@/store/cart'
 import { emitFunnelAction } from '@/shopee/funnel'
+import { withSimSession } from '@/shopee/simSession'
 import { compact } from '@/lib/utils'
 
 interface ShopeePageProps {
@@ -36,13 +37,13 @@ export function ShopeePage({ config }: ShopeePageProps) {
     >
       {/* breadcrumb */}
       <nav className="mb-3 flex flex-wrap items-center gap-1 text-xs text-ink-soft" aria-label="Breadcrumb">
-        <Link to="/" className="hover:text-shopee">
+        <Link to={withSimSession('/')} className="hover:text-shopee">
           Shopee
         </Link>
         {config.category.map((c) => (
           <span key={c} className="flex items-center gap-1">
             <ChevronRight size={12} />
-            <Link to={`/search?keyword=${encodeURIComponent(c)}`} className="hover:text-shopee">
+            <Link to={withSimSession(`/search?keyword=${encodeURIComponent(c)}`)} className="hover:text-shopee">
               {c}
             </Link>
           </span>
@@ -127,7 +128,7 @@ function ProductCheckoutBar({ listingId }: { listingId: string }) {
 
   function checkout() {
     emitFunnelAction('checkout', 'checkout', listingId)
-    navigate('/checkout')
+    navigate(withSimSession('/checkout'))
   }
 
   return (
@@ -135,7 +136,7 @@ function ProductCheckoutBar({ listingId }: { listingId: string }) {
       <ShoppingCart size={18} className="text-shopee" />
       <span className="text-sm text-ink">{count} item(s) in your cart</span>
       <Link
-        to="/cart"
+        to={withSimSession('/cart')}
         className="ml-auto rounded-sm border border-shopee px-4 py-2 text-sm text-shopee hover:bg-shopee-light/50"
       >
         View Cart

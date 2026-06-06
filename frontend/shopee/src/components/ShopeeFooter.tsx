@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useDemoAction } from '@/lib/demoAction'
+import { withSimSession } from '@/shopee/simSession'
 
 const FOOTER_ROUTES: Record<string, string> = {
   'Flash Deals': '/',
@@ -28,7 +29,7 @@ export function ShopeeFooter() {
               {col.links.map((l) => (
                 <li key={l}>
                   <button
-                    onClick={() => (FOOTER_ROUTES[l] ? navigate(FOOTER_ROUTES[l]) : demo(l))}
+                    onClick={() => (FOOTER_ROUTES[l] ? navigate(withSimSession(FOOTER_ROUTES[l])) : demo(l))}
                     className="hover:text-shopee"
                   >
                     {l}
