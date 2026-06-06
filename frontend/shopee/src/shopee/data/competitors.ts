@@ -76,6 +76,11 @@ const BRANDED: ListingConfig[] = [
     respRate: 98,
     images: ['supreme.jpg'],
     category: ['Men Clothes', 'Hats & Caps', 'Beanies'],
+    reviews: [
+      { author: 'boxlogo***', rating: 5, text: 'Authentic, came with tags and receipt. Embroidery is clean.', date: '2026-05-19' },
+      { author: 'streetwearsg', rating: 4, text: 'Premium but pricey. Bought for the brand more than warmth.', date: '2026-05-04' },
+      { author: 'capcollector', rating: 5, text: 'Looks legit and holds shape after washing.', date: '2026-04-22' },
+    ],
   }),
   mk({
     id: 'carhartt-watch-beanie',
@@ -90,6 +95,11 @@ const BRANDED: ListingConfig[] = [
     respRate: 97,
     images: ['carhartt.jpg'],
     category: ['Men Clothes', 'Hats & Caps', 'Beanies'],
+    reviews: [
+      { author: 'workwearfan', rating: 5, text: 'Thick acrylic, authentic label, no itch. Better value than most fashion beanies.', date: '2026-05-16' },
+      { author: 'sg_commuter', rating: 5, text: 'Fast delivery and warm enough for travel. Carhartt logo is subtle.', date: '2026-04-30' },
+      { author: 'min***', rating: 4, text: 'Black colour easy to match, but fit is tighter than Korean styles.', date: '2026-04-11' },
+    ],
   }),
   mk({
     id: 'stussy-stock-cuff-beanie',
@@ -104,6 +114,11 @@ const BRANDED: ListingConfig[] = [
     respRate: 96,
     images: ['stussy.jpg'],
     category: ['Men Clothes', 'Hats & Caps', 'Beanies'],
+    reviews: [
+      { author: 'hypegirl', rating: 5, text: 'Embroidery looks clean and the cream colour photographs well.', date: '2026-05-12' },
+      { author: 'skaterkid', rating: 4, text: 'Legit Stussy, but material is thinner than expected.', date: '2026-04-26' },
+      { author: 'ootd_sg', rating: 5, text: 'More streetwear vibe than basic beanies. Got compliments.', date: '2026-04-03' },
+    ],
   }),
   mk({
     id: 'straykids-loverboy-beanie',
@@ -132,6 +147,11 @@ const BRANDED: ListingConfig[] = [
     respRate: 94,
     images: ['chaewon.jpg'],
     category: ['Hobbies & Collections', 'K-Pop Merch', 'Beanies'],
+    reviews: [
+      { author: 'fearnot***', rating: 5, text: 'Official MD packaging, very cute for photos. Worth it for fans.', date: '2026-05-13' },
+      { author: 'chaewonbias', rating: 5, text: 'Fluffy and trendy, but white needs careful washing.', date: '2026-04-21' },
+      { author: 'kpopcart', rating: 4, text: 'Looks exactly like the listing. Delivery took a bit long.', date: '2026-04-02' },
+    ],
   }),
   mk({
     id: 'chrome-cross-beanie',
@@ -193,6 +213,7 @@ const CHEAP: ListingConfig[] = [
     reviews: [
       { author: 'value***hunter', rating: 5, text: 'Cheap and does the job. Cannot complain at this price.', date: '2026-04-08' },
       { author: 'mrs_tan', rating: 3, text: 'A bit thin and itchy leh. Ok for the price lor.', date: '2026-03-11' },
+      { author: 'deal_chaser', rating: 4, text: 'Colour is accurate, but no brand tag. Good spare beanie only.', date: '2026-02-28' },
     ],
   }),
   mk({
@@ -206,6 +227,11 @@ const CHEAP: ListingConfig[] = [
     count: 2103,
     respRate: 80,
     images: ['navy.jpg'],
+    reviews: [
+      { author: 'coldoffice', rating: 4, text: 'Warmer than the $3 ones and not too scratchy.', date: '2026-04-15' },
+      { author: 'budgettravels', rating: 5, text: 'Good value for winter trip. Wool blend feels thicker.', date: '2026-03-24' },
+      { author: 'lim***', rating: 3, text: 'Shape is okay but shipping took longer than stated.', date: '2026-03-03' },
+    ],
   }),
   mk({
     id: 'korean-solid-knit-beanie',

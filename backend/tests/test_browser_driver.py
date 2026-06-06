@@ -7,8 +7,9 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from contracts import AgentBoughtEvent, AgentTrace, CrowdConfig, ListingConfig, StageEnterEvent, StageTrace
+from contracts import AgentBoughtEvent, AgentTrace, CompetitorAnalysisEvent, CrowdConfig, ListingConfig, StageEnterEvent, StageTrace
 from sim.browser_use_driver import BrowserUseAgenticDriver, _Journey, _clean_reason, _clean_sentiment
+from sim.competitors import analyze_competitor
 from sim.runner import RunState, build_cohort, run_simulation
 from sim.screenshots import THUMB_SIZE, save_thumbnail, thumbnail_paths
 
@@ -94,6 +95,54 @@ def test_search_url_starts_agents_from_matin_kim_results() -> None:
     assert "agent_id=budget_1" in url
     assert "run_id=run_abc" in url
     assert "persona=budget" in url
+
+
+def test_competitor_analysis_uses_review_comments_and_persona_lens() -> None:
+    analysis = analyze_competitor(
+        "budget",
+        {"id": "basic-acrylic-beanie", "name": "Plain Solid Colour Knitted Beanie"},
+        {
+            "seller": "sgmega.deals",
+            "verified": "Unverified",
+            "price": "S$3.50",
+            "rating": "4.3",
+            "review_count": "12k",
+            "comments": [
+                "Cheap and does the job. Cannot complain at this price.",
+                "A bit thin and itchy leh. Ok for the price lor.",
+            ],
+        },
+        target_price=24.9,
+    )
+
+    assert analysis["price"] == 3.5
+    assert analysis["review_count"] == 12000
+    assert "S$21.40 cheaper than Matin Kim" in analysis["strengths"]
+    assert "review comments expose quality or delivery concerns" in analysis["weaknesses"]
+    assert "budget shopper" in analysis["verdict"]
+
+
+def test_competitor_analysis_event_accepts_scraped_summary_payload() -> None:
+    event = CompetitorAnalysisEvent(
+        run_id="run_1",
+        ts=1,
+        agent_id="budget_1",
+        competitor="basic-acrylic-beanie",
+        competitor_name="Plain Solid Colour Knitted Beanie",
+        seller="sgmega.deals",
+        verified=False,
+        price=3.5,
+        rating="4.3",
+        review_count=12000,
+        comments=["Cheap and does the job."],
+        strengths=["S$21.40 cheaper than Matin Kim"],
+        weaknesses=["seller is not verified"],
+        verdict="Tempting for a budget shopper.",
+        thumbnail_url="/static/shots/budget_1/discovery_basic_reviews.jpg?v=1",
+    )
+
+    assert event.type == "competitor_analysis"
+    assert event.comments == ["Cheap and does the job."]
 
 
 def test_objection_examples_handle_bare_string_entries() -> None:

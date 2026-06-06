@@ -47,6 +47,7 @@ from contracts import (
     AgentBailedEvent,
     AgentBoughtEvent,
     AgentThoughtEvent,
+    CompetitorAnalysisEvent,
     AgentTrace,
     BrowserFrameEvent,
     GateStage,
@@ -60,7 +61,7 @@ from contracts import (
     StageTrace,
 )
 from sim.agents import PERSONAS
-from sim.competitors import SEARCH_QUERY, competitors_for_persona
+from sim.competitors import SEARCH_QUERY, analyze_competitor, competitors_for_persona
 from sim.decision import decide, synth_purchase_reason, synth_reaction
 from sim.screenshots import save_thumbnail
 
@@ -277,6 +278,42 @@ class BrowserUseAgenticDriver:
             except Exception:
                 return False
 
+        async def text_all(page, selector: str, limit: int = 4) -> list[str]:  # noqa: ANN001
+            try:
+                return [
+                    text.strip()
+                    for text in (await page.locator(selector).all_inner_texts())[:limit]
+                    if text.strip()
+                ]
+            except Exception:
+                return []
+
+        async def text_one(page, selector: str) -> str | None:  # noqa: ANN001
+            try:
+                loc = page.locator(selector).first
+                if await loc.count() == 0:
+                    return None
+                text = await loc.inner_text(timeout=1500)
+                return text.strip() or None
+            except Exception:
+                return None
+
+        async def scrape_competitor_facts(page) -> dict[str, object]:  # noqa: ANN001
+            return {
+                "title": await text_one(page, '[data-field="title"]'),
+                "seller": await text_one(page, '[data-field="seller-name"]'),
+                "verified": await text_one(page, '[data-field="seller-verified"]'),
+                "price": await text_one(page, '[data-field="price"]'),
+                "base_price": await text_one(page, '[data-field="base-price"]'),
+                "rating": await text_one(page, '[data-field="rating"]'),
+                "review_count": await text_one(page, '[data-field="review-count"]'),
+                "response_rate": await text_one(page, '[data-field="response-rate"]'),
+                "shipping_fee": await text_one(page, '[data-field="shipping-fee"]'),
+                "shipping_days": await text_one(page, '[data-field="shipping-days"]'),
+                "comments": await text_all(page, '[data-field="review-text"]', limit=4),
+                "seller_responses": await text_all(page, '[data-field="seller-response"]', limit=2),
+            }
+
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page(viewport={"width": 1280, "height": 900})
@@ -331,19 +368,52 @@ class BrowserUseAgenticDriver:
                             if await click(page, selector):
                                 await page.wait_for_load_state("domcontentloaded", timeout=5000)
                                 await page.wait_for_timeout(450)
-                                competitor_thumbnail_url = await asyncio.to_thread(
+                                competitor_land_url = await asyncio.to_thread(
                                     save_thumbnail,
                                     await page.screenshot(full_page=False),
                                     ctx.agent_id,
-                                    f'discovery_{competitor["id"]}',
+                                    f'discovery_{competitor["id"]}_land',
                                 )
                                 await ctx.emit(
                                     BrowserFrameEvent(
                                         run_id=ctx.run_id,
                                         ts=_now_ms(),
                                         agent_id=ctx.agent_id,
-                                        thumbnail_url=competitor_thumbnail_url,
+                                        thumbnail_url=competitor_land_url,
                                         scroll_pct=0.08,
+                                    )
+                                )
+                                await click(page, '[data-action="open-reviews"]')
+                                await page.wait_for_timeout(350)
+                                competitor_reviews_url = await asyncio.to_thread(
+                                    save_thumbnail,
+                                    await page.screenshot(full_page=False),
+                                    ctx.agent_id,
+                                    f'discovery_{competitor["id"]}_reviews',
+                                )
+                                await ctx.emit(
+                                    BrowserFrameEvent(
+                                        run_id=ctx.run_id,
+                                        ts=_now_ms(),
+                                        agent_id=ctx.agent_id,
+                                        thumbnail_url=competitor_reviews_url,
+                                        scroll_pct=0.18,
+                                    )
+                                )
+                                facts = await scrape_competitor_facts(page)
+                                analysis = analyze_competitor(
+                                    ctx.archetype,
+                                    competitor,
+                                    facts,
+                                    target_price=ctx.listing.price,
+                                )
+                                analysis["thumbnail_url"] = competitor_reviews_url
+                                await ctx.emit(
+                                    CompetitorAnalysisEvent(
+                                        run_id=ctx.run_id,
+                                        ts=_now_ms(),
+                                        agent_id=ctx.agent_id,
+                                        **analysis,
                                     )
                                 )
                                 await ctx.emit(
@@ -353,7 +423,7 @@ class BrowserUseAgenticDriver:
                                         agent_id=ctx.agent_id,
                                         stage="discovery",
                                         sentiment="neutral",
-                                        comment=f"Checked competitor: {competitor['name']}.",
+                                        comment=str(analysis["verdict"]),
                                     )
                                 )
                                 await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)

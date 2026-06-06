@@ -18,6 +18,7 @@ export function FeaturedAgentView({ agent }: { agent: AgentState }) {
   const hue = ARCHETYPE_HUE[agent.archetype];
   const stageLabel = GATE_LABELS[agent.stage] ?? agent.stage;
   const thumb = resolveAssetUrl(agent.thumbnail_url);
+  const competitorRead = agent.competitorAnalyses?.[0];
   const streamLabel = thumb
     ? "Shopee screenshot"
     : agent.lastAction || agent.latestThought
@@ -63,6 +64,34 @@ export function FeaturedAgentView({ agent }: { agent: AgentState }) {
         {agent.latestGoal && (
           <div className="featured-panel-goal">
             <span>Next:</span> {agent.latestGoal}
+          </div>
+        )}
+        {competitorRead && (
+          <div className="featured-competitor-read">
+            <div className="featured-read-head">
+              <span>Competitor read</span>
+              <strong>{competitorRead.competitor_name}</strong>
+            </div>
+            <div className="featured-read-meta">
+              {competitorRead.price != null && <span>S${competitorRead.price.toFixed(2)}</span>}
+              {competitorRead.rating && <span>{competitorRead.rating}★</span>}
+              {competitorRead.review_count != null && <span>{competitorRead.review_count.toLocaleString()} ratings</span>}
+              {competitorRead.verified ? <span>verified seller</span> : <span>unverified</span>}
+            </div>
+            <div className="featured-read-verdict">{competitorRead.verdict}</div>
+            <div className="featured-read-grid">
+              <div>
+                <span>Pull</span>
+                <p>{competitorRead.strengths[0] ?? "No clear advantage found."}</p>
+              </div>
+              <div>
+                <span>Risk</span>
+                <p>{competitorRead.weaknesses[0] ?? "No clear concern found."}</p>
+              </div>
+            </div>
+            {competitorRead.comments[0] && (
+              <div className="featured-read-comment">“{competitorRead.comments[0]}”</div>
+            )}
           </div>
         )}
       </div>

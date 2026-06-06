@@ -2,7 +2,6 @@ import { useSimStore } from "@/store/simStore";
 import { useControlStore } from "@/store/controlStore";
 import { pauseRun, rerun, resumeRun, startRun } from "@/store/runController";
 import { PriceChip } from "@/components/PriceChip";
-import { StatusBadge } from "@/components/StatusBadge";
 
 /**
  * Left rail (was the top header). Vertical to reclaim vertical space for the
@@ -65,10 +64,6 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
         <button className="btn sidebar-btn" onClick={onOpenTweaks}>
           ⚙ Tweaks
         </button>
-      </div>
-
-      <div className="sidebar-foot">
-        <StatusBadge status={status} />
       </div>
     </aside>
   );
