@@ -68,11 +68,13 @@ left window; the other 6 are small tiles on the right. Clicking a small tile
 promotes it; the previously-featured agent drops back into the grid. The default
 featured agent is the first persona's rep and auto-resets on a new run.
 
-**Integration point:** the big window's detail content lives in
-`src/components/FeaturedAgentDetails.tsx` — a stub that receives the featured
-`AgentState`. H1 owns the enlarged visual + meta (`FeaturedAgentView`) and keeps
-the detail component in sync with the selected agent; the teammate builds the
-rich content (e.g. live/enlarged browser view, step trace) inside that one file.
+**Integration point:** the entire big window is a single agent card —
+`src/components/FeaturedAgentView.tsx` — and that whole component is the
+teammate's canvas (receives the featured `AgentState`). H1 only owns the sizing
+wrapper and keeps `agent` in sync with the selected tile; the teammate builds the
+card content (e.g. live/enlarged browser view, step trace) inside that one file.
+The default render (enlarged thumbnail / avatar + identity overlay) is a
+placeholder.
 
 ## Swapping the fixture for H4's stream
 
