@@ -1,62 +1,64 @@
 {
   "id": "matin_kim_beanie_sg",
-  "title": "Matin Kim Logo Beanie - Trendy Korean Winter Knit Hat",
+  "title": "Matin Kim Logo Beanie — Official Korean Knit Hat (Unisex)",
   "seller": {
-    "name": "Seoul Street SG",
-    "verified": false,
-    "rating": 4.3,
-    "response_rate": 42
+    "name": "Matin Kim Official Store",
+    "verified": true,
+    "rating": 4.8,
+    "response_rate": 96
   },
-  "price": 36.9,
-  "base_price": 29.9,
+  "price": 45.9,
+  "base_price": 45.9,
   "variants": [
     {
       "name": "Colour",
-      "options": ["Black", "Grey", "Cream", "Navy"]
+      "options": ["Black", "Ivory", "Charcoal", "Cream"]
     }
   ],
   "photos": [
     {
-      "url": "/mock/product-front.jpg",
+      "url": "/assets/beanies/matin-kim-black.jpg",
       "type": "product"
     },
     {
-      "url": "/mock/product-back.jpg",
-      "type": "product"
-    },
-    {
-      "url": "/mock/product-packaging.jpg",
+      "url": "/assets/beanies/matin-kim-cream.jpg",
       "type": "product"
     }
   ],
-  "description": "Korean-style Matin Kim logo beanie. Soft knit, unisex fit. Limited ready stock in Singapore.",
+  "description": "Matin Kim Logo Beanie — official Korean label. Soft midweight knit with the signature jacquard MATIN logo band. Unisex one-size. 100% authentic, ships with brand tag + authenticity card.\n\n• Authentic Matin Kim (Korea)\n• Midweight ribbed knit, double-fold band\n• Unisex one-size\n\nReady stock in Singapore.",
   "rating": {
-    "score": 4.3,
-    "count": 18
+    "score": 4.8,
+    "count": 312
   },
   "reviews": [
     {
-      "author": "buyer123",
-      "rating": 4,
-      "text": "Looks okay but delivery took a bit long.",
-      "date": "2026-05-18"
+      "author": "jiae***ng",
+      "rating": 5,
+      "text": "100% authentic! Came with the brand tag and dust bag. Exactly like the Korea store.",
+      "date": "2026-05-18",
+      "seller_response": "Thank you for shopping authentic Matin Kim with us! 🖤"
     },
     {
       "author": "sgfashion",
       "rating": 5,
-      "text": "Cute beanie, but photos don't show fit clearly.",
+      "text": "Quality knit, logo is clean. Worth the price for the real thing.",
       "date": "2026-05-22"
+    },
+    {
+      "author": "weeklyhaul",
+      "rating": 4,
+      "text": "Lovely beanie, delivery took a few days but legit product.",
+      "date": "2026-05-09"
     }
   ],
   "authenticity": {
-    "certificate": false,
-    "serial": false,
-    "unboxing": false
+    "certificate": true,
+    "serial": true,
+    "unboxing": true
   },
-  "category": ["Fashion Accessories", "Hats", "Beanies"],
+  "category": ["Women Clothes", "Hats & Caps", "Beanies"],
   "shipping": {
-    "fee": 3.5,
-    "days": "3-5 days"
+    "fee": 0,
+    "days": "Get by 9–11 Jun"
   }
 }
-

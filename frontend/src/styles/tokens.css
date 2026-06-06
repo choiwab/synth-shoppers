@@ -1,0 +1,46 @@
+/*
+ * tokens.css — shared design tokens.
+ *
+ * NOTE: PRD assigns ownership of this file to H1 (dashboard) and says H2 imports
+ * it. H1 had not seeded the scaffold yet, so H2 created it here. The Shopee brand
+ * palette + the 7 archetype hues (OVERVIEW §5.2, oklch(0.74 0.135 <hue>)) are the
+ * canonical values — H1 should reconcile against these, not redefine them.
+ *
+ * Tailwind v4: the @theme block registers brand colors as utilities
+ * (bg-shopee, text-shopee, border-line, etc.). Archetype colors live in :root as
+ * plain custom properties and are mirrored in TS (contracts.ts → archetypeColor()).
+ */
+
+@theme {
+  /* Shopee brand */
+  --color-shopee: #ee4d2d;
+  --color-shopee-dark: #d73211;
+  --color-shopee-light: #fbebe7;
+  --color-shopee-bg: #f5f5f5;
+
+  /* Ink + lines */
+  --color-ink: rgba(0, 0, 0, 0.87);
+  --color-ink-soft: rgba(0, 0, 0, 0.54);
+  --color-ink-faint: rgba(0, 0, 0, 0.26);
+  --color-line: rgba(0, 0, 0, 0.09);
+
+  /* Accents */
+  --color-gold: #ffce3d;
+  --color-shopee-mall: #d0011b;
+  --color-success: #26aa99;
+}
+
+:root {
+  /* Shopee header gradient (used by ShopeeHeader). */
+  --shopee-header-gradient: linear-gradient(-180deg, #f53d2d 0%, #f63 100%);
+
+  /* Archetype colors — OVERVIEW §5.2: oklch(0.74 0.135 <hue>). Keep in sync
+     with ARCHETYPE_HUE in src/types/contracts.ts. */
+  --archetype-xmm: oklch(0.74 0.135 10);
+  --archetype-auntie: oklch(0.74 0.135 75);
+  --archetype-nerd: oklch(0.74 0.135 175);
+  --archetype-geek: oklch(0.74 0.135 300);
+  --archetype-insecure: oklch(0.74 0.135 250);
+  --archetype-budget: oklch(0.74 0.135 145);
+  --archetype-high_spender: oklch(0.74 0.135 40);
+}
