@@ -461,31 +461,25 @@
   box-shadow: 0 0 0 2px oklch(0.79 0.14 45 / 0.55);
 }
 
-/* the big featured window: enlarged visual | meta + teammate detail slot */
+/* the big featured window — one full-bleed agent card (teammate's canvas) */
 .featured-window {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(150px, 220px);
-  gap: 10px;
+  position: relative;
   height: 100%;
   min-height: 0;
-}
-.featured-visual {
-  position: relative;
   border-radius: 12px;
   border: 2px solid oklch(0.74 0.135 var(--hue, 0) / 0.7);
   background: var(--panel-2);
   overflow: hidden;
-  min-height: 0;
 }
-.featured-window.bought .featured-visual {
+.featured-window.bought {
   border-color: var(--green);
   box-shadow: 0 0 0 2px var(--green), 0 0 22px oklch(0.8 0.15 145 / 0.35);
 }
-.featured-window.bailed .featured-visual {
+.featured-window.bailed {
   filter: grayscale(1);
   opacity: 0.6;
 }
-.featured-window.diverted .featured-visual {
+.featured-window.diverted {
   filter: grayscale(0.7);
   opacity: 0.7;
 }
@@ -497,38 +491,33 @@
   display: block;
 }
 .featured-fallback {
-  height: 100%;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 14px;
+  gap: 12px;
+  padding: 16px;
   text-align: center;
 }
 .featured-avatar {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
   color: oklch(0.2 0.03 var(--hue, 0));
   background: oklch(0.74 0.135 var(--hue, 0));
   flex-shrink: 0;
 }
 .featured-avatar.sm {
-  width: 30px;
-  height: 30px;
-  font-size: 11px;
-}
-.featured-action {
-  font-size: 12px;
-  color: var(--fg);
-  opacity: 0.85;
-  max-width: 85%;
+  width: 28px;
+  height: 28px;
+  font-size: 10px;
 }
 .featured-badge {
   position: absolute;
@@ -536,17 +525,40 @@
   right: 10px;
   font-size: 15px;
 }
-.featured-side {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  min-width: 0;
-  min-height: 0;
+.featured-obj {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--fg);
+  opacity: 0.9;
+  max-width: 80%;
 }
-.featured-head {
+.featured-stage-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  border: 1px solid oklch(0.79 0.14 45 / 0.4);
+  background: oklch(0.79 0.14 45 / 0.08);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.featured-stage-chip.sm {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 2px 8px;
+}
+/* identity overlay pinned to the bottom of the card */
+.featured-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   gap: 9px;
+  padding: 10px 12px;
+  background: linear-gradient(to top, oklch(0.165 0.008 70 / 0.94), transparent);
 }
 .featured-name {
   font-family: var(--font-display);
@@ -561,47 +573,6 @@
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--muted);
-}
-.featured-stage-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.featured-stage-chip {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  border: 1px solid oklch(0.79 0.14 45 / 0.4);
-  background: oklch(0.79 0.14 45 / 0.08);
-  border-radius: 999px;
-  padding: 3px 9px;
-}
-.featured-ret {
-  font-size: 10px;
-  color: var(--muted);
-}
-.featured-obj {
-  font-size: 12px;
-  font-style: italic;
-  color: var(--fg);
-  opacity: 0.9;
-}
-.featured-detail-slot {
-  margin-top: auto;
-  border: 1px dashed var(--line);
-  border-radius: 10px;
-  padding: 10px;
-  min-height: 56px;
-  background: oklch(0.74 0.135 45 / 0.02);
-  overflow: auto;
-}
-.detail-placeholder {
-  font-size: 12px;
-  color: var(--fg);
-  opacity: 0.85;
-  margin-top: 4px;
 }
 
 /* ---- funnel track --------------------------------------------------------- */
