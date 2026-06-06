@@ -19,14 +19,18 @@ export function SellerCard({ seller }: SellerCardProps) {
   ]
 
   return (
-    <section className="rounded-sm border border-line bg-white p-5">
+    <section
+      data-field="seller-trust"
+      data-seller-verified={seller.verified}
+      className="rounded-sm border border-line bg-white p-5"
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-shopee text-xl font-bold text-white">
             {seller.name.slice(0, 1).toUpperCase()}
           </span>
           <div>
-            <p className="flex items-center gap-1 font-medium">
+            <p data-field="seller-name-detail" className="flex items-center gap-1 font-medium">
               {seller.name}
               {seller.verified && (
                 <BadgeCheck size={16} className="text-shopee" aria-label="Verified seller" />
@@ -52,7 +56,11 @@ export function SellerCard({ seller }: SellerCardProps) {
 
         <div className="grid flex-1 grid-cols-2 gap-x-8 gap-y-2 border-line sm:grid-cols-4 sm:border-l sm:pl-6">
           {stats.map((s) => (
-            <div key={s.label} className="text-sm">
+            <div
+              key={s.label}
+              data-field={`seller-${s.label.toLowerCase().replaceAll(' ', '-')}`}
+              className="text-sm"
+            >
               <span className="text-ink-soft">{s.label}: </span>
               <span className={cn('font-medium', s.warn ? 'text-shopee-mall' : 'text-shopee')}>
                 {s.value}

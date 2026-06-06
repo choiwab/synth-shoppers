@@ -23,6 +23,10 @@ export function AuthenticityBlock({ authenticity }: AuthenticityBlockProps) {
 
   return (
     <section
+      data-field="authenticity-proof"
+      data-authenticity-certificate={authenticity.certificate}
+      data-authenticity-serial={authenticity.serial}
+      data-authenticity-unboxing={authenticity.unboxing}
       className={cn(
         'rounded-sm border bg-white p-5',
         allUnverified ? 'border-line' : 'border-success/40',
@@ -36,7 +40,10 @@ export function AuthenticityBlock({ authenticity }: AuthenticityBlockProps) {
         )}
         <h2 className="text-base font-medium text-ink">Authenticity</h2>
         {!allUnverified && (
-          <span className="rounded-sm bg-success/10 px-2 py-0.5 text-xs font-medium text-success">
+          <span
+            data-field="authenticity-proof-count"
+            className="rounded-sm bg-success/10 px-2 py-0.5 text-xs font-medium text-success"
+          >
             {verifiedCount}/3 verified
           </span>
         )}
@@ -54,6 +61,8 @@ export function AuthenticityBlock({ authenticity }: AuthenticityBlockProps) {
             return (
               <li
                 key={key}
+                data-field={`authenticity-${key}`}
+                data-verified={on}
                 className={cn(
                   'flex items-center gap-2 rounded-sm border p-3 text-sm',
                   on ? 'border-success/40 bg-success/5 text-ink' : 'border-line text-ink-faint',

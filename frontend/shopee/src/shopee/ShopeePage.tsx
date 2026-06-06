@@ -81,7 +81,7 @@ export function ShopeePage({ config }: ShopeePageProps) {
                 Ratings
               </span>
               <span className="border-r border-line pr-4 text-ink-soft">
-                <span className="font-medium text-ink">{compact(sold)}</span> Sold
+                <span data-field="sold-count" className="font-medium text-ink">{compact(sold)}</span> Sold
               </span>
               <span className="flex items-center gap-1 text-ink-faint">
                 <Flag size={13} /> Report
@@ -90,7 +90,8 @@ export function ShopeePage({ config }: ShopeePageProps) {
 
             <p className="mt-2 text-sm text-ink-soft">
               Sold by <span data-field="seller-name" className="text-shopee">{config.seller.name}</span>{' '}
-              · Shopee Singapore
+              · <span data-field="seller-verified">{config.seller.verified ? 'Verified' : 'Unverified'}</span>
+              {' '}· Shopee Singapore
             </p>
           </section>
 
