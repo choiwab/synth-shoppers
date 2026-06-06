@@ -3,6 +3,7 @@
 -r requirements.txt
 browser-use==0.9.0   # pin to the EXACT 0.9.x you install (run: pip show browser-use) so a
                      # mid-hackathon release can't change the Agent/Tools API under you.
+playwright>=1.50.0
 openai>=1.40.0
 pillow>=10.0.0
 # After installing: playwright install chromium

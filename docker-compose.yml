@@ -1,8 +1,8 @@
 services:
   shopee:
     build:
-      context: ./frontend/shopee
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/shopee/Dockerfile
     ports:
       - "5174:80"
 
