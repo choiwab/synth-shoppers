@@ -1,0 +1,84 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read()",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_MOCK: "1"
+        VITE_API_BASE: "http://localhost:8000"
+        VITE_WS_BASE: "ws://localhost:8000"
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  backend-real:
+    profiles: ["real"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.browser
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      LISTING_BASE_URL: http://shopee
+    ports:
+      - "8001:8000"
+    depends_on:
+      shopee:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read()",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  frontend-real:
+    profiles: ["real"]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_MOCK: "0"
+        VITE_API_BASE: "http://localhost:8001"
+        VITE_WS_BASE: "ws://localhost:8001"
+    ports:
+      - "8082:80"
+    depends_on:
+      backend-real:
+        condition: service_healthy
+
+  shopee:
+    profiles: ["real", "shopee"]
+    build:
+      context: ./frontend/shopee
+      dockerfile: Dockerfile
+    ports:
+      - "5174:80"
