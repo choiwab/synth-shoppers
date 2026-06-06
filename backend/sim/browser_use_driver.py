@@ -153,13 +153,13 @@ class BrowserUseAgenticDriver:
         url = f"{self.base_url}/?listing={listing_url}"
         ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit)
 
-        # land: emitted before the browser navigates, so no thumbnail yet (the first
-        # real thumbnail lands at the photos gate).
-        ctx.record("land", None)
-        await emit(StageEnterEvent(run_id=run_id, ts=_now_ms(), agent_id=agent_id, stage="land"))
-
         browser = self._make_browser()
         try:
+            # Open the listing ourselves so navigation is deterministic and we can
+            # grab a real `land` thumbnail; the agent then only drives the funnel.
+            await self._open(browser, url)
+            await self._enter(ctx, "land", await self._capture(ctx, browser, "land"))
+
             tools = self._build_tools(ctx)
             agent = self._make_agent(name, archetype, listing, url, tools, browser)
             try:
@@ -173,13 +173,26 @@ class BrowserUseAgenticDriver:
         finally:
             await self._close(browser)
 
+    async def _open(self, browser, url: str) -> None:
+        # VERIFY: BrowserSession.start() + navigate_to(url) — confirmed in 0.9.x.
+        if hasattr(browser, "start"):
+            await browser.start()
+        if hasattr(browser, "navigate_to"):
+            await browser.navigate_to(url)
+        else:
+            page = await browser.must_get_current_page()
+            await page.goto(url)
+        await asyncio.sleep(0.6)  # let first paint settle before the land screenshot
+
     # ---- custom action registry (the constrained funnel vocabulary) ------------
     def _build_tools(self, ctx: _Journey):
         # NOTE: `browser_session` is injected by NAME by browser-use's Tools registry;
         # it must be left UNANNOTATED (annotating it raises a type-conflict error).
         from browser_use import ActionResult, Tools
 
-        tools = Tools()
+        # Exclude the default `click` action so the agent CANNOT bypass the funnel by
+        # clicking raw buttons — it must use our gate actions, which emit events.
+        tools = Tools(exclude_actions=["click"])
 
         async def gate(browser_session, name: GateStage):
             if ctx.outcome is not None:
@@ -258,7 +271,7 @@ class BrowserUseAgenticDriver:
         return (
             f"You are {name}, a {persona.display} shopper in Singapore ({persona.tag}).\n"
             f"{persona.blurb}\n\n"
-            f"Shop this Shopee listing. Start by opening it: {url}\n\n"
+            f"You are already on this Shopee listing page ({url}); do not navigate away.\n\n"
             f"What you can see about the listing:\n{self._facts(listing)}\n\n"
             "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
             "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
