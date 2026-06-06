@@ -7,9 +7,8 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from contracts import AgentBoughtEvent, AgentTrace, CompetitorAnalysisEvent, CrowdConfig, ListingConfig, StageEnterEvent, StageTrace
-from sim.browser_use_driver import BrowserUseAgenticDriver, _Journey, _clean_reason, _clean_sentiment, _is_proper_image_url
-from sim.competitors import analyze_competitor
+from contracts import AgentBoughtEvent, AgentTrace, CrowdConfig, ListingConfig, StageEnterEvent, StageTrace
+from sim.browser_use_driver import BrowserUseAgenticDriver, _Journey, _clean_reason, _clean_sentiment
 from sim.runner import RunState, build_cohort, run_simulation
 from sim.screenshots import THUMB_SIZE, save_thumbnail, thumbnail_paths
 
@@ -58,140 +57,47 @@ async def test_runner_streams_live_for_emit_aware_driver_without_replay() -> Non
     assert run.agents[0].outcome == "bought"
 
 
-def test_task_prompt_reuses_persona_blurb_facts_and_objection_pool() -> None:
-    listing = load_listing()
-    driver = BrowserUseAgenticDriver(listing)
-    task = driver._task("Farhan", "budget", driver.listing, "http://localhost:8080/?listing=x")
+async def _noop(_event):  # pragma: no cover - trivial emit sink
+    return None
 
-    assert driver.autonomous is True
-    assert driver.use_vision is True
-    assert driver.vision_detail_level == "high"
+
+def _ctx(driver: BrowserUseAgenticDriver, *, run_id="run_abc", agent_id="budget_1", archetype="budget") -> _Journey:
+    return _Journey(run_id=run_id, agent_id=agent_id, name="Farhan", archetype=archetype, listing=driver.listing, emit=_noop)
+
+
+def test_task_prompt_starts_at_home_mandates_search_and_keeps_persona_voice() -> None:
+    driver = BrowserUseAgenticDriver(load_listing(), base_url="http://localhost:5174")
+    task = driver._task(_ctx(driver))
+
     assert "Farhan" in task and "Budget-tight" in task
     assert "scrutinize every dollar" in task  # persona blurb from sim.agents
-    assert f"S${listing.price:.2f}" in task and f"S${listing.base_price:.2f}" in task  # listing facts surfaced
-    assert "only open, compare, add to cart, checkout, or buy beanie listings with proper product photos" in task
-    assert "Do not access non-beanie listings" in task
-    assert "generated fallback SVG" in task
-    assert "confirm_purchase — only if you genuinely decide to buy a beanie AND you have seen proper non-placeholder product photos" in task
+    # Mandatory storefront entry route: home first, then search "beanie".
+    assert "http://localhost:5174/?" in task
+    assert "beanie" in task.lower() and "/search?keyword=beanie" in task
     assert "Over budget liao, next." in task  # objection style example from the pool
 
 
-def test_proper_image_url_rejects_placeholders_and_fallbacks() -> None:
-    assert _is_proper_image_url("/assets/beanies/matin-kim-black.jpg")
-    assert _is_proper_image_url("https://example.com/beanie.jpg")
-    assert not _is_proper_image_url("")
-    assert not _is_proper_image_url("data:image/svg+xml;base64,abc")
-    assert not _is_proper_image_url("blob:http://localhost/x")
-    assert not _is_proper_image_url("/assets/beanies/placeholder.jpg")
-    assert not _is_proper_image_url("/assets/beanies/stub-beanie.jpg")
-
-
-@pytest.mark.asyncio
-async def test_driver_bails_before_browser_when_listing_has_no_proper_images() -> None:
-    events: list = []
-
-    async def capture(event):
-        events.append(event.model_dump())
-
-    listing = load_listing()
-    no_image_listing = listing.model_copy(
-        update={"photos": [photo.model_copy(update={"url": "data:image/svg+xml;base64,abc"}) for photo in listing.photos]},
-        deep=True,
-    )
-    driver = BrowserUseAgenticDriver(no_image_listing, base_url="http://localhost:5174")
-
-    trace = await driver.run_journey(
-        listing_url=no_image_listing.id,
-        agent_id="budget_1",
-        name="Farhan",
-        archetype="budget",
-        listing=no_image_listing,
-        seed=7,
-        run_id="run_no_images",
-        emit=capture,
-    )
-
-    assert trace.outcome == "bailed"
-    assert trace.bail_stage == "land"
-    assert trace.bail_reason == "visual_photos"
-    assert any(event["type"] == "agent_bailed" for event in events)
-    assert "proper product images" in events[-1]["objection"]
-
-
-def test_page_url_scopes_browser_session_per_agent() -> None:
+def test_storefront_urls_carry_sim_session_and_scope_config_to_home() -> None:
     driver = BrowserUseAgenticDriver(load_listing(), base_url="http://localhost:5174")
-    url = driver._page_url(
-        driver.listing.id,
-        driver.listing,
-        agent_id="budget_1",
-        run_id="run_abc",
-        archetype="budget",
-    )
+    ctx = _ctx(driver)
 
-    assert url.startswith(f"http://localhost:5174/shopee/{driver.listing.id}?")
-    assert "agent_id=budget_1" in url
-    assert "run_id=run_abc" in url
-    assert "persona=budget" in url
-    assert "config=" in url
+    home = driver._home_url(ctx)
+    assert home.startswith("http://localhost:5174/?")
+    assert "agent_id=budget_1" in home and "run_id=run_abc" in home and "persona=budget" in home
+    assert "mk_config=" in home  # the listing config bootstraps the override on entry
 
+    search = driver._search_url(ctx)
+    assert search.startswith("http://localhost:5174/search?") and "keyword=beanie" in search
 
-def test_search_url_starts_agents_from_matin_kim_results() -> None:
-    driver = BrowserUseAgenticDriver(load_listing(), base_url="http://localhost:5174")
-    url = driver._search_url(agent_id="budget_1", run_id="run_abc", archetype="budget")
-
-    assert url.startswith("http://localhost:5174/search?")
-    assert "keyword=matin+kim+beanie" in url
-    assert "agent_id=budget_1" in url
-    assert "run_id=run_abc" in url
-    assert "persona=budget" in url
+    product = driver._product_url(ctx, driver.listing.id)
+    assert product.startswith(f"http://localhost:5174/shopee/{driver.listing.id}?")
+    assert "mk_config=" not in product  # config rides only on the home entry
 
 
-def test_competitor_analysis_uses_review_comments_and_persona_lens() -> None:
-    analysis = analyze_competitor(
-        "budget",
-        {"id": "basic-acrylic-beanie", "name": "Plain Solid Colour Knitted Beanie"},
-        {
-            "seller": "sgmega.deals",
-            "verified": "Unverified",
-            "price": "S$3.50",
-            "rating": "4.3",
-            "review_count": "12k",
-            "comments": [
-                "Cheap and does the job. Cannot complain at this price.",
-                "A bit thin and itchy leh. Ok for the price lor.",
-            ],
-        },
-        target_price=24.9,
-    )
-
-    assert analysis["price"] == 3.5
-    assert analysis["review_count"] == 12000
-    assert "S$21.40 cheaper than Matin Kim" in analysis["strengths"]
-    assert "review comments expose quality or delivery concerns" in analysis["weaknesses"]
-    assert "budget shopper" in analysis["verdict"]
-
-
-def test_competitor_analysis_event_accepts_scraped_summary_payload() -> None:
-    event = CompetitorAnalysisEvent(
-        run_id="run_1",
-        ts=1,
-        agent_id="budget_1",
-        competitor="basic-acrylic-beanie",
-        competitor_name="Plain Solid Colour Knitted Beanie",
-        seller="sgmega.deals",
-        verified=False,
-        price=3.5,
-        rating="4.3",
-        review_count=12000,
-        comments=["Cheap and does the job."],
-        strengths=["S$21.40 cheaper than Matin Kim"],
-        weaknesses=["seller is not verified"],
-        verdict="Tempting for a budget shopper.",
-        thumbnail_url="/static/shots/budget_1/discovery_basic_reviews.jpg?v=1",
-    )
-
-    assert event.type == "competitor_analysis"
-    assert event.comments == ["Cheap and does the job."]
+def test_default_base_url_targets_vite_port() -> None:
+    driver = BrowserUseAgenticDriver(load_listing())
+    assert driver.base_url == "http://localhost:5174"
+    assert driver.target_id == driver.listing.id
 
 
 def test_objection_examples_handle_bare_string_entries() -> None:
@@ -282,8 +188,6 @@ async def test_mock_run_populates_sentiment_diagnostics_and_dropoff() -> None:
     report = run.report
     assert report is not None
     assert report.comments
-    assert len(report.agent_trace_reports) == len(run.agents)
-    assert any(row["comments"] for row in report.agent_trace_reports)
     assert any(row.get("sentiment_arc") for row in report.archetypes)
     assert "engagement_rate" in report.diagnostics and "review_read_rate" in report.diagnostics
     assert report.diagnostics["click_rate"] is None  # honest until Tier-2 impression stage

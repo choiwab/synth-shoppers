@@ -8,6 +8,12 @@ import { OrderConfirmedPage } from '@/pages/OrderConfirmedPage'
 import { ReportPage } from '@/pages/ReportPage'
 import { ToastHost } from '@/components/ToastHost'
 import { withSimSession } from '@/shopee/simSession'
+import { bootstrapListingOverrideFromUrl } from '@/shopee/config/loadConfig'
+
+// Runs before React renders: if the browser-use runtime entered at `/?…&mk_config=…`,
+// stash the tracked listing into the sessionStorage override so it survives the
+// home → search → product navigation (links don't carry the config param).
+bootstrapListingOverrideFromUrl()
 
 /**
  * Root route. The browser-use runtime (H3) deep-links to `/?listing=<slug>`

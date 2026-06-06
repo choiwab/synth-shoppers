@@ -152,6 +152,18 @@ export type AgentEvent =
       retention_time_s: number
     }
   | { type: 'agent_bought'; run_id: string; ts: number; agent_id: string; retention_time_s: number }
+  | {
+      // Real mode: the agent left the tracked listing to buy a competitor.
+      type: 'agent_diverted'
+      run_id: string
+      ts: number
+      agent_id: string
+      from_stage: FunnelStage
+      competitor: string // competitor listing id
+      competitor_name?: string
+      converted?: boolean
+      reason?: string
+    }
   | { type: 'run_progress'; run_id: string; ts: number; active: number; bought: number; bailed: number }
   | { type: 'run_complete'; run_id: string; ts: number; buy_rate: number; report_ready: boolean }
 
@@ -216,13 +228,28 @@ export interface AgentTrace {
   agent_id: string
   name: string
   archetype: PersonaId
-  outcome: AgentOutcome
+  outcome: AgentOutcome // "bought" === bought the tracked Matin Kim listing
   bail_stage?: FunnelStage
   objection?: string
   retention_time_s: number
-  stage_trace: StageTraceStep[]
+  stage_trace: StageTraceStep[] // records ONLY the tracked listing's gates
   purchase_reason?: string
   bail_reason?: string
+  // Competitive attribution (real-mode free browsing)
+  landed_on_target?: boolean
+  chosen_listing_id?: string | null
+  divert_stage?: FunnelStage | null
+  competitor_id?: string | null
+  competitor_title?: string | null
+}
+
+/** Competitive attribution for the tracked listing (real mode; empty in mock). */
+export interface CompetitionSummary {
+  landed_rate?: number
+  lost_to_competitors?: number
+  left_without_buying?: number
+  competitor_breakdown?: { competitor_id: string; title?: string; wins: number; share: number }[]
+  divert_by_stage?: { stage: FunnelStage; count: number }[]
 }
 
 export interface AgentTraceReportStage {
@@ -282,6 +309,8 @@ export interface ViabilityReport {
   agent_trace_reports?: AgentTraceReport[]
   diagnostics?: Record<string, unknown>
   dropoff_reasons?: Array<Record<string, unknown>>
+  /** Competitive attribution for the tracked listing (real mode; empty in mock). */
+  competition?: CompetitionSummary
 }
 
 /* ── §5.7 run-control API ─────────────────────────────────────────────────── */

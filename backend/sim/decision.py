@@ -4,8 +4,8 @@ import hashlib
 import random
 from dataclasses import dataclass
 
-from contracts import GateStage, ListingConfig, PersonaId, Sentiment
-from sim.agents import PERSONAS, stage_objections
+from contracts import GateStage, ListingConfig, PersonaId, PersonaProfile, Sentiment
+from sim.agents import PERSONAS, profile_bail_multiplier, stage_objections
 
 
 @dataclass(frozen=True)
@@ -30,7 +30,9 @@ def objection_for(seed: int, agent_id: str, persona_id: PersonaId, stage: GateSt
     return choices[rng.randrange(len(choices))]
 
 
-def effective_bail_probability(persona_id: PersonaId, stage: GateStage, listing: ListingConfig) -> float:
+def effective_bail_probability(
+    persona_id: PersonaId, stage: GateStage, listing: ListingConfig, profile: PersonaProfile | None = None
+) -> float:
     persona = PERSONAS[persona_id]
     prob = persona.bail_prob[stage]
 
@@ -85,11 +87,22 @@ def effective_bail_probability(persona_id: PersonaId, stage: GateStage, listing:
     if persona_id == "high_spender":
         prob *= 0.65
 
+    # life-profile nudge (income/age/housing/hobby) — spreads a persona's agents
+    # across thresholds so listing improvements convert *some* of them.
+    prob *= profile_bail_multiplier(profile, persona_id, stage)
+
     return max(0.0, min(prob, 0.95))
 
 
-def decide(seed: int, agent_id: str, persona_id: PersonaId, stage: GateStage, listing: ListingConfig) -> Decision:
-    probability = effective_bail_probability(persona_id, stage, listing)
+def decide(
+    seed: int,
+    agent_id: str,
+    persona_id: PersonaId,
+    stage: GateStage,
+    listing: ListingConfig,
+    profile: PersonaProfile | None = None,
+) -> Decision:
+    probability = effective_bail_probability(persona_id, stage, listing, profile)
     threshold = stable_threshold(seed, agent_id, stage)
     if threshold < probability:
         return Decision(

@@ -3,7 +3,15 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
 
-from contracts import RerunSimulationRequest, RunResponse, StartSimulationRequest, UpliftReport, ViabilityReport
+from contracts import (
+    ListingAnalysis,
+    RerunSimulationRequest,
+    RunResponse,
+    StartSimulationRequest,
+    UpliftReport,
+    ViabilityReport,
+)
+from sim.analysis import analyze_run
 from sim.patching import PatchError, apply_config_patch
 from sim.runner import registry
 from sim.uplift import compute_uplift
@@ -26,6 +34,21 @@ async def get_report(run_id: str) -> ViabilityReport:
     if not run.report:
         raise HTTPException(status_code=202, detail="report is not ready")
     return run.report
+
+
+@router.post("/simulation/{run_id}/analyze", response_model=ListingAnalysis)
+async def analyze_simulation(run_id: str) -> ListingAnalysis:
+    """Role-play the product owner: read the finished run and propose a revised listing
+    (title/price/description/etc.) for the next iteration. Cached per run. Falls back to a
+    deterministic heuristic when no OPENAI_API_KEY is configured."""
+    run = registry.get(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="run not found")
+    if not run.report:
+        raise HTTPException(status_code=202, detail="report is not ready")
+    if run.analysis is None:
+        run.analysis = await analyze_run(run.report, run.listing)
+    return run.analysis
 
 
 @router.get("/simulation/{run_id}/uplift", response_model=UpliftReport)

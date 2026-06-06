@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { ARCHETYPE_HUE, GATE_LABELS } from "@/types/contracts";
 import { archetypeInitials, archetypeLabel, archetypeTag } from "@/lib/archetype";
+import { sentimentColor, SENTIMENT_LABEL } from "@/lib/sentiment";
 import { resolveAssetUrl } from "@/lib/assetUrl";
 import type { AgentState } from "@/store/simStore";
 import { ShopeeMonitorFrame } from "./ShopeeMonitorFrame";
@@ -17,6 +18,7 @@ import { ShopeeMonitorFrame } from "./ShopeeMonitorFrame";
 export function FeaturedAgentView({ agent }: { agent: AgentState }) {
   const hue = ARCHETYPE_HUE[agent.archetype];
   const stageLabel = GATE_LABELS[agent.stage] ?? agent.stage;
+  const sentiment = sentimentColor(agent.latestSentiment);
   const thumb = resolveAssetUrl(agent.thumbnail_url);
   const competitorRead = agent.competitorAnalyses?.[0];
   const streamLabel = thumb
@@ -50,7 +52,14 @@ export function FeaturedAgentView({ agent }: { agent: AgentState }) {
       {agent.outcome === "bought" && <span className="featured-badge">✓</span>}
 
       <div className="featured-action-panel">
-        <div className="featured-panel-kicker">{streamLabel}</div>
+        <div className="featured-panel-kicker">
+          <span>{streamLabel}</span>
+          {agent.latestSentiment && (
+            <span className="feeling-chip" style={{ color: sentiment, borderColor: sentiment }}>
+              {SENTIMENT_LABEL[agent.latestSentiment]}
+            </span>
+          )}
+        </div>
         <div className="featured-panel-action">
           {agent.lastAction ?? "Waiting for the backend agent to send its first screenshot"}
         </div>
@@ -104,6 +113,11 @@ export function FeaturedAgentView({ agent }: { agent: AgentState }) {
           <div className="featured-tags">
             {archetypeLabel(agent.archetype)} · {archetypeTag(agent.archetype)}
           </div>
+          {agent.profile && (
+            <div className="featured-profile" title={agent.profile.blurb}>
+              {agent.profile.blurb}
+            </div>
+          )}
         </div>
         <span className="featured-stage-chip sm">{stageLabel}</span>
       </div>

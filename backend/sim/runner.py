@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import os
 import random
 import time
 import uuid
@@ -18,7 +19,9 @@ from contracts import (
     AgentTrace,
     BrowserFrameEvent,
     CrowdConfig,
+    ListingAnalysis,
     ListingConfig,
+    PersonaProfile,
     ObjectionEvent,
     PersonaId,
     RunCompleteEvent,
@@ -30,7 +33,7 @@ from contracts import (
     StageTrace,
     ViabilityReport,
 )
-from sim.agents import PERSONAS
+from sim.agents import PERSONAS, generate_profile
 from sim.competitors import COMPETITORS
 from sim.decision import decide, synth_purchase_reason, synth_reaction
 from sim.mock_driver import AgenticJourneyDriver, BrowserDriver, MockBrowserDriver
@@ -50,6 +53,7 @@ class AgentProfile:
     agent_id: str
     name: str
     archetype: PersonaId
+    profile: PersonaProfile | None = None
 
 
 @dataclass
@@ -66,6 +70,7 @@ class RunState:
     agents: list[AgentTrace] = field(default_factory=list)
     report: ViabilityReport | None = None
     parent_report: ViabilityReport | None = None
+    analysis: ListingAnalysis | None = None  # cached product-owner analysis (sim/analysis.py)
     complete: bool = False
 
     async def emit(self, event: AgentEvent) -> None:
@@ -144,8 +149,12 @@ def build_cohort(personas: list[PersonaId], crowd_size: int, seed: int) -> list[
         persona = PERSONAS[persona_id]
         name = persona.names[(counts[persona_id] - 1) % len(persona.names)]
         suffix = counts[persona_id]
+        agent_id = f"{persona_id}_{suffix}"
+        # Profile seeded per (seed, agent_id) so a rerun (same seed+cohort) reproduces
+        # identical profiles — keeps uplift comparisons exactly 1:1.
+        profile = generate_profile(random.Random(f"{seed}:{agent_id}"))
         # Shuffle only the final ordering; ids stay stable and readable.
-        cohort.append(AgentProfile(agent_id=f"{persona_id}_{suffix}", name=name, archetype=persona_id))
+        cohort.append(AgentProfile(agent_id=agent_id, name=name, archetype=persona_id, profile=profile))
     rng.shuffle(cohort)
     return cohort
 
@@ -158,26 +167,40 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
             ts=now_ms(),
             listing={"title": run.listing.title, "price": run.listing.price, "seller": run.listing.seller.name},
             agents_total=len(run.cohort),
-            competitors=list(COMPETITORS),
+            competitors=[dict(c) for c in COMPETITORS],
         )
     )
 
     for agent in run.cohort:
-        await run.emit(AgentSpawnedEvent(run_id=run.run_id, ts=now_ms(), agent_id=agent.agent_id, name=agent.name, archetype=agent.archetype))
+        await run.emit(
+            AgentSpawnedEvent(
+                run_id=run.run_id,
+                ts=now_ms(),
+                agent_id=agent.agent_id,
+                name=agent.name,
+                archetype=agent.archetype,
+                profile=agent.profile,
+            )
+        )
 
     bought = 0
     bailed = 0
-    semaphore = asyncio.Semaphore(50 if run.mode == "mock" else 10)
+    # Real runs scale in waves of this cap (each guided journey ~5-6s): 28 agents
+    # ≈ 3 waves ≈ ~18s. Raise REAL_CONCURRENCY for fewer waves (heavier on Chromium).
+    real_concurrency = int(os.environ.get("REAL_CONCURRENCY", "10"))
+    semaphore = asyncio.Semaphore(50 if run.mode == "mock" else real_concurrency)
 
     async def run_agent(agent: AgentProfile) -> AgentTrace:
         async with semaphore:
             if hasattr(driver, "run_journey"):
-                accepts_emit = "emit" in inspect.signature(driver.run_journey).parameters  # type: ignore[attr-defined]
+                journey_params = inspect.signature(driver.run_journey).parameters  # type: ignore[attr-defined]
+                accepts_emit = "emit" in journey_params
+                extra = {"profile": agent.profile} if "profile" in journey_params else {}
                 if accepts_emit:
                     # H3 real driver streams events live (stage_enter+browser_frame+
                     # objection+agent_bailed/bought) from inside its custom actions,
                     # so the runner does not replay them post-hoc.
-                    return await driver.run_journey(  # type: ignore[attr-defined]
+                    trace = await driver.run_journey(  # type: ignore[attr-defined]
                         listing_url=run.listing.id,
                         agent_id=agent.agent_id,
                         name=agent.name,
@@ -186,7 +209,11 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                         seed=run.seed,
                         run_id=run.run_id,
                         emit=run.emit,
+                        **extra,
                     )
+                    if trace.profile is None:
+                        trace.profile = agent.profile
+                    return trace
                 # Legacy return-only drivers: replay the trace as events post-hoc.
                 trace = await driver.run_journey(  # type: ignore[attr-defined]
                     listing_url=run.listing.id,
@@ -195,7 +222,10 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                     archetype=agent.archetype,
                     listing=run.listing,
                     seed=run.seed,
+                    **extra,
                 )
+                if trace.profile is None:
+                    trace.profile = agent.profile
                 for stage in [item.stage for item in trace.stage_trace]:
                     await run.emit(StageEnterEvent(run_id=run.run_id, ts=now_ms(), agent_id=agent.agent_id, stage=stage))
                 if trace.outcome == "bailed":
@@ -238,7 +268,7 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                 for stage in GATE_ORDER:
                     page = await driver.goto_gate(session, stage)
                     elapsed = round(time.monotonic() - start + len(stage_trace) * 1.2, 2)
-                    decision = decide(run.seed, agent.agent_id, agent.archetype, stage, run.listing)
+                    decision = decide(run.seed, agent.agent_id, agent.archetype, stage, run.listing, agent.profile)
                     bailing = decision.action == "bail"
                     if bailing:
                         comment = decision.objection or "Not convinced enough to buy."
@@ -297,6 +327,7 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                             retention_time_s=retention,
                             stage_trace=stage_trace,
                             bail_reason=reason,
+                            profile=agent.profile,
                         )
                     await asyncio.sleep(0 if run.crowd.speed == 4 else 0.05 / run.crowd.speed)
 
@@ -314,6 +345,7 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                     retention_time_s=retention,
                     stage_trace=stage_trace,
                     purchase_reason=reason,
+                    profile=agent.profile,
                 )
             finally:
                 await driver.close(session)

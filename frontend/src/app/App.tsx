@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { Sidebar } from "./Sidebar";
+import { RunBanner } from "./RunBanner";
 import { AgentStrip } from "./AgentStrip";
 import { FunnelTrack } from "./FunnelTrack";
 import { RightRail } from "./RightRail";
@@ -77,6 +78,7 @@ export function Dashboard() {
       <Sidebar onOpenTweaks={() => setTweaksOpen(true)} />
 
       <div className="main-col">
+        <RunBanner />
         <div className="strip-wrap" style={{ height: stripHeight }}>
           <AgentStrip />
         </div>

@@ -37,6 +37,7 @@ import asyncio
 import base64
 import binascii
 import os
+import re
 import time
 import urllib.parse
 from dataclasses import dataclass, field
@@ -46,14 +47,15 @@ from contracts import (
     REASON_BY_STAGE,
     AgentBailedEvent,
     AgentBoughtEvent,
+    AgentDivertedEvent,
     AgentThoughtEvent,
-    CompetitorAnalysisEvent,
     AgentTrace,
     BrowserFrameEvent,
     GateStage,
     ListingConfig,
     ObjectionEvent,
     PersonaId,
+    PersonaProfile,
     ReasonCategory,
     Sentiment,
     StageEnterEvent,
@@ -61,9 +63,35 @@ from contracts import (
     StageTrace,
 )
 from sim.agents import PERSONAS
-from sim.competitors import SEARCH_QUERY, analyze_competitor, competitors_for_persona
 from sim.decision import decide, synth_purchase_reason, synth_reaction
 from sim.screenshots import save_thumbnail
+from sim.storefront import (
+    CandidateListing,
+    cheaper_alternative,
+    choose_listing,
+    competitor_objection,
+)
+
+# Search term every agent keys in before free browsing (mandatory funnel-entry route).
+SEARCH_KEYWORD = "beanie"
+
+_SHOPEE_PATH = re.compile(r"/shopee/([^/?#]+)")
+
+
+def listing_id_from_url(url: str | None) -> str | None:
+    """Parse the listing slug from a product URL (``…/shopee/<slug>?…``)."""
+    if not url:
+        return None
+    match = _SHOPEE_PATH.search(url)
+    return match.group(1) if match else None
+
+
+def _parse_price(text: str | None) -> float | None:
+    """Pull a numeric price out of a card label like ``"S$45.90"`` → ``45.9``."""
+    if not text:
+        return None
+    match = re.search(r"\d+(?:\.\d+)?", text.replace(",", ""))
+    return float(match.group()) if match else None
 
 EmitFn = Callable[[object], Awaitable[None]]
 
@@ -100,18 +128,6 @@ def _brain_field(brain: object, field: str) -> str | None:
     text = str(value).strip()
     return text or None
 
-
-def _env_bool(name: str, default: bool) -> bool:
-    raw = os.environ.get(name)
-    if raw is None:
-        return default
-    return raw.strip().lower() not in {"0", "false", "no", "off"}
-
-
-def _vision_detail_level() -> str:
-    raw = os.environ.get("BROWSER_USE_VISION_DETAIL", "high").strip().lower()
-    return raw if raw in {"auto", "low", "high"} else "high"
-
 # Funnel gate -> the H2 data-action selector that advances into it (OVERVIEW §5.6).
 GATE_ACTION: dict[GateStage, str] = {
     "photos": "scroll-gallery",
@@ -128,11 +144,6 @@ _GATE_INDEX = ["land", "photos", "reviews", "price", "cart", "checkout"]
 # checkout button lives on /cart, so we click the cart icon to get there. The driver
 # reuses its normal click path — no special browser-use navigation API needed.
 GATE_NAV: dict[GateStage, str] = {"checkout": 'a[href^="/cart"]'}
-PROPER_IMAGE_BEANIE_CARD = (
-    '[data-listing-card="search-result"]'
-    '[data-is-beanie="true"]'
-    '[data-has-proper-image="true"]'
-)
 
 
 def _now_ms() -> int:
@@ -141,21 +152,6 @@ def _now_ms() -> int:
 
 def _scroll_pct(gate: GateStage) -> float:
     return _GATE_INDEX.index(gate) / (len(_GATE_INDEX) - 1) if gate in _GATE_INDEX else 1.0
-
-
-def _is_proper_image_url(url: str | None) -> bool:
-    candidate = (url or "").strip().lower()
-    if not candidate:
-        return False
-    if candidate.startswith(("data:", "blob:")):
-        return False
-    if "placeholder" in candidate or "stub" in candidate:
-        return False
-    return candidate.startswith("/assets/beanies/") or candidate.startswith("http://") or candidate.startswith("https://")
-
-
-def _listing_has_proper_images(listing: ListingConfig) -> bool:
-    return any(_is_proper_image_url(photo.url) for photo in listing.photos)
 
 
 @dataclass
@@ -168,6 +164,7 @@ class _Journey:
     archetype: PersonaId
     listing: ListingConfig
     emit: EmitFn
+    profile: PersonaProfile | None = None
     _start: float = field(default_factory=time.monotonic)
     current_gate: GateStage | None = None
     outcome: str | None = None  # None until the agent buys/bails
@@ -175,6 +172,13 @@ class _Journey:
     objection: str | None = None
     bail_reason: ReasonCategory | None = None  # categorized dropout reason
     purchase_reason: str | None = None  # why a buyer committed (Layer 2)
+    # ── competitive attribution (free-browsing real mode) ────────────────────
+    landed_on_target: bool = False  # set True once the tracked PDP is opened
+    chosen_listing_id: str | None = None  # product actually bought (None if left)
+    divert_stage: GateStage | None = None  # where on OUR funnel they peeled off
+    competitor_id: str | None = None
+    competitor_title: str | None = None
+    last_listing_id: str | None = None  # most recent /shopee/<id> the agent viewed
     _traces: list[StageTrace] = field(default_factory=list)
     _thoughts: list[dict] = field(default_factory=list)  # Layer 1 raw CoT log
 
@@ -201,6 +205,15 @@ class _Journey:
 
     def trace(self) -> AgentTrace:
         outcome = self.outcome or "bailed"
+        # stage_trace records ONLY the tracked listing's gates. Agents who never
+        # opened our PDP (chose a competitor straight from search) keep it empty so
+        # the funnel rollup doesn't miscount them as having landed.
+        if self._traces:
+            stage_trace = list(self._traces)
+        elif self.landed_on_target:
+            stage_trace = [StageTrace(stage="land", time_s=self.elapsed())]
+        else:
+            stage_trace = []
         return AgentTrace(
             agent_id=self.agent_id,
             name=self.name,
@@ -209,9 +222,15 @@ class _Journey:
             bail_stage=self.bail_stage if outcome == "bailed" else None,
             objection=self.objection if outcome == "bailed" else None,
             retention_time_s=self.elapsed(),
-            stage_trace=list(self._traces) or [StageTrace(stage="land", time_s=self.elapsed())],
+            stage_trace=stage_trace,
             purchase_reason=self.purchase_reason if outcome == "bought" else None,
             bail_reason=self.bail_reason if outcome == "bailed" else None,
+            landed_on_target=self.landed_on_target,
+            chosen_listing_id=self.chosen_listing_id,
+            divert_stage=self.divert_stage,
+            competitor_id=self.competitor_id,
+            competitor_title=self.competitor_title,
+            profile=self.profile,
         )
 
 
@@ -232,14 +251,13 @@ class BrowserUseAgenticDriver:
         self.model = model
         self.max_steps = max_steps
         self.headless = headless
-        self.agent_timeout_s = agent_timeout_s or float(os.environ.get("BROWSER_USE_AGENT_TIMEOUT_S", "12"))
-        self.autonomous = _env_bool("BROWSER_USE_AUTONOMOUS", True)
-        self.use_vision = _env_bool("BROWSER_USE_VISION", True)
-        self.vision_detail_level = _vision_detail_level()
-        # The runner passes the listing *slug* (run.listing.id), not a URL, so we
-        # build the page URL from a configurable base. Default points at H3's local
-        # stub server; swap to H2's dev server via LISTING_BASE_URL (one-line swap).
-        self.base_url = (base_url or os.environ.get("LISTING_BASE_URL", "http://localhost:8080")).rstrip("/")
+        self.agent_timeout_s = agent_timeout_s or float(os.environ.get("BROWSER_USE_AGENT_TIMEOUT_S", "20"))
+        self.autonomous = os.environ.get("BROWSER_USE_AUTONOMOUS", "0") == "1"
+        # The runner passes the listing *slug* (run.listing.id); we build storefront
+        # URLs from a configurable base. Default points at H2's Vite dev server on
+        # :5174; override via LISTING_BASE_URL (one-line swap, no code change).
+        self.base_url = (base_url or os.environ.get("LISTING_BASE_URL", "http://localhost:5174")).rstrip("/")
+        self.target_id = listing.id  # the ONE listing every metric is tracked against
 
     # ---- the seam the runner calls (emit-aware -> streams live) -----------------
     async def run_journey(
@@ -253,39 +271,36 @@ class BrowserUseAgenticDriver:
         seed: int,
         run_id: str,
         emit: EmitFn,
+        profile: PersonaProfile | None = None,
     ) -> AgentTrace:
-        url = self._page_url(listing_url, listing, agent_id=agent_id, run_id=run_id, archetype=archetype)
-        ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit)
+        ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit, profile=profile)
 
-        if not _listing_has_proper_images(listing):
-            ctx.record("land", None, sentiment="reject", comment="Skipping this beanie because it has no proper product images.")
-            await self._bail(ctx, "land", "I only check out beanies with proper product images, not placeholders.", "visual_photos")
-            return ctx.trace()
-
+        # Every agent enters through the storefront (home → search "beanie") and only
+        # then browses freely. We do NOT emit a funnel `land` here — `land` means the
+        # agent opened the TRACKED listing's PDP, which happens later (or never, if
+        # they pick a competitor straight from the results).
         if not self.autonomous:
-            return await self._run_guided_browser_fallback(ctx, url, seed)
-
-        # land: emitted before the browser navigates, so no thumbnail yet (the first
-        # real thumbnail lands at the photos gate).
-        ctx.record("land", None)
-        await emit(StageEnterEvent(run_id=run_id, ts=_now_ms(), agent_id=agent_id, stage="land"))
+            return await self._run_guided_browser_fallback(ctx, seed)
 
         browser = self._make_browser()
         try:
             tools = self._build_tools(ctx)
-            agent = self._make_agent(name, archetype, listing, url, tools, browser)
+            agent = self._make_agent(ctx, tools, browser)
             try:
                 await asyncio.wait_for(
                     agent.run(max_steps=self.max_steps, on_step_end=self._on_step(ctx)),
                     timeout=self.agent_timeout_s,
                 )
             except TimeoutError:
-                return await self._run_guided_browser_fallback(ctx, url, seed)
-            except Exception as exc:  # agent crash -> degrade to a clean bail
-                if ctx.outcome is None:
-                    return await self._run_guided_browser_fallback(ctx, url, seed, f"browser-use fallback: {str(exc)[:120]}")
-            if ctx.outcome is None:  # ran out of steps without deciding
-                await self._bail(ctx, ctx.current_gate or "land", "Browsed but never committed to buying.")
+                pass  # fall through to the "never committed" handling below
+            except Exception as exc:  # agent crash -> deterministic journey if nothing happened
+                if ctx.outcome is None and not ctx._traces and not ctx.landed_on_target:
+                    return await self._run_guided_browser_fallback(ctx, seed, f"browser-use fallback: {str(exc)[:120]}")
+            if ctx.outcome is None:
+                if not ctx._traces and not ctx.landed_on_target:
+                    # The autonomous agent never got going → run the deterministic journey.
+                    return await self._run_guided_browser_fallback(ctx, seed)
+                await self._bail(ctx, ctx.current_gate or "land", "Browsed around but never committed to buying.")
             return ctx.trace()
         finally:
             await self._close(browser)
@@ -293,15 +308,14 @@ class BrowserUseAgenticDriver:
     async def _run_guided_browser_fallback(
         self,
         ctx: _Journey,
-        url: str,
         seed: int,
         note: str | None = None,
     ) -> AgentTrace:
-        """Fallback for demos when the autonomous browser-use loop stalls.
-
-        It still opens and clicks through the real Shopee frontend in Chromium,
-        captures thumbnails, and uses the same deterministic decision model as
-        mock mode to decide where this persona drops off.
+        """Deterministic real-mode journey (the default real path, and the autonomous
+        fallback). Drives the real Shopee frontend in Chromium: home → search "beanie"
+        → pick a product (target-biased, may choose a competitor) → funnel the TRACKED
+        listing with the mock decision model. Every recorded metric is about the tracked
+        listing only; a competitor purchase is attributed as a divert, never a buy.
         """
         from playwright.async_api import async_playwright
 
@@ -317,209 +331,47 @@ class BrowserUseAgenticDriver:
             except Exception:
                 return False
 
-        async def text_all(page, selector: str, limit: int = 4) -> list[str]:  # noqa: ANN001
+        async def shot(page, gate: GateStage) -> str | None:  # noqa: ANN001
             try:
-                return [
-                    text.strip()
-                    for text in (await page.locator(selector).all_inner_texts())[:limit]
-                    if text.strip()
-                ]
-            except Exception:
-                return []
-
-        async def text_one(page, selector: str) -> str | None:  # noqa: ANN001
-            try:
-                loc = page.locator(selector).first
-                if await loc.count() == 0:
-                    return None
-                text = await loc.inner_text(timeout=1500)
-                return text.strip() or None
+                return await asyncio.to_thread(save_thumbnail, await page.screenshot(full_page=False), ctx.agent_id, gate)
             except Exception:
                 return None
-
-        async def scrape_competitor_facts(page) -> dict[str, object]:  # noqa: ANN001
-            return {
-                "title": await text_one(page, '[data-field="title"]'),
-                "seller": await text_one(page, '[data-field="seller-name"]'),
-                "verified": await text_one(page, '[data-field="seller-verified"]'),
-                "price": await text_one(page, '[data-field="price"]'),
-                "base_price": await text_one(page, '[data-field="base-price"]'),
-                "rating": await text_one(page, '[data-field="rating"]'),
-                "review_count": await text_one(page, '[data-field="review-count"]'),
-                "response_rate": await text_one(page, '[data-field="response-rate"]'),
-                "shipping_fee": await text_one(page, '[data-field="shipping-fee"]'),
-                "shipping_days": await text_one(page, '[data-field="shipping-days"]'),
-                "comments": await text_all(page, '[data-field="review-text"]', limit=4),
-                "seller_responses": await text_all(page, '[data-field="seller-response"]', limit=2),
-            }
 
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page(viewport={"width": 1280, "height": 900})
             try:
-                search_url = self._search_url(
-                    agent_id=ctx.agent_id,
-                    run_id=ctx.run_id,
-                    archetype=ctx.archetype,
-                )
-                await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
-                await page.wait_for_timeout(700)
-                discovery_thumbnail_url = await asyncio.to_thread(
-                    save_thumbnail,
-                    await page.screenshot(full_page=False),
-                    ctx.agent_id,
-                    "discovery_search",
-                )
-                await ctx.emit(
-                    StageEnterEvent(
-                        run_id=ctx.run_id,
-                        ts=_now_ms(),
-                        agent_id=ctx.agent_id,
-                        stage="discovery",
-                        thumbnail_url=discovery_thumbnail_url,
-                    )
-                )
-                await ctx.emit(
-                    BrowserFrameEvent(
-                        run_id=ctx.run_id,
-                        ts=_now_ms(),
-                        agent_id=ctx.agent_id,
-                        thumbnail_url=discovery_thumbnail_url,
-                        scroll_pct=0.0,
-                    )
-                )
-                competitors = competitors_for_persona(ctx.archetype)
-                if competitors:
-                    names = ", ".join(c["name"] for c in competitors)
-                    await ctx.emit(
-                        StageSentimentEvent(
-                            run_id=ctx.run_id,
-                            ts=_now_ms(),
-                            agent_id=ctx.agent_id,
-                            stage="discovery",
-                            sentiment="neutral",
-                            comment=f"Searched '{SEARCH_QUERY}' and compared {names} before judging the Matin Kim listing.",
-                        )
-                    )
-                    for competitor in competitors:
-                        selector = f'[data-listing-id="{competitor["id"]}"]'
-                        try:
-                            if await click(page, f"{PROPER_IMAGE_BEANIE_CARD}{selector}"):
-                                await page.wait_for_load_state("domcontentloaded", timeout=5000)
-                                await page.wait_for_timeout(450)
-                                competitor_land_url = await asyncio.to_thread(
-                                    save_thumbnail,
-                                    await page.screenshot(full_page=False),
-                                    ctx.agent_id,
-                                    f'discovery_{competitor["id"]}_land',
-                                )
-                                await ctx.emit(
-                                    BrowserFrameEvent(
-                                        run_id=ctx.run_id,
-                                        ts=_now_ms(),
-                                        agent_id=ctx.agent_id,
-                                        thumbnail_url=competitor_land_url,
-                                        scroll_pct=0.08,
-                                    )
-                                )
-                                await click(page, '[data-action="open-reviews"]')
-                                await page.wait_for_timeout(350)
-                                competitor_reviews_url = await asyncio.to_thread(
-                                    save_thumbnail,
-                                    await page.screenshot(full_page=False),
-                                    ctx.agent_id,
-                                    f'discovery_{competitor["id"]}_reviews',
-                                )
-                                await ctx.emit(
-                                    BrowserFrameEvent(
-                                        run_id=ctx.run_id,
-                                        ts=_now_ms(),
-                                        agent_id=ctx.agent_id,
-                                        thumbnail_url=competitor_reviews_url,
-                                        scroll_pct=0.18,
-                                    )
-                                )
-                                facts = await scrape_competitor_facts(page)
-                                analysis = analyze_competitor(
-                                    ctx.archetype,
-                                    competitor,
-                                    facts,
-                                    target_price=ctx.listing.price,
-                                )
-                                analysis["thumbnail_url"] = competitor_reviews_url
-                                await ctx.emit(
-                                    CompetitorAnalysisEvent(
-                                        run_id=ctx.run_id,
-                                        ts=_now_ms(),
-                                        agent_id=ctx.agent_id,
-                                        **analysis,
-                                    )
-                                )
-                                await ctx.emit(
-                                    StageSentimentEvent(
-                                        run_id=ctx.run_id,
-                                        ts=_now_ms(),
-                                        agent_id=ctx.agent_id,
-                                        stage="discovery",
-                                        sentiment="neutral",
-                                        comment=str(analysis["verdict"]),
-                                    )
-                                )
-                                await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
-                                await page.wait_for_timeout(300)
-                        except Exception:
-                            await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
-                            await page.wait_for_timeout(300)
-                else:
-                    await ctx.emit(
-                        StageSentimentEvent(
-                            run_id=ctx.run_id,
-                            ts=_now_ms(),
-                            agent_id=ctx.agent_id,
-                            stage="discovery",
-                            sentiment="neutral",
-                            comment=f"Searched '{SEARCH_QUERY}' and picked the Matin Kim listing from results.",
-                        )
-                    )
-
-                await page.goto(url, wait_until="domcontentloaded", timeout=8000)
-                await page.wait_for_timeout(700)
-                land_thumbnail_url = await asyncio.to_thread(
-                    save_thumbnail,
-                    await page.screenshot(full_page=False),
-                    ctx.agent_id,
-                    "land",
-                )
-                ctx.record("land", land_thumbnail_url)
-                await ctx.emit(
-                    StageEnterEvent(
-                        run_id=ctx.run_id,
-                        ts=_now_ms(),
-                        agent_id=ctx.agent_id,
-                        stage="land",
-                        thumbnail_url=land_thumbnail_url,
-                    )
-                )
-                await ctx.emit(
-                    BrowserFrameEvent(
-                        run_id=ctx.run_id,
-                        ts=_now_ms(),
-                        agent_id=ctx.agent_id,
-                        thumbnail_url=land_thumbnail_url,
-                        scroll_pct=0.0,
-                    )
-                )
+                # 1. Home — the ?mk_config bootstrap writes the sessionStorage override here.
+                await page.goto(self._home_url(ctx), wait_until="domcontentloaded", timeout=8000)
+                await page.wait_for_timeout(500)
+                home_thumb = await shot(page, "land")
+                if home_thumb:
+                    await ctx.emit(BrowserFrameEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, thumbnail_url=home_thumb, scroll_pct=0.0))
                 if note:
-                    await ctx.emit(
-                        StageSentimentEvent(
-                            run_id=ctx.run_id,
-                            ts=_now_ms(),
-                            agent_id=ctx.agent_id,
-                            stage="land",
-                            sentiment="neutral",
-                            comment=note,
-                        )
-                    )
+                    await ctx.emit(StageSentimentEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage="land", sentiment="neutral", comment=note))
+
+                # 2. Mandatory search route — every agent goes through "beanie" results.
+                await page.goto(self._search_url(ctx), wait_until="domcontentloaded", timeout=8000)
+                await page.wait_for_timeout(600)
+                search_thumb = await shot(page, "land")
+                if search_thumb:
+                    await ctx.emit(BrowserFrameEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, thumbnail_url=search_thumb, scroll_pct=0.0))
+
+                # 3. Read the result cards; let this persona freely choose one.
+                candidates = await self._scrape_candidates(page)
+                by_id = {c.id: c for c in candidates}
+                chosen_id = choose_listing(seed, ctx.agent_id, ctx.archetype, candidates) if candidates else self.target_id
+
+                if chosen_id != self.target_id and chosen_id in by_id:
+                    # Picked a competitor straight from search — diverted before landing.
+                    await self._open_product(page, click, ctx, chosen_id)
+                    await self._divert(ctx, "land", by_id[chosen_id], await shot(page, "land"))
+                    return ctx.trace()
+
+                # 4. Chose the tracked listing → open it and run OUR funnel.
+                await self._open_product(page, click, ctx, self.target_id)
+                ctx.landed_on_target = True
+                await self._enter(ctx, "land", await shot(page, "land"))
 
                 for gate in ("photos", "reviews", "price", "cart", "checkout"):
                     nav = GATE_NAV.get(gate)  # type: ignore[arg-type]
@@ -530,57 +382,140 @@ class BrowserUseAgenticDriver:
                         await self._bail(ctx, gate, f"Couldn't reach the {gate} section — the page didn't respond.")
                         break
 
-                    thumbnail_url = await asyncio.to_thread(
-                        save_thumbnail,
-                        await page.screenshot(full_page=False),
-                        ctx.agent_id,
-                        gate,
-                    )
-                    decision = decide(seed, ctx.agent_id, ctx.archetype, gate, ctx.listing)
+                    thumb = await shot(page, gate)
+                    decision = decide(seed, ctx.agent_id, ctx.archetype, gate, ctx.listing, ctx.profile)
                     if decision.action == "bail":
                         objection = decision.objection or "Not convinced enough to buy."
-                        await self._enter(ctx, gate, thumbnail_url, sentiment="reject", comment=objection)
+                        await self._enter(ctx, gate, thumb, sentiment="reject", comment=objection)
                         await self._bail(ctx, gate, objection)
                         break
-
                     sentiment, comment = synth_reaction(ctx.archetype, gate, decision.probability)
-                    await self._enter(ctx, gate, thumbnail_url, sentiment=sentiment, comment=comment)
+                    await self._enter(ctx, gate, thumb, sentiment=sentiment, comment=comment)
+
+                    # After engaging the price, a price-sensitive shopper may leave for a
+                    # clearly cheaper card they saw in the results.
+                    if gate == "price":
+                        alt = cheaper_alternative(seed, ctx.agent_id, ctx.archetype, ctx.listing.price, candidates)
+                        if alt is not None:
+                            await page.goto(self._product_url(ctx, alt.id), wait_until="domcontentloaded", timeout=8000)
+                            await page.wait_for_timeout(400)
+                            await self._divert(ctx, "price", alt, await shot(page, "price"))
+                            break
 
                 if ctx.outcome is None:
                     await click(page, f'[data-action="{CONFIRM_ACTION}"]')
-                    thumbnail_url = await asyncio.to_thread(
-                        save_thumbnail,
-                        await page.screenshot(full_page=False),
-                        ctx.agent_id,
-                        "checkout",
-                    )
+                    thumb = await shot(page, "checkout")
                     reason = synth_purchase_reason(ctx.archetype)
                     ctx.outcome = "bought"
+                    ctx.chosen_listing_id = self.target_id
                     ctx.purchase_reason = reason
-                    await ctx.emit(
-                        BrowserFrameEvent(
-                            run_id=ctx.run_id,
-                            ts=_now_ms(),
-                            agent_id=ctx.agent_id,
-                            thumbnail_url=thumbnail_url,
-                            scroll_pct=1.0,
-                        )
-                    )
-                    await ctx.emit(
-                        StageSentimentEvent(
-                            run_id=ctx.run_id,
-                            ts=_now_ms(),
-                            agent_id=ctx.agent_id,
-                            stage="checkout",
-                            sentiment="love",
-                            comment=reason,
-                        )
-                    )
+                    if thumb:
+                        await ctx.emit(BrowserFrameEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, thumbnail_url=thumb, scroll_pct=1.0))
+                    await ctx.emit(StageSentimentEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage="checkout", sentiment="love", comment=reason))
                     await ctx.emit(AgentBoughtEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, retention_time_s=ctx.elapsed()))
             finally:
                 await browser.close()
 
         return ctx.trace()
+
+    # ---- storefront helpers (guided path: raw Playwright `page`) ----------------
+    async def _scrape_candidates(self, page) -> list[CandidateListing]:  # noqa: ANN001
+        """Read the visible search-result cards into choice candidates."""
+        out: dict[str, CandidateListing] = {}
+        try:
+            cards = page.locator('[data-action="open-listing"]')
+            count = await cards.count()
+        except Exception:
+            return []
+        for i in range(min(count, 24)):
+            card = cards.nth(i)
+            try:
+                listing_id = await card.get_attribute("data-listing-id")
+                if not listing_id or listing_id in out:
+                    continue
+                title = (await self._field_text(card, "listing-card-title")) or listing_id
+                price = _parse_price(await self._field_text(card, "listing-card-price"))
+                if price is None:
+                    continue
+                out[listing_id] = CandidateListing(
+                    id=listing_id, title=title.strip(), price=price, is_target=(listing_id == self.target_id)
+                )
+            except Exception:
+                continue
+        return list(out.values())
+
+    @staticmethod
+    async def _field_text(card, field_name: str) -> str | None:  # noqa: ANN001
+        try:
+            loc = card.locator(f'[data-field="{field_name}"]').first
+            if await loc.count() == 0:
+                return None
+            return await loc.inner_text()
+        except Exception:
+            return None
+
+    async def _open_product(self, page, click, ctx: _Journey, listing_id: str) -> None:  # noqa: ANN001
+        """Open a product by clicking its result card (fallback: navigate directly)."""
+        opened = await click(page, f'[data-action="open-listing"][data-listing-id="{listing_id}"]')
+        if not opened:
+            await page.goto(self._product_url(ctx, listing_id), wait_until="domcontentloaded", timeout=8000)
+            await page.wait_for_timeout(400)
+        ctx.last_listing_id = listing_id
+
+    # ---- competitive divert (shared by both paths) ------------------------------
+    async def _divert(self, ctx: _Journey, from_stage: GateStage, competitor: CandidateListing, thumbnail_url: str | None = None) -> None:
+        """Finalize a journey where the agent left the tracked listing to buy a
+        competitor: a non-conversion for us, attributed to the winning product."""
+        if ctx.outcome is not None:
+            return
+        objection = competitor_objection(ctx.archetype, competitor)
+        ctx.outcome = "bailed"
+        ctx.divert_stage = from_stage
+        # Only count it against OUR funnel stage if they had actually landed on us.
+        ctx.bail_stage = from_stage if ctx.landed_on_target else None
+        ctx.objection = objection
+        ctx.bail_reason = "chose_competitor"
+        ctx.competitor_id = competitor.id
+        ctx.competitor_title = competitor.title
+        ctx.chosen_listing_id = competitor.id
+        ctx.last_listing_id = competitor.id
+        if thumbnail_url:
+            await ctx.emit(BrowserFrameEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, thumbnail_url=thumbnail_url, scroll_pct=_scroll_pct(from_stage)))
+        # The diverted event fully represents this outcome for the dashboard (which
+        # marks the agent "diverted" and tallies the competitor). We deliberately do
+        # NOT also emit agent_bailed: the objection lives on the trace for the report,
+        # and a second terminal event would muddy the live agent state.
+        await ctx.emit(AgentDivertedEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, from_stage=from_stage, competitor=competitor.id, competitor_name=competitor.title, converted=True, reason=objection))
+
+    async def _current_listing_id(self, browser_session) -> str | None:  # noqa: ANN001
+        """The tracked-vs-competitor signal for the autonomous path: parse the listing
+        slug from the current ``/shopee/<slug>`` URL."""
+        try:
+            page = await browser_session.must_get_current_page()
+            url = getattr(page, "url", None)
+            if asyncio.iscoroutine(url):
+                url = await url
+            return listing_id_from_url(url if isinstance(url, str) else None)
+        except Exception:
+            return None
+
+    async def _current_competitor(self, browser_session, listing_id: str) -> CandidateListing:  # noqa: ANN001
+        """Best-effort snapshot of the competitor PDP the autonomous agent is buying."""
+        title = listing_id.replace("-", " ").replace("_", " ").title()
+        price = 0.0
+        try:
+            page = await browser_session.must_get_current_page()
+            if hasattr(page, "evaluate"):
+                data = await page.evaluate(
+                    "() => ({t: document.querySelector('[data-field=\"title\"]')?.textContent,"
+                    " p: document.querySelector('[data-field=\"price\"]')?.textContent})"
+                )
+                if isinstance(data, dict):
+                    title = (data.get("t") or title).strip()
+                    price = _parse_price(data.get("p")) or price
+        except Exception:
+            pass
+        return CandidateListing(id=listing_id, title=title, price=price, is_target=False)
 
     # ---- custom action registry (the constrained funnel vocabulary) ------------
     def _build_tools(self, ctx: _Journey):
@@ -597,17 +532,24 @@ class BrowserUseAgenticDriver:
         async def gate(browser_session, name: GateStage, reaction: str, sentiment: str):
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
-            if name in {"cart", "checkout"} and not _listing_has_proper_images(ctx.listing):
-                await self._bail(ctx, ctx.current_gate or "photos", "I only check out beanies with proper product images, not placeholders.", "visual_photos")
-                return ActionResult(extracted_content="Blocked checkout: listing has no proper product image.", is_done=True, success=False)
+            # Which PDP is the agent on? Only the TRACKED listing's gates are recorded;
+            # the same funnel buttons exist on competitor PDPs but never count for us.
+            current = await self._current_listing_id(browser_session)
+            if current:
+                ctx.last_listing_id = current
+            on_target = current == self.target_id or (current is None and ctx.last_listing_id == self.target_id)
             nav = GATE_NAV.get(name)
             if nav:  # e.g. checkout lives on /cart — click the cart icon to get there first
                 await self._click_css(browser_session, nav)
                 await asyncio.sleep(0.4)
             reached = await self._click(browser_session, GATE_ACTION[name])
+            if not on_target:
+                # Browsing a competitor — let the agent proceed but record nothing for us.
+                return ActionResult(extracted_content="(Not the tracked Matin Kim listing — this won't count toward its metrics.)")
             if not reached:
                 await self._bail(ctx, name, f"Couldn't reach the {name} section — the page didn't respond.")
                 return ActionResult(extracted_content=f"{name} unavailable; left the listing.", is_done=True, success=False)
+            ctx.landed_on_target = True
             url = await self._capture(ctx, browser_session, name)
             await self._enter(ctx, name, url, sentiment=_clean_sentiment(sentiment), comment=reaction or None)
             return ActionResult(extracted_content=self._gate_summary(name, ctx.listing))
@@ -636,12 +578,19 @@ class BrowserUseAgenticDriver:
         async def confirm_purchase(browser_session, reason: str = ""):  # noqa: ANN001
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
-            if not _listing_has_proper_images(ctx.listing):
-                await self._bail(ctx, ctx.current_gate or "photos", "I only buy beanies with proper product images, not placeholders.", "visual_photos")
-                return ActionResult(extracted_content="Purchase blocked: listing has no proper product image.", is_done=True, success=False)
+            current = await self._current_listing_id(browser_session)
+            effective = current or ctx.last_listing_id
             await self._click(browser_session, CONFIRM_ACTION)
+            if effective and effective != self.target_id:
+                # Bought a competitor — a loss for the tracked listing, attributed.
+                competitor = await self._current_competitor(browser_session, effective)
+                thumb = await self._capture(ctx, browser_session, ctx.current_gate or "land")
+                await self._divert(ctx, ctx.current_gate or "land", competitor, thumb)
+                return ActionResult(extracted_content=f"Bought a different product ({competitor.title}) instead.", is_done=True, success=True)
             url = await self._capture(ctx, browser_session, "checkout")
             ctx.outcome = "bought"
+            ctx.landed_on_target = True
+            ctx.chosen_listing_id = self.target_id
             ctx.purchase_reason = reason or None
             if reason:
                 # surface the buy rationale in the live sentiment/comment feed too
@@ -679,7 +628,10 @@ class BrowserUseAgenticDriver:
         if ctx.outcome is not None:
             return
         reason = _clean_reason(reason_category, gate)
-        ctx.outcome, ctx.bail_stage, ctx.objection, ctx.bail_reason = "bailed", gate, objection, reason
+        ctx.outcome, ctx.objection, ctx.bail_reason = "bailed", objection, reason
+        # Don't attribute the drop to one of OUR funnel stages if they never landed on
+        # the tracked listing (e.g. left the storefront from the search results).
+        ctx.bail_stage = gate if ctx.landed_on_target else None
         await ctx.emit(StageSentimentEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, sentiment="reject", comment=objection))
         await ctx.emit(ObjectionEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, text=objection))
         await ctx.emit(
@@ -687,33 +639,31 @@ class BrowserUseAgenticDriver:
         )
 
     # ---- prompt assembly (reuses H4's PERSONAS) --------------------------------
-    def _make_agent(self, name: str, archetype: PersonaId, listing: ListingConfig, url: str, tools, browser):
+    def _make_agent(self, ctx: _Journey, tools, browser):
         from browser_use import Agent, ChatOpenAI
 
         return Agent(
-            task=self._task(name, archetype, listing, url),
+            task=self._task(ctx),
             llm=ChatOpenAI(model=self.model),
             tools=tools,
             browser=browser,
-            extend_system_message=self._persona_system_message(name, archetype),
-            use_vision=self.use_vision,
-            vision_detail_level=self.vision_detail_level,
+            extend_system_message=self._persona_system_message(ctx.name, ctx.archetype, ctx.profile),
         )
 
     @staticmethod
-    def _persona_system_message(name: str, archetype: PersonaId) -> str:
+    def _persona_system_message(name: str, archetype: PersonaId, profile: PersonaProfile | None = None) -> str:
         """Inject the persona into the SYSTEM prompt so the agent's own chain-of-thought
         (Layer 1) reasons in character, not just the task prompt."""
         persona = PERSONAS[archetype]
+        life = f" Your life right now: {profile.blurb}." if profile else ""
         return (
             f"\n\nROLE-PLAY: You are {name}, a {persona.display} shopper in Singapore "
-            f"({persona.tag}). {persona.blurb}\n"
+            f"({persona.tag}). {persona.blurb}{life}\n"
             "Stay in character for ALL of your reasoning: in every `thinking` step, react to "
-            "the visible product images, reviews, price, seller trust and authenticity the way THIS persona "
-            "would. When you call a funnel action, fill its `reaction` with a short first-person "
-            "line in your voice and set `sentiment` honestly (love/like/neutral/dislike/reject). "
-            "Only open, compare, add to cart, or checkout beanie listings that have proper product photos. "
-            "Skip non-beanie results and skip beanies with missing, broken, blank, stub, generated fallback, or placeholder-looking images."
+            "the photos, reviews, price, seller trust and authenticity the way THIS persona "
+            "would, taking your life circumstances (income, age, family) into account. When you "
+            "call a funnel action, fill its `reaction` with a short first-person line in your "
+            "voice and set `sentiment` honestly (love/like/neutral/dislike/reject)."
         )
 
     def _on_step(self, ctx: _Journey):
@@ -753,27 +703,28 @@ class BrowserUseAgenticDriver:
 
         return hook
 
-    def _task(self, name: str, archetype: PersonaId, listing: ListingConfig, url: str) -> str:
-        persona = PERSONAS[archetype]
-        examples = "; ".join(self._objection_examples(archetype))
+    def _task(self, ctx: _Journey) -> str:
+        persona = PERSONAS[ctx.archetype]
+        examples = "; ".join(self._objection_examples(ctx.archetype))
+        life = f"Your life right now: {ctx.profile.blurb}.\n" if ctx.profile else ""
         return (
-            f"You are {name}, a {persona.display} shopper in Singapore ({persona.tag}).\n"
-            f"{persona.blurb}\n\n"
-            f"Shop this Shopee listing. Start by opening it: {url}\n\n"
-            f"Before judging it, search Shopee for '{SEARCH_QUERY}' and compare relevant alternatives if your persona would naturally comparison-shop.\n\n"
-            "Image rule: only open, compare, add to cart, checkout, or buy beanie listings with proper product photos. "
-            "Do not access non-beanie listings. Do not check out any beanie that has no image, a broken image, a blank/stub image, a generated fallback SVG, or a placeholder-looking image. "
-            "If images do not clearly show the product, skip it or bail at the photos gate.\n\n"
-            f"What you can see about the listing:\n{self._facts(listing)}\n\n"
-            "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
-            "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
-            "  At EACH step pass `reaction` (a short first-person line in your voice about what you just\n"
-            "  saw) and `sentiment` (love/like/neutral/dislike/reject) — this is how we record what you think.\n"
-            "  confirm_purchase — only if you genuinely decide to buy a beanie AND you have seen proper non-placeholder product photos; pass `reason` (why you're buying).\n"
-            "  bail — the moment something puts you off; state your exact objection in character and a\n"
-            "  `reason_category` (price_value/trust_authenticity/visual_photos/social_proof_reviews/shipping/other).\n\n"
+            f"You are {ctx.name}, a {persona.display} shopper in Singapore ({persona.tag}).\n"
+            f"{persona.blurb}\n{life}\n"
+            f"You begin on the Shopee home page: {self._home_url(ctx)}\n"
+            "FIRST, search for a beanie: type \"beanie\" into the search bar at the top and press Enter "
+            f"(or open {self._search_url(ctx)}). You MUST go through the search results before opening any product.\n\n"
+            "Then browse FREELY, the way you really would: open whichever beanie listings catch your eye, "
+            "compare them, and either buy the one you genuinely want or leave without buying. You are NOT "
+            "required to buy any particular product.\n\n"
+            "When you are looking at a product you like, use these actions to work through it and record what "
+            "you think:\n"
+            "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout.\n"
+            "  At EACH step pass `reaction` (a short first-person line in your voice) and `sentiment` "
+            "(love/like/neutral/dislike/reject).\n"
+            "  confirm_purchase — when you genuinely decide to buy whatever is in front of you; pass `reason`.\n"
+            "  bail — if you leave without buying anything; give your objection and a `reason_category`.\n\n"
             f"Stay fully in character. If you bail, phrase it like these Singlish lines: {examples}\n"
-            f"Decide the way {persona.display} really would for THIS listing."
+            f"Decide the way {persona.display} really would."
         )
 
     @staticmethod
@@ -813,43 +764,26 @@ class BrowserUseAgenticDriver:
             return f"In cart: S${listing.price:.2f} + S${listing.shipping.fee:.2f} shipping = S${total:.2f}."
         return f"Checkout total ~S${total:.2f}. Authenticity proof: cert={a.certificate}, serial={a.serial}, unboxing={a.unboxing}."
 
-    def _page_url(
-        self,
-        slug: str,
-        listing: ListingConfig,
-        *,
-        agent_id: str | None = None,
-        run_id: str | None = None,
-        archetype: PersonaId | None = None,
-    ) -> str:
-        """The React product route + the listing config, so the agent browses exactly
-        the listing we're simulating (and mutated reruns render). ``loadConfig.ts`` reads
-        ``?config=<base64 of UTF-8 JSON>``; URL-quote it so ``+ / =`` survive URLSearchParams."""
-        cfg = base64.b64encode(listing.model_dump_json().encode("utf-8")).decode("ascii")
-        params = {
-            "config": cfg,
-            "agent_id": agent_id,
-            "run_id": run_id,
-            "persona": archetype,
-        }
-        query = urllib.parse.urlencode({k: v for k, v in params.items() if v})
-        return f"{self.base_url}/shopee/{slug}?{query}"
+    def _sim_params(self, ctx: _Journey, *, with_config: bool = False) -> dict[str, str]:
+        """The sim-session params the frontend threads across navigation. ``mk_config``
+        (base64 of the tracked listing) is included only on the home entry: a one-time
+        bootstrap writes it into the sessionStorage override (loadConfig.ts), so the
+        tracked PDP and its search card render the exact simulated/mutated listing even
+        though in-app links only carry agent_id/run_id/persona."""
+        params = {"agent_id": ctx.agent_id, "run_id": ctx.run_id, "persona": ctx.archetype}
+        if with_config:
+            params["mk_config"] = base64.b64encode(ctx.listing.model_dump_json().encode("utf-8")).decode("ascii")
+        return params
 
-    def _search_url(
-        self,
-        *,
-        agent_id: str | None = None,
-        run_id: str | None = None,
-        archetype: PersonaId | None = None,
-    ) -> str:
-        params = {
-            "keyword": SEARCH_QUERY,
-            "agent_id": agent_id,
-            "run_id": run_id,
-            "persona": archetype,
-        }
-        query = urllib.parse.urlencode({k: v for k, v in params.items() if v})
-        return f"{self.base_url}/search?{query}"
+    def _home_url(self, ctx: _Journey) -> str:
+        return f"{self.base_url}/?{urllib.parse.urlencode(self._sim_params(ctx, with_config=True))}"
+
+    def _search_url(self, ctx: _Journey) -> str:
+        params = {"keyword": SEARCH_KEYWORD, **self._sim_params(ctx)}
+        return f"{self.base_url}/search?{urllib.parse.urlencode(params)}"
+
+    def _product_url(self, ctx: _Journey, slug: str) -> str:
+        return f"{self.base_url}/shopee/{slug}?{urllib.parse.urlencode(self._sim_params(ctx))}"
 
     # ---- browser-use runtime touchpoints (isolated; see VERIFY in module docstring)
     def _make_browser(self):
