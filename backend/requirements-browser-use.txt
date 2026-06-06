@@ -1,0 +1,3 @@
+# Optional for H3 real/agentic mode.
+-r requirements.txt
+browser-use>=0.9.0

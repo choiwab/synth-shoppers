@@ -1,0 +1,1056 @@
+{
+  "run_id": "run_sample",
+  "market_fit_score": 46,
+  "recommended_price": 29.9,
+  "go_no_go": {
+    "decision": "no_go",
+    "confidence": 0.71
+  },
+  "funnel": [
+    {
+      "stage": "land",
+      "entered": 28,
+      "bailed": 1,
+      "bail_rate": 0.036
+    },
+    {
+      "stage": "photos",
+      "entered": 27,
+      "bailed": 9,
+      "bail_rate": 0.333
+    },
+    {
+      "stage": "reviews",
+      "entered": 18,
+      "bailed": 4,
+      "bail_rate": 0.222
+    },
+    {
+      "stage": "price",
+      "entered": 14,
+      "bailed": 5,
+      "bail_rate": 0.357
+    },
+    {
+      "stage": "cart",
+      "entered": 9,
+      "bailed": 0,
+      "bail_rate": 0.0
+    },
+    {
+      "stage": "checkout",
+      "entered": 9,
+      "bailed": 1,
+      "bail_rate": 0.111
+    }
+  ],
+  "archetypes": [
+    {
+      "archetype": "auntie",
+      "agents": 4,
+      "bought": 1,
+      "bailed": 3,
+      "buy_rate": 0.25,
+      "avg_retention_s": 3.6,
+      "top_objection": "Hmm, not feeling this shop page."
+    },
+    {
+      "archetype": "budget",
+      "agents": 4,
+      "bought": 0,
+      "bailed": 4,
+      "buy_rate": 0.0,
+      "avg_retention_s": 4.2,
+      "top_objection": "Over budget liao, next."
+    },
+    {
+      "archetype": "geek",
+      "agents": 4,
+      "bought": 1,
+      "bailed": 3,
+      "buy_rate": 0.25,
+      "avg_retention_s": 3.6,
+      "top_objection": "Can't tell the knit gauge from these."
+    },
+    {
+      "archetype": "high_spender",
+      "agents": 4,
+      "bought": 2,
+      "bailed": 2,
+      "buy_rate": 0.5,
+      "avg_retention_s": 5.1,
+      "top_objection": "Even I need some trust signal lah."
+    },
+    {
+      "archetype": "insecure",
+      "agents": 4,
+      "bought": 1,
+      "bailed": 3,
+      "buy_rate": 0.25,
+      "avg_retention_s": 5.4,
+      "top_objection": "Reviews don't make me feel safe."
+    },
+    {
+      "archetype": "nerd",
+      "agents": 4,
+      "bought": 1,
+      "bailed": 3,
+      "buy_rate": 0.25,
+      "avg_retention_s": 4.8,
+      "top_objection": "Price not justified by the specs."
+    },
+    {
+      "archetype": "xmm",
+      "agents": 4,
+      "bought": 2,
+      "bailed": 2,
+      "buy_rate": 0.5,
+      "avg_retention_s": 4.8,
+      "top_objection": "Photos damn ugly leh, vibe not there."
+    }
+  ],
+  "objection_heatmap": [
+    {
+      "field": "Photos",
+      "bail_count": 9
+    },
+    {
+      "field": "Price",
+      "bail_count": 5
+    },
+    {
+      "field": "Reviews",
+      "bail_count": 4
+    },
+    {
+      "field": "Title",
+      "bail_count": 1
+    },
+    {
+      "field": "Authenticity",
+      "bail_count": 1
+    }
+  ],
+  "risk_archetypes": [
+    "budget"
+  ],
+  "recommendations": [
+    {
+      "id": "rec_photos_lifestyle",
+      "field": "Photos",
+      "issue": "9 agents bailed at Photos; XMM/Geek agents need stronger visual proof.",
+      "fix": "Add lifestyle model shots and close-up knit/detail photos before the product-only gallery.",
+      "impact_estimate": "Est. +6-9% buy rate",
+      "affected_archetypes": [
+        "xmm",
+        "geek",
+        "nerd"
+      ],
+      "config_patch": [
+        {
+          "op": "add",
+          "path": "/photos/-",
+          "value": {
+            "url": "/mock/lifestyle-1.jpg",
+            "type": "lifestyle"
+          }
+        },
+        {
+          "op": "add",
+          "path": "/photos/-",
+          "value": {
+            "url": "/mock/closeup-1.jpg",
+            "type": "closeup"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rec_price_promo",
+      "field": "Price",
+      "issue": "5 agents objected around price/cart total.",
+      "fix": "Test a launch promo price closer to baseline and absorb part of shipping into the displayed price.",
+      "impact_estimate": "Est. +5-8% buy rate",
+      "affected_archetypes": [
+        "budget",
+        "auntie",
+        "nerd"
+      ],
+      "config_patch": [
+        {
+          "op": "replace",
+          "path": "/price",
+          "value": 29.9
+        },
+        {
+          "op": "replace",
+          "path": "/shipping/fee",
+          "value": 0.0
+        }
+      ]
+    },
+    {
+      "id": "rec_trust_authenticity",
+      "field": "Authenticity",
+      "issue": "5 agents bailed at trust-sensitive stages; Auntie/Insecure personas need clearer proof.",
+      "fix": "Add authenticity certificate/unboxing proof and seller responses to the top reviews.",
+      "impact_estimate": "Est. +4-7% buy rate",
+      "affected_archetypes": [
+        "auntie",
+        "insecure"
+      ],
+      "config_patch": [
+        {
+          "op": "replace",
+          "path": "/authenticity/certificate",
+          "value": true
+        },
+        {
+          "op": "replace",
+          "path": "/authenticity/unboxing",
+          "value": true
+        },
+        {
+          "op": "replace",
+          "path": "/seller/response_rate",
+          "value": 92
+        }
+      ]
+    }
+  ],
+  "agents": [
+    {
+      "agent_id": "auntie_1",
+      "name": "Auntie May",
+      "archetype": "auntie",
+      "outcome": "bailed",
+      "bail_stage": "land",
+      "objection": "Hmm, not feeling this shop page.",
+      "retention_time_s": 1.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_1/land.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/checkout.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "auntie_3",
+      "name": "Auntie Lee",
+      "archetype": "auntie",
+      "outcome": "bailed",
+      "bail_stage": "reviews",
+      "objection": "Seller never reply reviews, not safe.",
+      "retention_time_s": 3.6,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/reviews.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "auntie_4",
+      "name": "Mdm Goh",
+      "archetype": "auntie",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Photos not convincing enough.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_4/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_4/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "budget_1",
+      "name": "Farhan",
+      "archetype": "budget",
+      "outcome": "bailed",
+      "bail_stage": "price",
+      "objection": "Over budget liao, next.",
+      "retention_time_s": 4.8,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/price.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "budget_2",
+      "name": "Xin Yi",
+      "archetype": "budget",
+      "outcome": "bailed",
+      "bail_stage": "price",
+      "objection": "Add shipping also? Forget it.",
+      "retention_time_s": 4.8,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/price.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "budget_3",
+      "name": "Aqil",
+      "archetype": "budget",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Photos not convincing enough.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_3/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_3/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "outcome": "bailed",
+      "bail_stage": "price",
+      "objection": "Over budget liao, next.",
+      "retention_time_s": 4.8,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/price.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "geek_1",
+      "name": "Kai",
+      "archetype": "geek",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Can't tell the knit gauge from these.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_1/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_1/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "geek_2",
+      "name": "Zach",
+      "archetype": "geek",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Can't tell the knit gauge from these.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_2/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_2/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/checkout.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Can't tell the knit gauge from these.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "high_spender_1",
+      "name": "Ethan",
+      "archetype": "high_spender",
+      "outcome": "bailed",
+      "bail_stage": "reviews",
+      "objection": "Even I need some trust signal lah.",
+      "retention_time_s": 3.6,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/reviews.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/checkout.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "high_spender_3",
+      "name": "Brandon",
+      "archetype": "high_spender",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Photos not convincing enough.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_3/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_3/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/checkout.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/checkout.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "insecure_2",
+      "name": "Nadia",
+      "archetype": "insecure",
+      "outcome": "bailed",
+      "bail_stage": "reviews",
+      "objection": "Reviews don't make me feel safe.",
+      "retention_time_s": 3.6,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/reviews.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "outcome": "bailed",
+      "bail_stage": "checkout",
+      "objection": "No authenticity proof, I scared kena fake.",
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/checkout.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "insecure_4",
+      "name": "Yun Xuan",
+      "archetype": "insecure",
+      "outcome": "bailed",
+      "bail_stage": "reviews",
+      "objection": "So many scams nowadays... what if fake?",
+      "retention_time_s": 3.6,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/reviews.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "nerd_1",
+      "name": "Wei Jie",
+      "archetype": "nerd",
+      "outcome": "bailed",
+      "bail_stage": "price",
+      "objection": "Price not justified by the specs.",
+      "retention_time_s": 4.8,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/price.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "nerd_2",
+      "name": "Daryl",
+      "archetype": "nerd",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Can't inspect the fabric properly from these photos.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_2/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_2/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "nerd_3",
+      "name": "Jun Hao",
+      "archetype": "nerd",
+      "outcome": "bailed",
+      "bail_stage": "price",
+      "objection": "Price not justified by the specs.",
+      "retention_time_s": 4.8,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/price.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/checkout.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "xmm_1",
+      "name": "Jia En",
+      "archetype": "xmm",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Photos damn ugly leh, vibe not there.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_1/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_1/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/checkout.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "outcome": "bailed",
+      "bail_stage": "photos",
+      "objection": "Photos damn ugly leh, vibe not there.",
+      "retention_time_s": 2.4,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/photos.png"
+        }
+      ]
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
+      "stage_trace": [
+        {
+          "stage": "land",
+          "time_s": 0.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/land.png"
+        },
+        {
+          "stage": "photos",
+          "time_s": 1.2,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/photos.png"
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/reviews.png"
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/price.png"
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/cart.png"
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/checkout.png"
+        }
+      ]
+    }
+  ]
+}

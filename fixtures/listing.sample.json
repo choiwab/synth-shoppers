@@ -1,0 +1,62 @@
+{
+  "id": "matin_kim_beanie_sg",
+  "title": "Matin Kim Logo Beanie - Trendy Korean Winter Knit Hat",
+  "seller": {
+    "name": "Seoul Street SG",
+    "verified": false,
+    "rating": 4.3,
+    "response_rate": 42
+  },
+  "price": 36.9,
+  "base_price": 29.9,
+  "variants": [
+    {
+      "name": "Colour",
+      "options": ["Black", "Grey", "Cream", "Navy"]
+    }
+  ],
+  "photos": [
+    {
+      "url": "/mock/product-front.jpg",
+      "type": "product"
+    },
+    {
+      "url": "/mock/product-back.jpg",
+      "type": "product"
+    },
+    {
+      "url": "/mock/product-packaging.jpg",
+      "type": "product"
+    }
+  ],
+  "description": "Korean-style Matin Kim logo beanie. Soft knit, unisex fit. Limited ready stock in Singapore.",
+  "rating": {
+    "score": 4.3,
+    "count": 18
+  },
+  "reviews": [
+    {
+      "author": "buyer123",
+      "rating": 4,
+      "text": "Looks okay but delivery took a bit long.",
+      "date": "2026-05-18"
+    },
+    {
+      "author": "sgfashion",
+      "rating": 5,
+      "text": "Cute beanie, but photos don't show fit clearly.",
+      "date": "2026-05-22"
+    }
+  ],
+  "authenticity": {
+    "certificate": false,
+    "serial": false,
+    "unboxing": false
+  },
+  "category": ["Fashion Accessories", "Hats", "Beanies"],
+  "shipping": {
+    "fee": 3.5,
+    "days": "3-5 days"
+  }
+}
+
