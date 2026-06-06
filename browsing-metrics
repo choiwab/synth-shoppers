@@ -1,0 +1,20 @@
+Primary — your north stars (trust these)
+
+Buyer uplift — extra unique buyers vs. control; the headline metric.
+Order uplift — extra total orders/units vs. control; only diverges from buyer uplift once agents can buy multiples or bundles.
+
+Diagnostics — track relative, not absolute (they tell you where uplift came from)
+
+Click rate / CTR — % who clicked into the listing; moves when you change the image. (Your "buyer clickthrough rate" is the same thing — merge them.)
+Read rate — % who actually read the description/reviews; moves when you change the copy.
+Engagement rate — % who interacted beyond a glance (scroll, expand reviews, zoom images); define it concretely or it's noise.
+
+Conditional — only if carts hold multiple items
+
+Average basket cost — how much an agent's basket totals; useless in a single-product test, useful once you add cross-sell/bundles.
+
+Sim-native — the stuff real analytics can't give you (highest value)
+
+Dropoff-reason distribution — what share bailed for each reason; tells you why, not just that.
+Objection-resolution rate — did your change actually kill the objection it targeted?
+Per-persona uplift — who a change wins vs. loses, segmented by archetype.

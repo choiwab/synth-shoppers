@@ -6,6 +6,45 @@
     "decision": "no_go",
     "confidence": 0.71
   },
+  "browsing_metrics": {
+    "unique_buyers": 8,
+    "orders": 8,
+    "buyer_uplift": null,
+    "order_uplift": null,
+    "click_rate": 0.964,
+    "read_rate": 0.643,
+    "engagement_rate": 0.964,
+    "average_basket_cost": null,
+    "dropoff_reason_distribution": [
+      {
+        "reason": "Photos",
+        "count": 9,
+        "share": 0.45
+      },
+      {
+        "reason": "Price",
+        "count": 5,
+        "share": 0.25
+      },
+      {
+        "reason": "Reviews",
+        "count": 4,
+        "share": 0.2
+      },
+      {
+        "reason": "Title",
+        "count": 1,
+        "share": 0.05
+      },
+      {
+        "reason": "Authenticity",
+        "count": 1,
+        "share": 0.05
+      }
+    ],
+    "objection_resolution_rate": null,
+    "per_persona_uplift": null
+  },
   "funnel": [
     {
       "stage": "land",

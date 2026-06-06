@@ -226,10 +226,10 @@ class ViabilityReport(BaseModel):
     market_fit_score: int = Field(ge=0, le=100)
     recommended_price: float
     go_no_go: dict[str, Any]
+    browsing_metrics: dict[str, Any] = Field(default_factory=dict)
     funnel: list[dict[str, Any]]
     archetypes: list[dict[str, Any]]
     objection_heatmap: list[dict[str, Any]]
     risk_archetypes: list[PersonaId]
     recommendations: list[Recommendation]
     agents: list[AgentTrace]
-
