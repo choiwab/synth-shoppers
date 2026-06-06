@@ -357,14 +357,9 @@
   display: block;
 }
 .tile-fallback {
+  position: relative;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px;
-  text-align: center;
+  overflow: hidden;
 }
 .tile-avatar {
   width: 34px;
@@ -547,6 +542,17 @@
   color: var(--fg);
   opacity: 0.9;
   max-width: 80%;
+}
+.featured-obj.floating {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 150px;
+  z-index: 2;
+  max-width: none;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: oklch(0.165 0.008 70 / 0.82);
 }
 .featured-stage-chip {
   font-family: var(--font-mono);
@@ -875,6 +881,46 @@
   gap: 14px;
   min-height: 0;
 }
+
+.shopee-monitor {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: white;
+}
+.shopee-monitor-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: white;
+  pointer-events: none;
+}
+.agent-tile .shopee-monitor-frame {
+  width: 240%;
+  height: 240%;
+  transform: scale(0.4167);
+  transform-origin: top left;
+}
+.featured-window .shopee-monitor-frame {
+  width: 150%;
+  height: 150%;
+  transform: scale(0.6667);
+  transform-origin: top left;
+}
+.shopee-monitor-chip {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 2;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: oklch(0.165 0.008 70 / 0.8);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 .feed {
   display: flex;
   flex-direction: column;
@@ -1123,6 +1169,55 @@ input[type="range"]::-webkit-slider-thumb {
   background: var(--accent);
   border: 2px solid var(--bg);
   cursor: pointer;
+}
+.text-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--fg);
+  padding: 9px 10px;
+  font: inherit;
+  outline: none;
+}
+.text-input:focus {
+  border-color: var(--accent);
+}
+.text-input.textarea {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.35;
+}
+.text-input.textarea.short {
+  min-height: 72px;
+}
+.text-input.compact {
+  margin-top: 8px;
+}
+.field-label.sub {
+  margin-top: 14px;
+}
+.check-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+  margin-top: 10px;
+}
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--fg);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+.check-row input {
+  accent-color: var(--accent);
 }
 
 /* segmented control */
