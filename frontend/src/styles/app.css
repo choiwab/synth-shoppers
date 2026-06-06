@@ -815,7 +815,7 @@
 /* ---- right rail ----------------------------------------------------------- */
 .right-rail {
   display: grid;
-  grid-template-rows: 1.35fr 1fr;
+  grid-template-rows: minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
 }
