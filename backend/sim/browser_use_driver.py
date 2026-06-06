@@ -60,6 +60,7 @@ from contracts import (
     StageTrace,
 )
 from sim.agents import PERSONAS
+from sim.decision import decide, synth_purchase_reason, synth_reaction
 from sim.screenshots import save_thumbnail
 
 EmitFn = Callable[[object], Awaitable[None]]
@@ -191,11 +192,14 @@ class BrowserUseAgenticDriver:
         max_steps: int = 15,
         headless: bool = True,
         base_url: str | None = None,
+        agent_timeout_s: float | None = None,
     ) -> None:
         self.listing = listing
         self.model = model
         self.max_steps = max_steps
         self.headless = headless
+        self.agent_timeout_s = agent_timeout_s or float(os.environ.get("BROWSER_USE_AGENT_TIMEOUT_S", "12"))
+        self.autonomous = os.environ.get("BROWSER_USE_AUTONOMOUS", "0") == "1"
         # The runner passes the listing *slug* (run.listing.id), not a URL, so we
         # build the page URL from a configurable base. Default points at H3's local
         # stub server; swap to H2's dev server via LISTING_BASE_URL (one-line swap).
@@ -222,20 +226,149 @@ class BrowserUseAgenticDriver:
         ctx.record("land", None)
         await emit(StageEnterEvent(run_id=run_id, ts=_now_ms(), agent_id=agent_id, stage="land"))
 
+        if not self.autonomous:
+            return await self._run_guided_browser_fallback(ctx, url, seed)
+
         browser = self._make_browser()
         try:
             tools = self._build_tools(ctx)
             agent = self._make_agent(name, archetype, listing, url, tools, browser)
             try:
-                await agent.run(max_steps=self.max_steps, on_step_end=self._on_step(ctx))
+                await asyncio.wait_for(
+                    agent.run(max_steps=self.max_steps, on_step_end=self._on_step(ctx)),
+                    timeout=self.agent_timeout_s,
+                )
+            except TimeoutError:
+                return await self._run_guided_browser_fallback(ctx, url, seed)
             except Exception as exc:  # agent crash -> degrade to a clean bail
                 if ctx.outcome is None:
-                    await self._bail(ctx, ctx.current_gate or "land", f"(agent stopped) {str(exc)[:160]}")
+                    return await self._run_guided_browser_fallback(ctx, url, seed, f"browser-use fallback: {str(exc)[:120]}")
             if ctx.outcome is None:  # ran out of steps without deciding
                 await self._bail(ctx, ctx.current_gate or "land", "Browsed but never committed to buying.")
             return ctx.trace()
         finally:
             await self._close(browser)
+
+    async def _run_guided_browser_fallback(
+        self,
+        ctx: _Journey,
+        url: str,
+        seed: int,
+        note: str | None = None,
+    ) -> AgentTrace:
+        """Fallback for demos when the autonomous browser-use loop stalls.
+
+        It still opens and clicks through the real Shopee frontend in Chromium,
+        captures thumbnails, and uses the same deterministic decision model as
+        mock mode to decide where this persona drops off.
+        """
+        from playwright.async_api import async_playwright
+
+        async def click(page, selector: str) -> bool:  # noqa: ANN001
+            try:
+                loc = page.locator(selector).first
+                if await loc.count() == 0:
+                    return False
+                await loc.scroll_into_view_if_needed(timeout=3000)
+                await loc.click(timeout=3000)
+                await page.wait_for_timeout(450)
+                return True
+            except Exception:
+                return False
+
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page(viewport={"width": 1280, "height": 900})
+            try:
+                await page.goto(url, wait_until="domcontentloaded", timeout=8000)
+                await page.wait_for_timeout(700)
+                land_thumbnail_url = await asyncio.to_thread(
+                    save_thumbnail,
+                    await page.screenshot(full_page=False),
+                    ctx.agent_id,
+                    "land",
+                )
+                await ctx.emit(
+                    BrowserFrameEvent(
+                        run_id=ctx.run_id,
+                        ts=_now_ms(),
+                        agent_id=ctx.agent_id,
+                        thumbnail_url=land_thumbnail_url,
+                        scroll_pct=0.0,
+                    )
+                )
+                if note:
+                    await ctx.emit(
+                        StageSentimentEvent(
+                            run_id=ctx.run_id,
+                            ts=_now_ms(),
+                            agent_id=ctx.agent_id,
+                            stage="land",
+                            sentiment="neutral",
+                            comment=note,
+                        )
+                    )
+
+                for gate in ("photos", "reviews", "price", "cart", "checkout"):
+                    nav = GATE_NAV.get(gate)  # type: ignore[arg-type]
+                    if nav:
+                        await click(page, nav)
+                    reached = await click(page, f'[data-action="{GATE_ACTION[gate]}"]')  # type: ignore[index]
+                    if not reached:
+                        await self._bail(ctx, gate, f"Couldn't reach the {gate} section — the page didn't respond.")
+                        break
+
+                    thumbnail_url = await asyncio.to_thread(
+                        save_thumbnail,
+                        await page.screenshot(full_page=False),
+                        ctx.agent_id,
+                        gate,
+                    )
+                    decision = decide(seed, ctx.agent_id, ctx.archetype, gate, ctx.listing)
+                    if decision.action == "bail":
+                        objection = decision.objection or "Not convinced enough to buy."
+                        await self._enter(ctx, gate, thumbnail_url, sentiment="reject", comment=objection)
+                        await self._bail(ctx, gate, objection)
+                        break
+
+                    sentiment, comment = synth_reaction(ctx.archetype, gate, decision.probability)
+                    await self._enter(ctx, gate, thumbnail_url, sentiment=sentiment, comment=comment)
+
+                if ctx.outcome is None:
+                    await click(page, f'[data-action="{CONFIRM_ACTION}"]')
+                    thumbnail_url = await asyncio.to_thread(
+                        save_thumbnail,
+                        await page.screenshot(full_page=False),
+                        ctx.agent_id,
+                        "checkout",
+                    )
+                    reason = synth_purchase_reason(ctx.archetype)
+                    ctx.outcome = "bought"
+                    ctx.purchase_reason = reason
+                    await ctx.emit(
+                        BrowserFrameEvent(
+                            run_id=ctx.run_id,
+                            ts=_now_ms(),
+                            agent_id=ctx.agent_id,
+                            thumbnail_url=thumbnail_url,
+                            scroll_pct=1.0,
+                        )
+                    )
+                    await ctx.emit(
+                        StageSentimentEvent(
+                            run_id=ctx.run_id,
+                            ts=_now_ms(),
+                            agent_id=ctx.agent_id,
+                            stage="checkout",
+                            sentiment="love",
+                            comment=reason,
+                        )
+                    )
+                    await ctx.emit(AgentBoughtEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, retention_time_s=ctx.elapsed()))
+            finally:
+                await browser.close()
+
+        return ctx.trace()
 
     # ---- custom action registry (the constrained funnel vocabulary) ------------
     def _build_tools(self, ctx: _Journey):

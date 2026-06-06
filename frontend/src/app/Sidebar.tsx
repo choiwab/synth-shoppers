@@ -1,6 +1,6 @@
 import { useSimStore } from "@/store/simStore";
 import { useControlStore } from "@/store/controlStore";
-import { pauseRun, rerun, resumeRun } from "@/store/runController";
+import { pauseRun, rerun, resumeRun, startRun } from "@/store/runController";
 import { PriceChip } from "@/components/PriceChip";
 import { StatusBadge } from "@/components/StatusBadge";
 
@@ -21,6 +21,7 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
 
   const paused = status === "paused";
   const running = status === "running" || status === "paused";
+  const canRun = status === "idle" || status === "complete" || status === "error";
 
   return (
     <aside className="panel sidebar">
@@ -41,6 +42,13 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
       <PriceChip price={price} basePrice={baseListing.base_price} />
 
       <div className="sidebar-controls">
+        <button
+          className="btn sidebar-btn"
+          disabled={!canRun}
+          onClick={() => void startRun()}
+        >
+          ▶ Run agents
+        </button>
         <div className="sidebar-btn-row">
           <button
             className="btn sidebar-btn"
@@ -49,7 +57,7 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
           >
             {paused ? "▶ Resume" : "⏸ Pause"}
           </button>
-          <button className="btn sidebar-btn" onClick={() => void rerun()}>
+          <button className="btn sidebar-btn" disabled={!running} onClick={() => void rerun()}>
             ↻ Re-run
           </button>
         </div>

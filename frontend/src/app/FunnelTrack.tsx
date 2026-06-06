@@ -3,16 +3,26 @@ import { AnimatePresence, LayoutGroup } from "framer-motion";
 import { ARCHETYPE_HUE, GATES, GATE_LABELS } from "@/types/contracts";
 import { archetypeLabel } from "@/lib/archetype";
 import { AgentDot } from "@/components/AgentDot";
-import { selectActiveByGate, useSimStore, type AgentState } from "@/store/simStore";
+import {
+  selectActiveByGate,
+  selectFunnelAgents,
+  selectFunnelSignature,
+  useSimStore,
+  type FunnelAgentState,
+} from "@/store/simStore";
 
 interface Hover {
-  agent: AgentState;
+  agent: FunnelAgentState;
   x: number;
   y: number;
 }
 
 export function FunnelTrack() {
-  const agents = useSimStore((s) => s.agents);
+  const funnelSignature = useSimStore((s) => selectFunnelSignature(s.agents));
+  const agents = useMemo(
+    () => selectFunnelAgents(useSimStore.getState().agents),
+    [funnelSignature],
+  );
   const bailsByGate = useSimStore((s) => s.bailsByGate);
   const competitors = useSimStore((s) => s.competitors);
   const competitorOrder = useSimStore((s) => s.competitorOrder);
@@ -29,7 +39,7 @@ export function FunnelTrack() {
     [agents],
   );
   const bailedByGate = useMemo(() => {
-    const out: Record<string, AgentState[]> = {};
+    const out: Record<string, FunnelAgentState[]> = {};
     for (const g of GATES) out[g] = [];
     for (const a of Object.values(agents)) {
       if (a.outcome === "bailed" && out[a.stage]) out[a.stage].push(a);
@@ -56,7 +66,7 @@ export function FunnelTrack() {
   );
   const reachPct = marketTotal ? Math.round((considered / marketTotal) * 100) : 0;
 
-  const onHover = (agent: AgentState, x: number, y: number) =>
+  const onHover = (agent: FunnelAgentState, x: number, y: number) =>
     setHover({ agent, x, y });
   const onLeave = () => setHover(null);
 

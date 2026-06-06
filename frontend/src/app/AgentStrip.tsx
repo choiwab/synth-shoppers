@@ -11,6 +11,8 @@ import { FeaturedAgentView } from "@/components/FeaturedAgentView";
  */
 export function AgentStrip() {
   const agents = useSimStore((s) => s.agents);
+  const error = useSimStore((s) => s.error);
+  const runId = useSimStore((s) => s.runId);
   // the user's explicit pick (undefined until they click a tile)
   const [pickedId, setPickedId] = useState<string | undefined>();
 
@@ -35,13 +37,17 @@ export function AgentStrip() {
   return (
     <section className="panel agent-panel">
       <div className="section-head">
-        <span className="section-title">Agent Preview</span>
+        <span className="section-title">Backend Agent Screenshots</span>
         <span className="count-pill">{reps.length} agents</span>
       </div>
       <div className="agent-strip">
         {reps.length === 0 || !featured ? (
           <div className="muted" style={{ padding: "8px 2px", fontSize: 13 }}>
-            Waiting for agents to spawn…
+            {error
+              ? `Could not start backend agents: ${error}`
+              : runId
+                ? "Waiting for backend agents to send screenshots…"
+                : "Press Run agents to start backend browsing."}
           </div>
         ) : (
           <div className="agent-spotlight">

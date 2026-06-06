@@ -24,17 +24,20 @@ function AgentTileBase({ agent }: Props) {
       style={{ ["--hue" as string]: hue }}
     >
       {agent.thumbnail_url ? (
-        <img
-          className="tile-thumb"
-          src={resolveAssetUrl(agent.thumbnail_url)}
-          alt={`${agent.name} — ${stageLabel}`}
-          style={
-            agent.scroll_pct != null
-              ? { objectPosition: `center ${agent.scroll_pct}%` }
-              : undefined
-          }
-          loading="lazy"
-        />
+        <>
+          <img
+            className="tile-thumb"
+            src={resolveAssetUrl(agent.thumbnail_url)}
+            alt={`${agent.name} — ${stageLabel}`}
+            style={
+              agent.scroll_pct != null
+                ? { objectPosition: `center ${agent.scroll_pct}%` }
+                : undefined
+            }
+            loading="lazy"
+          />
+          {agent.lastAction && <div className="tile-action-overlay">{agent.lastAction}</div>}
+        </>
       ) : (
         <div className="tile-fallback">
           <div className="tile-avatar">{archetypeInitials(agent.archetype)}</div>
@@ -62,5 +65,6 @@ export const AgentTile = memo(
     a.agent.outcome === b.agent.outcome &&
     a.agent.thumbnail_url === b.agent.thumbnail_url &&
     a.agent.scroll_pct === b.agent.scroll_pct &&
-    a.agent.lastAction === b.agent.lastAction,
+    a.agent.lastAction === b.agent.lastAction &&
+    a.agent.latestThought === b.agent.latestThought,
 );

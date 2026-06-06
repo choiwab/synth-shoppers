@@ -395,6 +395,22 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.tile-action-overlay {
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  bottom: 22px;
+  padding: 4px 6px;
+  border-radius: 7px;
+  background: oklch(0.165 0.008 70 / 0.78);
+  color: var(--fg);
+  font-size: 10px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .tile-footer {
   position: absolute;
   left: 0;
@@ -547,6 +563,46 @@
   margin-left: auto;
   flex-shrink: 0;
   padding: 2px 8px;
+}
+.featured-action-panel {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 58px;
+  display: grid;
+  gap: 5px;
+  padding: 10px 11px;
+  border: 1px solid oklch(0.74 0.135 var(--hue, 0) / 0.35);
+  border-radius: 11px;
+  background: oklch(0.165 0.008 70 / 0.86);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 28px oklch(0.08 0.01 70 / 0.28);
+}
+.featured-panel-kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: oklch(0.74 0.135 var(--hue, 0));
+}
+.featured-panel-action {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+.featured-panel-thought,
+.featured-panel-goal {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.featured-panel-thought span,
+.featured-panel-goal span {
+  color: var(--fg);
 }
 /* identity overlay pinned to the bottom of the card */
 .featured-overlay {
@@ -850,6 +906,13 @@
 .feed-text.divert {
   color: var(--accent);
   opacity: 0.85;
+}
+.feed-text.action {
+  color: var(--fg);
+}
+.feed-text.thought {
+  color: var(--muted);
+  font-style: italic;
 }
 .feed-dot {
   width: 9px;

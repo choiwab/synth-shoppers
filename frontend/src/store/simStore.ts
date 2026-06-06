@@ -16,6 +16,11 @@ export interface AgentState {
   objection?: string;
   competitor?: string; // competitor id, when outcome === "diverted"
   lastAction?: string; // surfaced on fallback tiles
+  latestThought?: string;
+  latestEvaluation?: string;
+  latestGoal?: string;
+  latestSentiment?: "love" | "like" | "neutral" | "dislike" | "reject";
+  latestComment?: string;
   thumbnail_url?: string;
   scroll_pct?: number;
   retention_time_s?: number;
@@ -30,7 +35,7 @@ export interface CompetitorStat {
   bought: number;
 }
 
-export type FeedKind = "objection" | "bail" | "buy" | "divert";
+export type FeedKind = "objection" | "bail" | "buy" | "divert" | "action" | "thought";
 export interface FeedItem {
   id: string;
   agent_id: string;
@@ -49,7 +54,7 @@ export interface RosterEntry {
   diverted: number;
 }
 
-export type RunStatus = "idle" | "running" | "paused" | "complete";
+export type RunStatus = "idle" | "running" | "paused" | "complete" | "error";
 
 export interface SimStore {
   runId?: string;
@@ -64,12 +69,26 @@ export interface SimStore {
   counts: { active: number; bought: number; bailed: number; diverted: number; total: number };
   buyRate?: number;
   reportReady: boolean;
+  error?: string;
   nowTs: number; // run clock = latest event ts (for relative feed times)
   spawnSeq: number;
   feedSeq: number;
 
   apply(ev: AgentEvent): void;
   reset(): void;
+}
+
+export interface FunnelAgentState {
+  agent_id: string;
+  name: string;
+  archetype: PersonaId;
+  stage: FunnelStage;
+  outcome: AgentState["outcome"];
+  objection?: string;
+  competitor?: string;
+  lastAction?: string;
+  retention_time_s?: number;
+  spawnOrder: number;
 }
 
 function emptyGateRecord(): Record<FunnelStage, number> {
@@ -112,6 +131,7 @@ const initial = () => ({
   counts: { active: 0, bought: 0, bailed: 0, diverted: 0, total: 0 },
   buyRate: undefined,
   reportReady: false,
+  error: undefined,
   nowTs: 0,
   spawnSeq: 0,
   feedSeq: 0,
@@ -196,14 +216,19 @@ export const useSimStore = create<SimStore>((set) => ({
         case "stage_enter": {
           const a = s.agents[ev.agent_id];
           if (!a || a.outcome !== "active") return { nowTs };
+          const nextAction = STAGE_ACTION[ev.stage] ?? a.lastAction;
+          const nextThumb = ev.thumbnail_url ?? a.thumbnail_url;
+          if (a.stage === ev.stage && a.lastAction === nextAction && a.thumbnail_url === nextThumb) {
+            return { nowTs };
+          }
           return {
             agents: {
               ...s.agents,
               [ev.agent_id]: {
                 ...a,
                 stage: ev.stage,
-                lastAction: STAGE_ACTION[ev.stage] ?? a.lastAction,
-                thumbnail_url: ev.thumbnail_url ?? a.thumbnail_url,
+                lastAction: nextAction,
+                thumbnail_url: nextThumb,
               },
             },
             nowTs,
@@ -213,15 +238,77 @@ export const useSimStore = create<SimStore>((set) => ({
         case "browser_frame": {
           const a = s.agents[ev.agent_id];
           if (!a) return { nowTs };
+          const nextScroll = ev.scroll_pct ?? a.scroll_pct;
+          if (a.thumbnail_url === ev.thumbnail_url && a.scroll_pct === nextScroll) {
+            return { nowTs };
+          }
           return {
             agents: {
               ...s.agents,
               [ev.agent_id]: {
                 ...a,
                 thumbnail_url: ev.thumbnail_url,
-                scroll_pct: ev.scroll_pct ?? a.scroll_pct,
+                scroll_pct: nextScroll,
               },
             },
+            nowTs,
+          };
+        }
+
+        case "stage_sentiment": {
+          const a = s.agents[ev.agent_id];
+          if (!a) return { nowTs };
+          const item: FeedItem = {
+            id: `f${s.feedSeq}`,
+            agent_id: ev.agent_id,
+            name: a.name,
+            archetype: a.archetype,
+            kind: "action",
+            text: ev.comment,
+            stage: ev.stage,
+            ts: ev.ts,
+          };
+          return {
+            agents: {
+              ...s.agents,
+              [ev.agent_id]: {
+                ...a,
+                lastAction: ev.comment,
+                latestSentiment: ev.sentiment,
+                latestComment: ev.comment,
+              },
+            },
+            feed: [item, ...s.feed].slice(0, FEED_CAP),
+            feedSeq: s.feedSeq + 1,
+            nowTs,
+          };
+        }
+
+        case "agent_thought": {
+          const a = s.agents[ev.agent_id];
+          if (!a) return { nowTs };
+          const item: FeedItem = {
+            id: `f${s.feedSeq}`,
+            agent_id: ev.agent_id,
+            name: a.name,
+            archetype: a.archetype,
+            kind: "thought",
+            text: ev.thinking,
+            stage: ev.stage,
+            ts: ev.ts,
+          };
+          return {
+            agents: {
+              ...s.agents,
+              [ev.agent_id]: {
+                ...a,
+                latestThought: ev.thinking,
+                latestEvaluation: ev.evaluation,
+                latestGoal: ev.next_goal,
+              },
+            },
+            feed: [item, ...s.feed].slice(0, FEED_CAP),
+            feedSeq: s.feedSeq + 1,
             nowTs,
           };
         }
@@ -416,8 +503,8 @@ export const useSimStore = create<SimStore>((set) => ({
 
 /** Active agents at a given gate, in spawn order — used by the funnel track. */
 export function selectActiveByGate(
-  agents: Record<string, AgentState>,
-): Record<FunnelStage, AgentState[]> {
+  agents: Record<string, FunnelAgentState>,
+): Record<FunnelStage, FunnelAgentState[]> {
   const out = {
     discovery: [],
     land: [],
@@ -434,4 +521,40 @@ export function selectActiveByGate(
     if (a.outcome === "active" && GATES.includes(a.stage)) out[a.stage].push(a);
   }
   return out;
+}
+
+export function selectFunnelAgents(agents: Record<string, AgentState>): Record<string, FunnelAgentState> {
+  const out: Record<string, FunnelAgentState> = {};
+  for (const [id, a] of Object.entries(agents)) {
+    out[id] = {
+      agent_id: a.agent_id,
+      name: a.name,
+      archetype: a.archetype,
+      stage: a.stage,
+      outcome: a.outcome,
+      objection: a.objection,
+      competitor: a.competitor,
+      lastAction: a.lastAction,
+      retention_time_s: a.retention_time_s,
+      spawnOrder: a.spawnOrder,
+    };
+  }
+  return out;
+}
+
+export function selectFunnelSignature(agents: Record<string, AgentState>): string {
+  return Object.values(agents)
+    .sort((a, b) => a.spawnOrder - b.spawnOrder)
+    .map((a) =>
+      [
+        a.agent_id,
+        a.stage,
+        a.outcome,
+        a.objection ?? "",
+        a.competitor ?? "",
+        a.lastAction ?? "",
+        a.retention_time_s ?? "",
+      ].join(":"),
+    )
+    .join("|");
 }

@@ -6,6 +6,7 @@ const LABEL: Record<RunStatus, string> = {
   running: "Live",
   paused: "Paused",
   complete: "Complete",
+  error: "Error",
 };
 
 export function StatusBadge({ status }: { status: RunStatus }) {

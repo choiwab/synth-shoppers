@@ -62,9 +62,15 @@ export function ActivityFeed() {
                   "feed-text",
                   item.kind === "buy" && "buy",
                   item.kind === "divert" && "divert",
+                  item.kind === "thought" && "thought",
+                  item.kind === "action" && "action",
                 )}
               >
-                {item.kind === "buy" ? "bought ✓" : item.text}
+                {item.kind === "buy"
+                  ? "bought ✓"
+                  : item.kind === "thought"
+                    ? `thinking: ${item.text}`
+                    : item.text}
               </div>
             </div>
           </div>

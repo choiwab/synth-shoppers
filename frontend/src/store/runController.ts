@@ -1,41 +1,35 @@
 // Ties REST start/rerun + socket + store together. Imperative singleton so the
-// header, tweaks panel, and auto-start on mount all drive the same run.
-import { MOCK, rerunSimulation, startSimulation } from "./api";
-import { connectMockSocket } from "./mockSocket";
+// left rail and tweaks panel drive the same backend run.
+import { rerunSimulation, startSimulation } from "./api";
 import { connectSocket, type SimSocket } from "./socket";
 import { useSimStore } from "./simStore";
 import { currentListingConfig, useControlStore } from "./controlStore";
-import type { SimMode } from "@/types/contracts";
 
 let socket: SimSocket | null = null;
 
-/** 4× ⇒ mock (PRD §4.6); VITE_MOCK forces mock for backend-free dev. */
-function effectiveMode(): SimMode {
-  const { speed } = useControlStore.getState();
-  return MOCK || speed === 4 ? "mock" : "real";
-}
-
-function attach(runId: string, mode: SimMode) {
+function attach(runId: string) {
   socket?.close();
-  const { speed } = useControlStore.getState();
   const sink = useSimStore.getState().apply;
-  socket =
-    mode === "mock"
-      ? connectMockSocket(runId, sink, speed)
-      : connectSocket(runId, sink);
+  socket = connectSocket(runId, sink);
 }
 
 /** Start a fresh run from current tweaks. Resets the dashboard. */
 export async function startRun(): Promise<void> {
   const c = useControlStore.getState();
-  const mode = effectiveMode();
   useSimStore.getState().reset();
-  const { run_id } = await startSimulation({
-    listing_config: currentListingConfig(c),
-    crowd: { personas: c.personas, crowd_size: c.crowdSize, speed: c.speed },
-    mode,
-  });
-  attach(run_id, mode);
+  try {
+    const { run_id } = await startSimulation({
+      listing_config: currentListingConfig(c),
+      crowd: { personas: c.personas, crowd_size: c.personas.length, speed: c.speed },
+      mode: "real",
+    });
+    attach(run_id);
+  } catch (error) {
+    useSimStore.setState({
+      status: "error",
+      error: error instanceof Error ? error.message : "Failed to start simulation",
+    });
+  }
 }
 
 /** Re-run with the current (possibly mutated) config — used by Re-run + H2's
@@ -43,19 +37,25 @@ export async function startRun(): Promise<void> {
 export async function rerun(fromRecommendation?: string): Promise<void> {
   const c = useControlStore.getState();
   const prevRunId = useSimStore.getState().runId;
-  const mode = effectiveMode();
   useSimStore.getState().reset();
-  const { run_id } = prevRunId
-    ? await rerunSimulation(prevRunId, {
-        listing_config: currentListingConfig(c),
-        from_recommendation: fromRecommendation,
-      })
-    : await startSimulation({
-        listing_config: currentListingConfig(c),
-        crowd: { personas: c.personas, crowd_size: c.crowdSize, speed: c.speed },
-        mode,
-      });
-  attach(run_id, mode);
+  try {
+    const { run_id } = prevRunId
+      ? await rerunSimulation(prevRunId, {
+          listing_config: currentListingConfig(c),
+          from_recommendation: fromRecommendation,
+        })
+      : await startSimulation({
+          listing_config: currentListingConfig(c),
+          crowd: { personas: c.personas, crowd_size: c.personas.length, speed: c.speed },
+          mode: "real",
+        });
+    attach(run_id);
+  } catch (error) {
+    useSimStore.setState({
+      status: "error",
+      error: error instanceof Error ? error.message : "Failed to start simulation",
+    });
+  }
 }
 
 export function pauseRun(): void {

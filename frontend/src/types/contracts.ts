@@ -132,6 +132,25 @@ export type AgentEvent =
       scroll_pct?: number;
     }
   | {
+      type: "stage_sentiment";
+      run_id: string;
+      ts: number;
+      agent_id: string;
+      stage: FunnelStage;
+      sentiment: "love" | "like" | "neutral" | "dislike" | "reject";
+      comment: string;
+    }
+  | {
+      type: "agent_thought";
+      run_id: string;
+      ts: number;
+      agent_id: string;
+      stage: FunnelStage;
+      thinking: string;
+      evaluation?: string;
+      next_goal?: string;
+    }
+  | {
       type: "objection";
       run_id: string;
       ts: number;

@@ -5,7 +5,7 @@ import { AgentStrip } from "./AgentStrip";
 import { FunnelTrack } from "./FunnelTrack";
 import { RightRail } from "./RightRail";
 import { TweaksPanel } from "./TweaksPanel";
-import { startRun, teardownRun } from "@/store/runController";
+import { teardownRun } from "@/store/runController";
 
 const STRIP_MIN = 120; // header + a sliver of one tile row
 const STRIP_DEFAULT = 300; // room for the spotlight (big featured + 6 small)
@@ -28,9 +28,7 @@ export function Dashboard() {
   const [dragging, setDragging] = useState(false);
   const drag = useRef<{ startY: number; startH: number } | null>(null);
 
-  // Demo beat 1: dots flow on open. Auto-start a run on mount.
   useEffect(() => {
-    void startRun();
     return () => teardownRun();
   }, []);
 
