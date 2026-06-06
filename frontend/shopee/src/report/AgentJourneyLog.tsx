@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import type { AgentTrace } from '@/types/contracts'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { ArchetypeChip } from '@/components/ArchetypeChip'
+import { resolveAssetUrl } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 interface AgentJourneyLogProps {
@@ -134,7 +135,7 @@ function DropOffShot({ agent }: { agent: AgentTrace }) {
   if (!ok || !last?.screenshot_url) return null
   return (
     <img
-      src={last.screenshot_url}
+      src={resolveAssetUrl(last.screenshot_url)}
       alt={`${agent.name} drop-off at ${last.stage}`}
       onError={() => setOk(false)}
       className="mt-2 h-16 w-24 rounded-sm border border-line object-cover"

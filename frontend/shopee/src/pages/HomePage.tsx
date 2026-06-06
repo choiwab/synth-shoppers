@@ -12,6 +12,7 @@ import { HeroCarousel } from '@/components/HeroCarousel'
 import { SimpleProductCard } from '@/components/SimpleProductCard'
 import { FLASH_DEALS, DISCOVER } from '@/shopee/data/discover'
 import { withSimSession } from '@/shopee/simSession'
+import { TARGET_SEARCH_PATH } from '@/shopee/searchQuery'
 import { shuffle } from '@/lib/utils'
 
 const CATEGORIES: { label: string; icon: typeof Shirt }[] = [
@@ -58,14 +59,14 @@ export function HomePage() {
           <HeroCarousel />
           <div className="grid grid-rows-2 gap-2">
             <Link
-              to={withSimSession('/search?keyword=beanie')}
+              to={withSimSession(TARGET_SEARCH_PATH)}
               className="flex flex-col justify-center rounded-sm bg-gradient-to-br from-[#ff6f3c] to-[#ee4d2d] p-5 text-white"
             >
               <p className="text-lg font-bold">Buy Shopee E-Vouchers</p>
               <p className="text-xs opacity-90">Up to 20% off your next order</p>
             </Link>
             <Link
-              to={withSimSession('/search?keyword=beanie')}
+              to={withSimSession(TARGET_SEARCH_PATH)}
               className="flex flex-col justify-center rounded-sm bg-gradient-to-br from-[#ffce3d] to-[#ff8a00] p-5 text-white"
             >
               <p className="text-lg font-bold">6.6 Great Shopee Sale</p>
@@ -119,7 +120,7 @@ export function HomePage() {
               ))}
             </div>
             <Link
-              to={withSimSession('/search?keyword=beanie')}
+              to={withSimSession(TARGET_SEARCH_PATH)}
               className="ml-auto flex items-center text-sm text-shopee hover:underline"
             >
               See All <ChevronRight size={14} />

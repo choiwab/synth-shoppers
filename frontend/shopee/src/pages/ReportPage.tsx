@@ -7,6 +7,7 @@ import { loadListing, MATINKIM_ID } from '@/shopee/config/loadConfig'
 import { AnalyticsView } from '@/report/AnalyticsView'
 import { RecommendationsPanel } from '@/report/RecommendationsPanel'
 import { ViabilityReport } from '@/report/ViabilityReport'
+import { DASHBOARD_BASE } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 type Tab = 'viability' | 'analytics' | 'recommendations'
@@ -42,8 +43,12 @@ export function ReportPage() {
       {/* internal analytics header (not the storefront chrome) */}
       <header className="border-b border-line bg-white">
         <div className="mx-auto flex max-w-[1100px] flex-wrap items-center gap-3 px-4 py-3">
-          <Link to="/" className="flex items-center gap-1 text-sm text-ink-soft hover:text-shopee">
-            <ArrowLeft size={16} /> Storefront
+          <a href={DASHBOARD_BASE} className="flex items-center gap-1 text-sm font-medium text-shopee hover:underline">
+            <ArrowLeft size={16} /> Dashboard
+          </a>
+          <span className="text-line">|</span>
+          <Link to="/" className="text-sm text-ink-soft hover:text-shopee">
+            Storefront
           </Link>
           <span className="text-line">|</span>
           <h1 className="text-base font-semibold text-ink">

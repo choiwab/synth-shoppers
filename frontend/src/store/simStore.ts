@@ -3,6 +3,7 @@ import {
   GATES,
   PERSONA_IDS,
   type AgentEvent,
+  type CompetitorAnalysis,
   type FunnelStage,
   type PersonaId,
 } from "@/types/contracts";
@@ -21,6 +22,7 @@ export interface AgentState {
   latestGoal?: string;
   latestSentiment?: "love" | "like" | "neutral" | "dislike" | "reject";
   latestComment?: string;
+  competitorAnalyses?: CompetitorAnalysis[];
   thumbnail_url?: string;
   scroll_pct?: number;
   retention_time_s?: number;
@@ -276,6 +278,50 @@ export const useSimStore = create<SimStore>((set) => ({
                 lastAction: ev.comment,
                 latestSentiment: ev.sentiment,
                 latestComment: ev.comment,
+              },
+            },
+            feed: [item, ...s.feed].slice(0, FEED_CAP),
+            feedSeq: s.feedSeq + 1,
+            nowTs,
+          };
+        }
+
+        case "competitor_analysis": {
+          const a = s.agents[ev.agent_id];
+          if (!a) return { nowTs };
+          const analysis: CompetitorAnalysis = {
+            competitor: ev.competitor,
+            competitor_name: ev.competitor_name,
+            seller: ev.seller,
+            verified: ev.verified,
+            price: ev.price,
+            rating: ev.rating,
+            review_count: ev.review_count,
+            comments: ev.comments,
+            strengths: ev.strengths,
+            weaknesses: ev.weaknesses,
+            verdict: ev.verdict,
+            thumbnail_url: ev.thumbnail_url,
+          };
+          const item: FeedItem = {
+            id: `f${s.feedSeq}`,
+            agent_id: ev.agent_id,
+            name: a.name,
+            archetype: a.archetype,
+            kind: "action",
+            text: ev.verdict,
+            stage: "discovery",
+            ts: ev.ts,
+          };
+          return {
+            agents: {
+              ...s.agents,
+              [ev.agent_id]: {
+                ...a,
+                lastAction: ev.verdict,
+                latestComment: ev.verdict,
+                competitorAnalyses: [analysis, ...(a.competitorAnalyses ?? [])].slice(0, 4),
+                thumbnail_url: ev.thumbnail_url ?? a.thumbnail_url,
               },
             },
             feed: [item, ...s.feed].slice(0, FEED_CAP),

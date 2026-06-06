@@ -7,6 +7,7 @@ import { SearchDropdown } from './SearchDropdown'
 import { sgd } from '@/lib/utils'
 import { useDemoAction } from '@/lib/demoAction'
 import { withSimSession } from '@/shopee/simSession'
+import { TARGET_SEARCH_QUERY } from '@/shopee/searchQuery'
 
 interface ShopeeHeaderProps {
   /** 'full' = home/search/product (search bar + suggestions). 'minimal' = cart/checkout. */
@@ -19,8 +20,8 @@ interface ShopeeHeaderProps {
 }
 
 const TRENDING = [
+  TARGET_SEARCH_QUERY,
   'Matin Kim',
-  'Winter Beanie',
   'Knitted Hat',
   'AirPods 4',
   'Keyboard Foam',
@@ -81,7 +82,7 @@ export function ShopeeHeader({
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   onFocus={() => setFocused(true)}
-                  placeholder="Xiaomi: 17T series new launch"
+                  placeholder={`Search ${TARGET_SEARCH_QUERY}`}
                   aria-label="Search Shopee"
                   autoComplete="off"
                   className="flex-1 bg-transparent px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-faint"

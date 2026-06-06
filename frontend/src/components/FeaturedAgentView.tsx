@@ -3,6 +3,7 @@ import { ARCHETYPE_HUE, GATE_LABELS } from "@/types/contracts";
 import { archetypeInitials, archetypeLabel, archetypeTag } from "@/lib/archetype";
 import { resolveAssetUrl } from "@/lib/assetUrl";
 import type { AgentState } from "@/store/simStore";
+import { ShopeeMonitorFrame } from "./ShopeeMonitorFrame";
 
 /**
  * ⛳ INTEGRATION POINT — the big "spotlight" window. The WHOLE window is a single
@@ -11,13 +12,13 @@ import type { AgentState } from "@/store/simStore";
  * H1 owns only the sizing wrapper: the strip places this in the left cell and
  * keeps `agent` in sync with the selected tile. Everything *inside* the card is
  * yours to build — e.g. a live/enlarged browser view, step trace, screenshots.
- * The default below (enlarged thumbnail, or avatar + stage + objection, with a
- * name/archetype/stage overlay) is just a placeholder; replace it freely.
+ * The default below shows editable Shopee HTML until H3 supplies screenshots.
  */
 export function FeaturedAgentView({ agent }: { agent: AgentState }) {
   const hue = ARCHETYPE_HUE[agent.archetype];
   const stageLabel = GATE_LABELS[agent.stage] ?? agent.stage;
   const thumb = resolveAssetUrl(agent.thumbnail_url);
+  const competitorRead = agent.competitorAnalyses?.[0];
   const streamLabel = thumb
     ? "Shopee screenshot"
     : agent.lastAction || agent.latestThought
@@ -41,12 +42,10 @@ export function FeaturedAgentView({ agent }: { agent: AgentState }) {
           }
         />
       ) : (
-        <div className="featured-fallback">
-          <div className="featured-avatar">{archetypeInitials(agent.archetype)}</div>
-          <span className="featured-stage-chip">{stageLabel}</span>
-          {agent.objection && <div className="featured-obj">“{agent.objection}”</div>}
-        </div>
+        <ShopeeMonitorFrame agentId={agent.agent_id} persona={agent.archetype} label={stageLabel} />
       )}
+
+      {!thumb && agent.objection && <div className="featured-obj floating">“{agent.objection}”</div>}
 
       {agent.outcome === "bought" && <span className="featured-badge">✓</span>}
 
@@ -63,6 +62,34 @@ export function FeaturedAgentView({ agent }: { agent: AgentState }) {
         {agent.latestGoal && (
           <div className="featured-panel-goal">
             <span>Next:</span> {agent.latestGoal}
+          </div>
+        )}
+        {competitorRead && (
+          <div className="featured-competitor-read">
+            <div className="featured-read-head">
+              <span>Competitor read</span>
+              <strong>{competitorRead.competitor_name}</strong>
+            </div>
+            <div className="featured-read-meta">
+              {competitorRead.price != null && <span>S${competitorRead.price.toFixed(2)}</span>}
+              {competitorRead.rating && <span>{competitorRead.rating}★</span>}
+              {competitorRead.review_count != null && <span>{competitorRead.review_count.toLocaleString()} ratings</span>}
+              {competitorRead.verified ? <span>verified seller</span> : <span>unverified</span>}
+            </div>
+            <div className="featured-read-verdict">{competitorRead.verdict}</div>
+            <div className="featured-read-grid">
+              <div>
+                <span>Pull</span>
+                <p>{competitorRead.strengths[0] ?? "No clear advantage found."}</p>
+              </div>
+              <div>
+                <span>Risk</span>
+                <p>{competitorRead.weaknesses[0] ?? "No clear concern found."}</p>
+              </div>
+            </div>
+            {competitorRead.comments[0] && (
+              <div className="featured-read-comment">“{competitorRead.comments[0]}”</div>
+            )}
           </div>
         )}
       </div>

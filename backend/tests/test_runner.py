@@ -37,7 +37,15 @@ async def test_runner_emits_buffered_events_and_report() -> None:
     assert run.report.browsing_metrics["unique_buyers"] == sum(1 for agent in run.agents if agent.outcome == "bought")
     assert run.report.browsing_metrics["click_rate"] >= run.report.browsing_metrics["read_rate"]
     assert run.report.browsing_metrics["dropoff_reason_distribution"]
+    assert len(run.report.agent_trace_reports) == len(run.agents)
+    first_trace_report = run.report.agent_trace_reports[0]
+    assert first_trace_report["agent_id"]
+    assert first_trace_report["summary"]
+    assert first_trace_report["stage_path"]
+    assert "retention_time_s" in first_trace_report["metrics"]
+    assert "run_metrics_context" in first_trace_report
     assert run.events[0]["type"] == "run_started"
+    assert run.events[0]["competitors"]
     assert run.events[-1]["type"] == "run_complete"
 
     replay = await run.subscribe()
