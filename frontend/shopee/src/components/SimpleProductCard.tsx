@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { DiscoverItem } from '@/shopee/data/discover'
 import { ProductImage } from './ProductImage'
 import { StarRating } from './StarRating'
+import { withSimSession } from '@/shopee/simSession'
 import { sgd, compact } from '@/lib/utils'
 
 /** Lightweight card for the Home Flash Deals / Daily Discover grids (decorative). */
@@ -10,7 +11,7 @@ export function SimpleProductCard({ item }: { item: DiscoverItem }) {
     item.basePrice && item.basePrice > item.price
       ? Math.round((1 - item.price / item.basePrice) * 100)
       : 0
-  const to = `/search?keyword=${encodeURIComponent(item.title.split(' ').slice(0, 2).join(' '))}`
+  const to = withSimSession(`/search?keyword=${encodeURIComponent(item.title.split(' ').slice(0, 2).join(' '))}`)
 
   return (
     <Link

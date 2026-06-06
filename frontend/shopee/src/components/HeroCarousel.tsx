@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { withSimSession } from '@/shopee/simSession'
 
 interface Slide {
   eyebrow: string
@@ -47,7 +48,7 @@ export function HeroCarousel() {
   return (
     <div className="group relative h-[235px] overflow-hidden rounded-sm">
       <Link
-        to="/search?keyword=beanie"
+        to={withSimSession('/search?keyword=beanie')}
         className="flex h-full flex-col justify-center px-10"
         style={{ background: slide.bg, color: slide.text }}
       >

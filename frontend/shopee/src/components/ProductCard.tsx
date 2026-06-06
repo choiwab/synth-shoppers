@@ -5,6 +5,7 @@ import { ProductImage } from './ProductImage'
 import { StarRating } from './StarRating'
 import { emitFunnelAction } from '@/shopee/funnel'
 import { soldCount, sellerLocation, discountPct, MATINKIM_ID } from '@/shopee/config/loadConfig'
+import { withSimSession } from '@/shopee/simSession'
 import { sgd, compact, cn } from '@/lib/utils'
 
 interface ProductCardProps {
@@ -22,7 +23,7 @@ export function ProductCard({ config, highlightTarget = false }: ProductCardProp
 
   return (
     <Link
-      to={`/shopee/${config.id}`}
+      to={withSimSession(`/shopee/${config.id}`)}
       data-action="open-listing"
       data-listing-id={config.id}
       data-listing-card="search-result"

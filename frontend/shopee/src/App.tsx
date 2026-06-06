@@ -7,6 +7,7 @@ import { CheckoutPage } from '@/pages/CheckoutPage'
 import { OrderConfirmedPage } from '@/pages/OrderConfirmedPage'
 import { ReportPage } from '@/pages/ReportPage'
 import { ToastHost } from '@/components/ToastHost'
+import { withSimSession } from '@/shopee/simSession'
 
 /**
  * Root route. The browser-use runtime (H3) deep-links to `/?listing=<slug>`
@@ -16,7 +17,7 @@ import { ToastHost } from '@/components/ToastHost'
 function RootRoute() {
   const [params] = useSearchParams()
   const listing = params.get('listing')
-  if (listing) return <Navigate to={`/shopee/${encodeURIComponent(listing)}`} replace />
+  if (listing) return <Navigate to={withSimSession(`/shopee/${encodeURIComponent(listing)}`)} replace />
   return <HomePage />
 }
 
@@ -32,7 +33,7 @@ function App() {
         <Route path="/order-confirmed" element={<OrderConfirmedPage />} />
         <Route path="/report" element={<ReportPage />} />
         <Route path="/report/:runId" element={<ReportPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to={withSimSession('/')} replace />} />
       </Routes>
       <ToastHost />
     </BrowserRouter>

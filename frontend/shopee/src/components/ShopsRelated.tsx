@@ -3,6 +3,7 @@ import { BadgeCheck, ChevronRight } from 'lucide-react'
 import { ProductImage } from './ProductImage'
 import { sgd } from '@/lib/utils'
 import { useDemoAction } from '@/lib/demoAction'
+import { withSimSession } from '@/shopee/simSession'
 
 const SHOP_PRODUCTS = [
   { title: 'Converse Cam Day 1 Chuck Bucket Hat', price: 20.0, color: 'Cream', sold: 7 },
@@ -19,7 +20,10 @@ export function ShopsRelated({ keyword }: { keyword: string }) {
         <h3 className="text-sm text-ink-soft">
           SHOPS RELATED TO '<span className="font-medium text-ink">{keyword.toUpperCase()}</span>'
         </h3>
-        <Link to="/search?keyword=converse" className="flex items-center text-xs text-shopee hover:underline">
+        <Link
+          to={withSimSession('/search?keyword=converse')}
+          className="flex items-center text-xs text-shopee hover:underline"
+        >
           More Shops <ChevronRight size={13} />
         </Link>
       </div>
@@ -34,7 +38,7 @@ export function ShopsRelated({ keyword }: { keyword: string }) {
             Converse Official Store <BadgeCheck size={14} className="text-shopee-mall" />
           </p>
           <Link
-            to="/search?keyword=converse"
+            to={withSimSession('/search?keyword=converse')}
             className="rounded-sm border border-shopee px-4 py-1 text-xs text-shopee hover:bg-shopee-light/50"
           >
             Visit Shop
@@ -45,7 +49,7 @@ export function ShopsRelated({ keyword }: { keyword: string }) {
         {/* shop products */}
         <div className="grid flex-1 grid-cols-3 gap-3">
           {SHOP_PRODUCTS.map((p) => (
-            <Link key={p.title} to="/search?keyword=converse" className="group text-center">
+            <Link key={p.title} to={withSimSession('/search?keyword=converse')} className="group text-center">
               <div className="aspect-square overflow-hidden border border-line bg-shopee-bg">
                 <ProductImage src={undefined} alt={p.title} color={p.color} className="h-full w-full" />
               </div>

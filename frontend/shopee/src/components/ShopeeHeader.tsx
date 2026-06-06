@@ -6,6 +6,7 @@ import { ProductImage } from './ProductImage'
 import { SearchDropdown } from './SearchDropdown'
 import { sgd } from '@/lib/utils'
 import { useDemoAction } from '@/lib/demoAction'
+import { withSimSession } from '@/shopee/simSession'
 
 interface ShopeeHeaderProps {
   /** 'full' = home/search/product (search bar + suggestions). 'minimal' = cart/checkout. */
@@ -54,7 +55,7 @@ export function ShopeeHeader({
   }
   function go(kw: string) {
     setFocused(false)
-    navigate(`/search?keyword=${encodeURIComponent(kw)}`)
+    navigate(withSimSession(`/search?keyword=${encodeURIComponent(kw)}`))
   }
 
   const showSearchBar = variant === 'full' || showSearch
@@ -63,7 +64,7 @@ export function ShopeeHeader({
     <header className="text-white" style={{ background: 'var(--shopee-header-gradient)' }}>
       {variant === 'full' && <UtilityBar />}
       <div className="mx-auto flex w-full items-center gap-6 px-4 py-4 xl:px-8">
-        <Link to="/" className="flex shrink-0 items-end gap-2" aria-label="Shopee home">
+        <Link to={withSimSession('/')} className="flex shrink-0 items-end gap-2" aria-label="Shopee home">
           <ShopeeLogo />
           {variant === 'minimal' && title && (
             <span className="mb-0.5 border-l border-white/40 pl-3 text-[22px] font-light">{title}</span>
@@ -100,7 +101,7 @@ export function ShopeeHeader({
             {variant === 'full' && !focused && (
               <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/90">
                 {TRENDING.map((s) => (
-                  <Link key={s} to={`/search?keyword=${encodeURIComponent(s)}`} className="hover:underline">
+                  <Link key={s} to={withSimSession(`/search?keyword=${encodeURIComponent(s)}`)} className="hover:underline">
                     {s}
                   </Link>
                 ))}
@@ -170,7 +171,7 @@ function CartIcon() {
 
   return (
     <div className="group relative shrink-0">
-      <Link to="/cart" aria-label={`Cart, ${count} items`} className="relative block p-1">
+      <Link to={withSimSession('/cart')} aria-label={`Cart, ${count} items`} className="relative block p-1">
         <ShoppingCart size={28} />
         {count > 0 && (
           <span
@@ -211,7 +212,7 @@ function CartIcon() {
               <div className="flex items-center justify-between px-3 py-3">
                 <span className="text-xs text-ink-soft">{count} item(s) in cart</span>
                 <Link
-                  to="/cart"
+                  to={withSimSession('/cart')}
                   className="rounded-sm bg-shopee px-4 py-2 text-xs font-medium text-white hover:bg-shopee-dark"
                 >
                   View My Shopping Cart

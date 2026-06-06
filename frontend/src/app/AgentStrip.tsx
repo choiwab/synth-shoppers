@@ -39,28 +39,30 @@ export function AgentStrip() {
         <span className="count-pill">{reps.length} agents</span>
       </div>
       <div className="agent-strip">
-        {reps.length === 0 || !featured ? (
-          <div className="muted" style={{ padding: "8px 2px", fontSize: 13 }}>
-            Waiting for agents to spawn…
-          </div>
-        ) : (
-          <div className="agent-spotlight">
+        <div className="agent-spotlight">
+          {featured ? (
             <FeaturedAgentView agent={featured} />
-            <div className="spotlight-grid">
-              {smallReps.map((a) => (
-                <button
-                  key={a.agent_id}
-                  type="button"
-                  className="spotlight-tile"
-                  onClick={() => setPickedId(a.agent_id)}
-                  title={`Spotlight ${a.name}`}
-                >
-                  <AgentTile agent={a} />
-                </button>
-              ))}
+          ) : (
+            <div className="featured-window featured-empty">
+              <div className="muted" style={{ padding: "8px 2px", fontSize: 13 }}>
+                Waiting for agents to spawn…
+              </div>
             </div>
+          )}
+          <div className="spotlight-grid">
+            {smallReps.map((a) => (
+              <button
+                key={a.agent_id}
+                type="button"
+                className="spotlight-tile"
+                onClick={() => setPickedId(a.agent_id)}
+                title={`Spotlight ${a.name}`}
+              >
+                <AgentTile agent={a} />
+              </button>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
