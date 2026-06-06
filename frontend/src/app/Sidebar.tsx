@@ -3,6 +3,13 @@ import { useControlStore } from "@/store/controlStore";
 import { pauseRun, rerun, resumeRun, startRun } from "@/store/runController";
 import { PriceChip } from "@/components/PriceChip";
 
+const DEFAULT_SHOPEE_BASE = "http://localhost:5174";
+
+function reportUrl(runId: string): string {
+  const base = (import.meta.env.VITE_SHOPEE_BASE ?? DEFAULT_SHOPEE_BASE).replace(/\/$/, "");
+  return `${base}/report/${encodeURIComponent(runId)}`;
+}
+
 /**
  * Left rail (was the top header). Vertical to reclaim vertical space for the
  * strip + funnel. Listing identity → price → run controls → status.
@@ -10,6 +17,8 @@ import { PriceChip } from "@/components/PriceChip";
 export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
   const status = useSimStore((s) => s.status);
   const evListing = useSimStore((s) => s.listing);
+  const runId = useSimStore((s) => s.runId);
+  const reportReady = useSimStore((s) => s.reportReady);
 
   const price = useControlStore((s) => s.price);
   const baseListing = useControlStore((s) => s.listing);
@@ -21,6 +30,7 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
   const paused = status === "paused";
   const running = status === "running" || status === "paused";
   const canRun = status === "idle" || status === "complete" || status === "error";
+  const canViewReport = Boolean(runId && reportReady);
 
   return (
     <aside className="panel sidebar">
@@ -64,6 +74,17 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
         <button className="btn sidebar-btn" onClick={onOpenTweaks}>
           ⚙ Tweaks
         </button>
+
+        <a
+          className="btn sidebar-btn"
+          href={runId ? reportUrl(runId) : undefined}
+          aria-disabled={!canViewReport}
+          onClick={(event) => {
+            if (!canViewReport) event.preventDefault();
+          }}
+        >
+          View report
+        </a>
       </div>
     </aside>
   );

@@ -292,7 +292,48 @@ export interface AgentTrace {
   bail_stage?: FunnelStage;
   objection?: string;
   retention_time_s: number;
-  stage_trace: { stage: FunnelStage; time_s: number; screenshot_url?: string }[];
+  stage_trace: {
+    stage: FunnelStage;
+    time_s: number;
+    screenshot_url?: string;
+    sentiment?: "love" | "like" | "neutral" | "dislike" | "reject";
+    comment?: string;
+  }[];
+  purchase_reason?: string;
+  bail_reason?: string;
+}
+
+export interface AgentTraceReport {
+  agent_id: string;
+  name: string;
+  archetype: PersonaId;
+  outcome: "bought" | "bailed";
+  status_label: string;
+  summary: string;
+  retention_time_s: number;
+  completed_gates: number;
+  total_gates: number;
+  progress_pct: number;
+  stage_path: FunnelStage[];
+  last_stage?: FunnelStage;
+  bail_stage?: FunnelStage;
+  bail_reason?: string;
+  objection?: string;
+  purchase_reason?: string;
+  key_reason?: string;
+  metrics: Record<string, unknown>;
+  run_metrics_context: Record<string, unknown>;
+  comments: Array<{ stage: FunnelStage; sentiment?: string; comment: string; time_s: number }>;
+  screenshots: Array<{ stage: FunnelStage; screenshot_url: string; time_s: number }>;
+  stage_trace: Array<{
+    order: number;
+    stage: FunnelStage;
+    time_s: number;
+    delta_s: number;
+    screenshot_url?: string;
+    sentiment?: "love" | "like" | "neutral" | "dislike" | "reject";
+    comment?: string;
+  }>;
 }
 
 export interface ViabilityReport {
@@ -300,6 +341,7 @@ export interface ViabilityReport {
   market_fit_score: number;
   recommended_price: number;
   go_no_go: { decision: "go" | "no_go"; confidence: number };
+  browsing_metrics?: Record<string, unknown>;
   funnel: { stage: FunnelStage; entered: number; bailed: number; bail_rate: number }[];
   archetypes: {
     archetype: PersonaId;
@@ -314,4 +356,9 @@ export interface ViabilityReport {
   risk_archetypes: PersonaId[];
   recommendations: Recommendation[];
   agents: AgentTrace[];
+  comments?: Array<Record<string, unknown>>;
+  purchase_reasons?: Array<Record<string, unknown>>;
+  agent_trace_reports?: AgentTraceReport[];
+  diagnostics?: Record<string, unknown>;
+  dropoff_reasons?: Array<Record<string, unknown>>;
 }

@@ -14,7 +14,7 @@ export const SAMPLE_LISTING: ListingConfig = {
   variants: [
     {
       name: "Colour",
-      options: ["Black", "Cream", "Camel", "Grey", "Navy", "Olive", "Wine", "Pink"],
+      options: ["Black", "Ivory", "Charcoal", "Cream"],
     },
   ],
   photos: [
@@ -24,11 +24,11 @@ export const SAMPLE_LISTING: ListingConfig = {
   description: "Matin Kim logo beanie with a soft Korean streetwear knit. One size, unisex fit.",
   rating: { score: 4.8, count: 312 },
   reviews: [
-    { author: "jq***", rating: 5, text: "Warm and not itchy leh, worth it.", date: "2026-05-02" },
-    { author: "tan***", rating: 4, text: "Colour abit off from photo but ok.", date: "2026-04-28" },
-    { author: "wx***", rating: 2, text: "Took 3 weeks to arrive, seller never reply.", date: "2026-04-19" },
+    { author: "jiae***ng", rating: 5, text: "100% authentic! Came with the brand tag and dust bag.", date: "2026-05-18" },
+    { author: "sgfashion", rating: 5, text: "Quality knit, logo is clean. Worth the price for the real thing.", date: "2026-05-22" },
+    { author: "weeklyhaul", rating: 4, text: "Lovely beanie, delivery took a few days but legit product.", date: "2026-05-09" },
   ],
-  authenticity: { certificate: false, serial: false, unboxing: false },
-  category: ["Fashion", "Accessories", "Hats & Caps"],
-  shipping: { fee: 2.9, days: "3–5" },
+  authenticity: { certificate: true, serial: true, unboxing: true },
+  category: ["Women Clothes", "Hats & Caps", "Beanies"],
+  shipping: { fee: 0, days: "Get by 9–11 Jun" },
 };
