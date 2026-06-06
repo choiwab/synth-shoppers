@@ -63,9 +63,14 @@ def test_task_prompt_reuses_persona_blurb_facts_and_objection_pool() -> None:
     driver = BrowserUseAgenticDriver(listing)
     task = driver._task("Farhan", "budget", driver.listing, "http://localhost:8080/?listing=x")
 
+    assert driver.autonomous is True
+    assert driver.use_vision is True
+    assert driver.vision_detail_level == "high"
     assert "Farhan" in task and "Budget-tight" in task
     assert "scrutinize every dollar" in task  # persona blurb from sim.agents
     assert f"S${listing.price:.2f}" in task and f"S${listing.base_price:.2f}" in task  # listing facts surfaced
+    assert "only open, compare, add to cart, checkout, or buy listings with visible product images" in task
+    assert "confirm_purchase — only if you genuinely decide to buy AND you have seen clear product images" in task
     assert "Over budget liao, next." in task  # objection style example from the pool
 
 

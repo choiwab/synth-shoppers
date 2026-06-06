@@ -20,12 +20,14 @@ export function ProductCard({ config, highlightTarget = false }: ProductCardProp
   const colour = config.variants[0]?.options[0]
   const isTarget = config.id === MATINKIM_ID
   const freeShipping = config.shipping.fee === 0
+  const hasImage = config.photos.some((photo) => Boolean(photo.url))
 
   return (
     <Link
       to={withSimSession(`/shopee/${config.id}`)}
       data-action="open-listing"
       data-listing-id={config.id}
+      data-has-image={hasImage ? 'true' : 'false'}
       data-listing-card="search-result"
       onClick={() => emitFunnelAction('open_listing', 'land', config.id)}
       className={cn(

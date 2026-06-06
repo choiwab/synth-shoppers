@@ -100,6 +100,18 @@ def _brain_field(brain: object, field: str) -> str | None:
     text = str(value).strip()
     return text or None
 
+
+def _env_bool(name: str, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _vision_detail_level() -> str:
+    raw = os.environ.get("BROWSER_USE_VISION_DETAIL", "high").strip().lower()
+    return raw if raw in {"auto", "low", "high"} else "high"
+
 # Funnel gate -> the H2 data-action selector that advances into it (OVERVIEW §5.6).
 GATE_ACTION: dict[GateStage, str] = {
     "photos": "scroll-gallery",
@@ -201,7 +213,9 @@ class BrowserUseAgenticDriver:
         self.max_steps = max_steps
         self.headless = headless
         self.agent_timeout_s = agent_timeout_s or float(os.environ.get("BROWSER_USE_AGENT_TIMEOUT_S", "12"))
-        self.autonomous = os.environ.get("BROWSER_USE_AUTONOMOUS", "0") == "1"
+        self.autonomous = _env_bool("BROWSER_USE_AUTONOMOUS", True)
+        self.use_vision = _env_bool("BROWSER_USE_VISION", True)
+        self.vision_detail_level = _vision_detail_level()
         # The runner passes the listing *slug* (run.listing.id), not a URL, so we
         # build the page URL from a configurable base. Default points at H3's local
         # stub server; swap to H2's dev server via LISTING_BASE_URL (one-line swap).
@@ -365,7 +379,7 @@ class BrowserUseAgenticDriver:
                     for competitor in competitors:
                         selector = f'[data-listing-id="{competitor["id"]}"]'
                         try:
-                            if await click(page, selector):
+                            if await click(page, f'{selector}[data-has-image="true"]'):
                                 await page.wait_for_load_state("domcontentloaded", timeout=5000)
                                 await page.wait_for_timeout(450)
                                 competitor_land_url = await asyncio.to_thread(
@@ -651,6 +665,8 @@ class BrowserUseAgenticDriver:
             tools=tools,
             browser=browser,
             extend_system_message=self._persona_system_message(name, archetype),
+            use_vision=self.use_vision,
+            vision_detail_level=self.vision_detail_level,
         )
 
     @staticmethod
@@ -662,9 +678,11 @@ class BrowserUseAgenticDriver:
             f"\n\nROLE-PLAY: You are {name}, a {persona.display} shopper in Singapore "
             f"({persona.tag}). {persona.blurb}\n"
             "Stay in character for ALL of your reasoning: in every `thinking` step, react to "
-            "the photos, reviews, price, seller trust and authenticity the way THIS persona "
+            "the visible product images, reviews, price, seller trust and authenticity the way THIS persona "
             "would. When you call a funnel action, fill its `reaction` with a short first-person "
-            "line in your voice and set `sentiment` honestly (love/like/neutral/dislike/reject)."
+            "line in your voice and set `sentiment` honestly (love/like/neutral/dislike/reject). "
+            "Only open, compare, add to cart, or checkout listings that have visible product images. "
+            "Skip search results with missing, broken, blank, or placeholder-looking images."
         )
 
     def _on_step(self, ctx: _Journey):
@@ -712,12 +730,14 @@ class BrowserUseAgenticDriver:
             f"{persona.blurb}\n\n"
             f"Shop this Shopee listing. Start by opening it: {url}\n\n"
             f"Before judging it, search Shopee for '{SEARCH_QUERY}' and compare relevant alternatives if your persona would naturally comparison-shop.\n\n"
+            "Image rule: only open, compare, add to cart, checkout, or buy listings with visible product images. "
+            "If a listing has no image, a broken image, a blank placeholder, or images that do not show the product clearly, skip it or bail at the photos gate.\n\n"
             f"What you can see about the listing:\n{self._facts(listing)}\n\n"
             "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
             "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
             "  At EACH step pass `reaction` (a short first-person line in your voice about what you just\n"
             "  saw) and `sentiment` (love/like/neutral/dislike/reject) — this is how we record what you think.\n"
-            "  confirm_purchase — only if you genuinely decide to buy; pass `reason` (why you're buying).\n"
+            "  confirm_purchase — only if you genuinely decide to buy AND you have seen clear product images; pass `reason` (why you're buying).\n"
             "  bail — the moment something puts you off; state your exact objection in character and a\n"
             "  `reason_category` (price_value/trust_authenticity/visual_photos/social_proof_reviews/shipping/other).\n\n"
             f"Stay fully in character. If you bail, phrase it like these Singlish lines: {examples}\n"
