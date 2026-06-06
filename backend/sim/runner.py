@@ -31,6 +31,7 @@ from contracts import (
     ViabilityReport,
 )
 from sim.agents import PERSONAS
+from sim.competitors import COMPETITORS
 from sim.decision import decide, synth_purchase_reason, synth_reaction
 from sim.mock_driver import AgenticJourneyDriver, BrowserDriver, MockBrowserDriver
 from sim.report import build_report
@@ -157,6 +158,7 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
             ts=now_ms(),
             listing={"title": run.listing.title, "price": run.listing.price, "seller": run.listing.seller.name},
             agents_total=len(run.cohort),
+            competitors=list(COMPETITORS),
         )
     )
 

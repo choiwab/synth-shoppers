@@ -85,6 +85,17 @@ def test_page_url_scopes_browser_session_per_agent() -> None:
     assert "config=" in url
 
 
+def test_search_url_starts_agents_from_matin_kim_results() -> None:
+    driver = BrowserUseAgenticDriver(load_listing(), base_url="http://localhost:5174")
+    url = driver._search_url(agent_id="budget_1", run_id="run_abc", archetype="budget")
+
+    assert url.startswith("http://localhost:5174/search?")
+    assert "keyword=matin+kim+beanie" in url
+    assert "agent_id=budget_1" in url
+    assert "run_id=run_abc" in url
+    assert "persona=budget" in url
+
+
 def test_objection_examples_handle_bare_string_entries() -> None:
     # xmm's price objection in agents.py is a bare string (no trailing comma);
     # it must not be iterated character-by-character.

@@ -60,6 +60,7 @@ from contracts import (
     StageTrace,
 )
 from sim.agents import PERSONAS
+from sim.competitors import SEARCH_QUERY, competitors_for_persona
 from sim.decision import decide, synth_purchase_reason, synth_reaction
 from sim.screenshots import save_thumbnail
 
@@ -221,13 +222,13 @@ class BrowserUseAgenticDriver:
         url = self._page_url(listing_url, listing, agent_id=agent_id, run_id=run_id, archetype=archetype)
         ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit)
 
+        if not self.autonomous:
+            return await self._run_guided_browser_fallback(ctx, url, seed)
+
         # land: emitted before the browser navigates, so no thumbnail yet (the first
         # real thumbnail lands at the photos gate).
         ctx.record("land", None)
         await emit(StageEnterEvent(run_id=run_id, ts=_now_ms(), agent_id=agent_id, stage="land"))
-
-        if not self.autonomous:
-            return await self._run_guided_browser_fallback(ctx, url, seed)
 
         browser = self._make_browser()
         try:
@@ -280,6 +281,98 @@ class BrowserUseAgenticDriver:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page(viewport={"width": 1280, "height": 900})
             try:
+                search_url = self._search_url(
+                    agent_id=ctx.agent_id,
+                    run_id=ctx.run_id,
+                    archetype=ctx.archetype,
+                )
+                await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
+                await page.wait_for_timeout(700)
+                discovery_thumbnail_url = await asyncio.to_thread(
+                    save_thumbnail,
+                    await page.screenshot(full_page=False),
+                    ctx.agent_id,
+                    "discovery_search",
+                )
+                await ctx.emit(
+                    StageEnterEvent(
+                        run_id=ctx.run_id,
+                        ts=_now_ms(),
+                        agent_id=ctx.agent_id,
+                        stage="discovery",
+                        thumbnail_url=discovery_thumbnail_url,
+                    )
+                )
+                await ctx.emit(
+                    BrowserFrameEvent(
+                        run_id=ctx.run_id,
+                        ts=_now_ms(),
+                        agent_id=ctx.agent_id,
+                        thumbnail_url=discovery_thumbnail_url,
+                        scroll_pct=0.0,
+                    )
+                )
+                competitors = competitors_for_persona(ctx.archetype)
+                if competitors:
+                    names = ", ".join(c["name"] for c in competitors)
+                    await ctx.emit(
+                        StageSentimentEvent(
+                            run_id=ctx.run_id,
+                            ts=_now_ms(),
+                            agent_id=ctx.agent_id,
+                            stage="discovery",
+                            sentiment="neutral",
+                            comment=f"Searched '{SEARCH_QUERY}' and compared {names} before judging the Matin Kim listing.",
+                        )
+                    )
+                    for competitor in competitors:
+                        selector = f'[data-listing-id="{competitor["id"]}"]'
+                        try:
+                            if await click(page, selector):
+                                await page.wait_for_load_state("domcontentloaded", timeout=5000)
+                                await page.wait_for_timeout(450)
+                                competitor_thumbnail_url = await asyncio.to_thread(
+                                    save_thumbnail,
+                                    await page.screenshot(full_page=False),
+                                    ctx.agent_id,
+                                    f'discovery_{competitor["id"]}',
+                                )
+                                await ctx.emit(
+                                    BrowserFrameEvent(
+                                        run_id=ctx.run_id,
+                                        ts=_now_ms(),
+                                        agent_id=ctx.agent_id,
+                                        thumbnail_url=competitor_thumbnail_url,
+                                        scroll_pct=0.08,
+                                    )
+                                )
+                                await ctx.emit(
+                                    StageSentimentEvent(
+                                        run_id=ctx.run_id,
+                                        ts=_now_ms(),
+                                        agent_id=ctx.agent_id,
+                                        stage="discovery",
+                                        sentiment="neutral",
+                                        comment=f"Checked competitor: {competitor['name']}.",
+                                    )
+                                )
+                                await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
+                                await page.wait_for_timeout(300)
+                        except Exception:
+                            await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
+                            await page.wait_for_timeout(300)
+                else:
+                    await ctx.emit(
+                        StageSentimentEvent(
+                            run_id=ctx.run_id,
+                            ts=_now_ms(),
+                            agent_id=ctx.agent_id,
+                            stage="discovery",
+                            sentiment="neutral",
+                            comment=f"Searched '{SEARCH_QUERY}' and picked the Matin Kim listing from results.",
+                        )
+                    )
+
                 await page.goto(url, wait_until="domcontentloaded", timeout=8000)
                 await page.wait_for_timeout(700)
                 land_thumbnail_url = await asyncio.to_thread(
@@ -287,6 +380,16 @@ class BrowserUseAgenticDriver:
                     await page.screenshot(full_page=False),
                     ctx.agent_id,
                     "land",
+                )
+                ctx.record("land", land_thumbnail_url)
+                await ctx.emit(
+                    StageEnterEvent(
+                        run_id=ctx.run_id,
+                        ts=_now_ms(),
+                        agent_id=ctx.agent_id,
+                        stage="land",
+                        thumbnail_url=land_thumbnail_url,
+                    )
                 )
                 await ctx.emit(
                     BrowserFrameEvent(
@@ -538,6 +641,7 @@ class BrowserUseAgenticDriver:
             f"You are {name}, a {persona.display} shopper in Singapore ({persona.tag}).\n"
             f"{persona.blurb}\n\n"
             f"Shop this Shopee listing. Start by opening it: {url}\n\n"
+            f"Before judging it, search Shopee for '{SEARCH_QUERY}' and compare relevant alternatives if your persona would naturally comparison-shop.\n\n"
             f"What you can see about the listing:\n{self._facts(listing)}\n\n"
             "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
             "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
@@ -608,6 +712,22 @@ class BrowserUseAgenticDriver:
         }
         query = urllib.parse.urlencode({k: v for k, v in params.items() if v})
         return f"{self.base_url}/shopee/{slug}?{query}"
+
+    def _search_url(
+        self,
+        *,
+        agent_id: str | None = None,
+        run_id: str | None = None,
+        archetype: PersonaId | None = None,
+    ) -> str:
+        params = {
+            "keyword": SEARCH_QUERY,
+            "agent_id": agent_id,
+            "run_id": run_id,
+            "persona": archetype,
+        }
+        query = urllib.parse.urlencode({k: v for k, v in params.items() if v})
+        return f"{self.base_url}/search?{query}"
 
     # ---- browser-use runtime touchpoints (isolated; see VERIFY in module docstring)
     def _make_browser(self):

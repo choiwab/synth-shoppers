@@ -5,7 +5,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, field_validator
 
 
-FunnelStage = Literal["land", "photos", "reviews", "price", "cart", "checkout", "bought", "bailed"]
+FunnelStage = Literal["discovery", "land", "photos", "reviews", "price", "cart", "checkout", "bought", "bailed", "diverted"]
 GateStage = Literal["land", "photos", "reviews", "price", "cart", "checkout"]
 PersonaId = Literal["xmm", "auntie", "nerd", "geek", "insecure", "budget", "high_spender"]
 RunMode = Literal["mock", "real"]
@@ -141,6 +141,7 @@ class RunStartedEvent(BaseModel):
     ts: int
     listing: dict[str, str | float]
     agents_total: int
+    competitors: list[dict[str, str]] | None = None
 
 
 class AgentSpawnedEvent(BaseModel):
@@ -198,6 +199,17 @@ class AgentBoughtEvent(BaseModel):
     retention_time_s: float
 
 
+class AgentDivertedEvent(BaseModel):
+    type: Literal["agent_diverted"] = "agent_diverted"
+    run_id: str
+    ts: int
+    agent_id: str
+    competitor: str
+    competitor_name: str | None = None
+    converted: bool | None = None
+    reason: str | None = None
+
+
 class RunProgressEvent(BaseModel):
     type: Literal["run_progress"] = "run_progress"
     run_id: str
@@ -248,6 +260,7 @@ AgentEvent = (
     | ObjectionEvent
     | AgentBailedEvent
     | AgentBoughtEvent
+    | AgentDivertedEvent
     | RunProgressEvent
     | RunCompleteEvent
     | StageSentimentEvent

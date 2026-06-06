@@ -38,6 +38,7 @@ async def test_runner_emits_buffered_events_and_report() -> None:
     assert run.report.browsing_metrics["click_rate"] >= run.report.browsing_metrics["read_rate"]
     assert run.report.browsing_metrics["dropoff_reason_distribution"]
     assert run.events[0]["type"] == "run_started"
+    assert run.events[0]["competitors"]
     assert run.events[-1]["type"] == "run_complete"
 
     replay = await run.subscribe()

@@ -7,7 +7,7 @@ import type { ListingConfig } from "@/types/contracts";
  */
 export const SAMPLE_LISTING: ListingConfig = {
   id: "matinkim-beanie",
-  title: "CozyKnit Ribbed Merino Beanie — Unisex, 8 Colours",
+  title: "Matin Kim Logo Beanie — Official Korean Knit Hat (Unisex)",
   seller: { name: "MatinKim Official", verified: true, rating: 4.7, response_rate: 0.12 },
   price: 24.9,
   base_price: 24.9,
@@ -22,7 +22,7 @@ export const SAMPLE_LISTING: ListingConfig = {
     { url: "", type: "product" },
     { url: "", type: "lifestyle" },
   ],
-  description: "Soft ribbed merino-blend beanie. One size, unisex fit.",
+  description: "Matin Kim logo beanie with a soft Korean streetwear knit. One size, unisex fit.",
   rating: { score: 4.8, count: 312 },
   reviews: [
     { author: "jq***", rating: 5, text: "Warm and not itchy leh, worth it.", date: "2026-05-02" },
