@@ -5,6 +5,7 @@ import {
   type AgentEvent,
   type FunnelStage,
   type PersonaId,
+  type PersonaProfile,
 } from "@/types/contracts";
 
 export interface AgentState {
@@ -24,6 +25,7 @@ export interface AgentState {
   thumbnail_url?: string;
   scroll_pct?: number;
   retention_time_s?: number;
+  profile?: PersonaProfile;
   spawnOrder: number;
 }
 
@@ -194,6 +196,7 @@ export const useSimStore = create<SimStore>((set) => ({
               stage: "discovery" as FunnelStage, // enters the market first
               outcome: "active" as const,
               lastAction: STAGE_ACTION.discovery,
+              profile: ev.profile,
               spawnOrder,
             },
           };

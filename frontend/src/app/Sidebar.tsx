@@ -3,6 +3,7 @@ import { useControlStore } from "@/store/controlStore";
 import { pauseRun, rerun, resumeRun, startRun } from "@/store/runController";
 import { PriceChip } from "@/components/PriceChip";
 import { StatusBadge } from "@/components/StatusBadge";
+import { useIterationStore, latestReadyIteration } from "@/store/iterationStore";
 
 /**
  * Left rail (was the top header). Vertical to reclaim vertical space for the
@@ -14,6 +15,7 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
 
   const price = useControlStore((s) => s.price);
   const baseListing = useControlStore((s) => s.listing);
+  const proposalReady = useIterationStore((s) => !!latestReadyIteration(s));
 
   const title = evListing?.title ?? baseListing.title;
   const seller = evListing?.seller ?? baseListing.seller.name;
@@ -64,6 +66,7 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
 
         <button className="btn sidebar-btn" onClick={onOpenTweaks}>
           ⚙ Tweaks
+          {proposalReady && <span className="tweaks-ready-dot" title="A listing improvement is ready" />}
         </button>
       </div>
 

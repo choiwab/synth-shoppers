@@ -77,6 +77,11 @@ export function FeaturedAgentView({ agent }: { agent: AgentState }) {
           <div className="featured-tags">
             {archetypeLabel(agent.archetype)} · {archetypeTag(agent.archetype)}
           </div>
+          {agent.profile && (
+            <div className="featured-profile" title={agent.profile.blurb}>
+              {agent.profile.blurb}
+            </div>
+          )}
         </div>
         <span className="featured-stage-chip sm">{stageLabel}</span>
       </div>
