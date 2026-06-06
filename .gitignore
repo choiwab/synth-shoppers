@@ -30,3 +30,6 @@ frontend/shopee/.vite/
 
 # Temp
 /tmp/
+
+# Playwright MCP session artifacts
+.playwright-mcp/

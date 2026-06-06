@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 
-from contracts import GATE_ORDER, GateStage, PersonaId
+from contracts import GATE_ORDER, GateStage, PersonaId, PersonaProfile
 
 
 @dataclass(frozen=True)
@@ -140,3 +141,80 @@ def validate_personas() -> None:
         missing = set(GATE_ORDER) - set(persona.bail_prob)
         if missing:
             raise ValueError(f"{persona.id} missing bail probabilities for {sorted(missing)}")
+
+
+# ── Singaporean life-profiles ────────────────────────────────────────────────
+# A randomized profile layered on top of an archetype, so each spawned agent is a
+# distinct person. Attributes nudge the per-gate bail thresholds (see
+# `profile_bail_multiplier`), which spreads a persona's agents across thresholds —
+# that spread is what makes a listing improvement convert *some* of them and move
+# the numbers (instead of all clones flipping together).
+
+_HOBBIES: tuple[str, ...] = (
+    "K-drama & fashion",
+    "gym & sports",
+    "gaming & tech",
+    "hiking & outdoors",
+    "cafe-hopping & food",
+    "thrift & deals",
+    "travel & lifestyle",
+    "parenting & home",
+)
+_INCOME_BY_HOUSING: dict[str, tuple[str, ...]] = {
+    "HDB": ("tight", "tight", "comfortable"),
+    "condo": ("comfortable", "comfortable", "affluent"),
+    "landed": ("affluent",),
+}
+
+
+def generate_profile(rng: random.Random) -> PersonaProfile:
+    """Sample a Singaporean life-profile. Deterministic for a given seeded ``rng``."""
+    age = rng.randint(18, 62)
+    sex = rng.choice(["F", "M"])
+    housing = rng.choice(["HDB", "HDB", "condo", "condo", "landed"])
+    income = rng.choice(_INCOME_BY_HOUSING[housing])
+    if age < 26:
+        marital = rng.choice(["single", "single", "married"])
+    else:
+        marital = rng.choice(["single", "married", "married_kids", "married_kids"])
+    hobby = rng.choice(_HOBBIES)
+
+    marital_label = {"single": "single", "married": "married", "married_kids": "married w/ kids"}[marital]
+    blurb = f"{age}{sex}, {marital_label}, {housing}, {income} income, into {hobby}"
+    return PersonaProfile(age=age, sex=sex, marital=marital, income=income, housing=housing, hobby=hobby, blurb=blurb)
+
+
+def profile_bail_multiplier(profile: PersonaProfile | None, persona_id: PersonaId, stage: GateStage) -> float:
+    """Multiplicative nudge (around 1.0) applied AFTER the archetype calibration in
+    `effective_bail_probability`. Returns 1.0 for unaffected (profile, stage) pairs."""
+    if profile is None:
+        return 1.0
+    m = 1.0
+
+    # income / wealth — the biggest lever, on price + cart
+    if stage in ("price", "cart"):
+        m *= {"tight": 1.4, "comfortable": 1.0, "affluent": 0.55}[profile.income]
+        if profile.housing in ("condo", "landed"):
+            m *= 0.85  # wealth proxy stacks lightly with income
+        if profile.marital == "married_kids":
+            m *= 1.15  # household budget pressure
+        if profile.hobby == "thrift & deals":
+            m *= 1.3
+
+    # age — older shoppers weigh trust; younger weigh vibe/social-proof
+    if profile.age >= 45:
+        if stage in ("checkout", "reviews"):
+            m *= 1.3
+        if stage == "photos":
+            m *= 0.85
+    elif profile.age <= 24:
+        if stage == "photos":
+            m *= 1.25
+        if stage == "reviews":
+            m *= 1.2
+
+    # hobby affinity — fashion-led shoppers are more forgiving of so-so photos
+    if stage == "photos" and profile.hobby == "K-drama & fashion":
+        m *= 0.8
+
+    return m
