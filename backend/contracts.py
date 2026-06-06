@@ -302,6 +302,8 @@ class ViabilityReport(BaseModel):
     # `archetypes[].sentiment_arc` carries the per-gate sentiment curve per persona.
     comments: list[dict[str, Any]] = Field(default_factory=list)
     purchase_reasons: list[dict[str, Any]] = Field(default_factory=list)
+    # Per-agent consolidated trace reports generated after each run.
+    agent_trace_reports: list[dict[str, Any]] = Field(default_factory=list)
     # Relative diagnostics (review_read_rate, engagement_rate, click_rate) and the
     # dropout-reason distribution. click_rate is None until the Tier-2 impression stage.
     diagnostics: dict[str, Any] = Field(default_factory=dict)

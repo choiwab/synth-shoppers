@@ -173,6 +173,8 @@ async def test_mock_run_populates_sentiment_diagnostics_and_dropoff() -> None:
     report = run.report
     assert report is not None
     assert report.comments
+    assert len(report.agent_trace_reports) == len(run.agents)
+    assert any(row["comments"] for row in report.agent_trace_reports)
     assert any(row.get("sentiment_arc") for row in report.archetypes)
     assert "engagement_rate" in report.diagnostics and "review_read_rate" in report.diagnostics
     assert report.diagnostics["click_rate"] is None  # honest until Tier-2 impression stage
