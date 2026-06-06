@@ -1,0 +1,85 @@
+{"type":"run_started","listing":{"title":"CozyKnit Ribbed Merino Beanie — Unisex, 8 Colours","price":24.9,"seller":"MatinKim Official"},"agents_total":16,"competitors":[{"id":"ribknit","name":"RibKnit Co"},{"id":"warmthreads","name":"WarmThreads"}],"run_id":"run_fixture1","ts":1750000000000}
+{"type":"agent_spawned","agent_id":"budget_1","name":"Ah Beng","archetype":"budget","run_id":"run_fixture1","ts":1750000000080}
+{"type":"agent_spawned","agent_id":"budget_2","name":"Siti","archetype":"budget","run_id":"run_fixture1","ts":1750000000160}
+{"type":"agent_spawned","agent_id":"budget_3","name":"Kumar","archetype":"budget","run_id":"run_fixture1","ts":1750000000240}
+{"type":"agent_spawned","agent_id":"xmm_1","name":"Jiamin","archetype":"xmm","run_id":"run_fixture1","ts":1750000000320}
+{"type":"agent_spawned","agent_id":"xmm_2","name":"Rachel","archetype":"xmm","run_id":"run_fixture1","ts":1750000000400}
+{"type":"agent_spawned","agent_id":"xmm_3","name":"Yuki","archetype":"xmm","run_id":"run_fixture1","ts":1750000000480}
+{"type":"agent_spawned","agent_id":"auntie_1","name":"Auntie Lim","archetype":"auntie","run_id":"run_fixture1","ts":1750000000560}
+{"type":"agent_spawned","agent_id":"auntie_2","name":"Madam Tan","archetype":"auntie","run_id":"run_fixture1","ts":1750000000640}
+{"type":"agent_spawned","agent_id":"nerd_1","name":"Wei Jie","archetype":"nerd","run_id":"run_fixture1","ts":1750000000720}
+{"type":"agent_spawned","agent_id":"nerd_2","name":"Daryl","archetype":"nerd","run_id":"run_fixture1","ts":1750000000800}
+{"type":"agent_spawned","agent_id":"geek_1","name":"Marcus","archetype":"geek","run_id":"run_fixture1","ts":1750000000880}
+{"type":"agent_spawned","agent_id":"geek_2","name":"Hafiz","archetype":"geek","run_id":"run_fixture1","ts":1750000000960}
+{"type":"agent_spawned","agent_id":"insecure_1","name":"Nicole","archetype":"insecure","run_id":"run_fixture1","ts":1750000001040}
+{"type":"agent_spawned","agent_id":"insecure_2","name":"Pris","archetype":"insecure","run_id":"run_fixture1","ts":1750000001120}
+{"type":"agent_spawned","agent_id":"high_spender_1","name":"Vanessa","archetype":"high_spender","run_id":"run_fixture1","ts":1750000001200}
+{"type":"agent_spawned","agent_id":"high_spender_2","name":"Dr Ong","archetype":"high_spender","run_id":"run_fixture1","ts":1750000001280}
+{"type":"stage_enter","agent_id":"budget_1","stage":"land","run_id":"run_fixture1","ts":1750000001380}
+{"type":"stage_enter","agent_id":"budget_2","stage":"land","run_id":"run_fixture1","ts":1750000001480}
+{"type":"agent_diverted","agent_id":"budget_3","competitor":"ribknit","competitor_name":"RibKnit Co","converted":false,"reason":"RibKnit Co got better photos.","run_id":"run_fixture1","ts":1750000001600}
+{"type":"stage_enter","agent_id":"xmm_1","stage":"land","run_id":"run_fixture1","ts":1750000001700}
+{"type":"stage_enter","agent_id":"xmm_2","stage":"land","run_id":"run_fixture1","ts":1750000001800}
+{"type":"stage_enter","agent_id":"xmm_3","stage":"land","run_id":"run_fixture1","ts":1750000001900}
+{"type":"stage_enter","agent_id":"auntie_1","stage":"land","run_id":"run_fixture1","ts":1750000002000}
+{"type":"agent_diverted","agent_id":"auntie_2","competitor":"warmthreads","competitor_name":"WarmThreads","converted":true,"reason":"WarmThreads cheaper with free shipping.","run_id":"run_fixture1","ts":1750000002120}
+{"type":"stage_enter","agent_id":"nerd_1","stage":"land","run_id":"run_fixture1","ts":1750000002220}
+{"type":"stage_enter","agent_id":"nerd_2","stage":"land","run_id":"run_fixture1","ts":1750000002320}
+{"type":"agent_diverted","agent_id":"geek_1","competitor":"ribknit","competitor_name":"RibKnit Co","converted":true,"reason":"RibKnit Co got better photos.","run_id":"run_fixture1","ts":1750000002440}
+{"type":"stage_enter","agent_id":"geek_2","stage":"land","run_id":"run_fixture1","ts":1750000002540}
+{"type":"stage_enter","agent_id":"insecure_1","stage":"land","run_id":"run_fixture1","ts":1750000002640}
+{"type":"agent_diverted","agent_id":"insecure_2","competitor":"warmthreads","competitor_name":"WarmThreads","converted":false,"reason":"WarmThreads cheaper with free shipping.","run_id":"run_fixture1","ts":1750000002760}
+{"type":"stage_enter","agent_id":"high_spender_1","stage":"land","run_id":"run_fixture1","ts":1750000002860}
+{"type":"agent_diverted","agent_id":"high_spender_2","competitor":"ribknit","competitor_name":"RibKnit Co","converted":false,"reason":"RibKnit Co got better photos.","run_id":"run_fixture1","ts":1750000002980}
+{"type":"run_progress","active":11,"bought":0,"bailed":0,"run_id":"run_fixture1","ts":1750000003020}
+{"type":"stage_enter","agent_id":"budget_1","stage":"photos","run_id":"run_fixture1","ts":1750000003130}
+{"type":"stage_enter","agent_id":"budget_2","stage":"photos","run_id":"run_fixture1","ts":1750000003240}
+{"type":"objection","agent_id":"xmm_1","stage":"photos","text":"Photos so blur, cannot see the knit also.","run_id":"run_fixture1","ts":1750000003380}
+{"type":"agent_bailed","agent_id":"xmm_1","stage":"photos","objection":"Photos so blur, cannot see the knit also.","retention_time_s":15,"run_id":"run_fixture1","ts":1750000003440}
+{"type":"stage_enter","agent_id":"xmm_2","stage":"photos","run_id":"run_fixture1","ts":1750000003550}
+{"type":"objection","agent_id":"xmm_3","stage":"photos","text":"Only stock photo? Want lifestyle pic lah.","run_id":"run_fixture1","ts":1750000003690}
+{"type":"agent_bailed","agent_id":"xmm_3","stage":"photos","objection":"Only stock photo? Want lifestyle pic lah.","retention_time_s":12,"run_id":"run_fixture1","ts":1750000003750}
+{"type":"stage_enter","agent_id":"auntie_1","stage":"photos","run_id":"run_fixture1","ts":1750000003860}
+{"type":"stage_enter","agent_id":"nerd_1","stage":"photos","run_id":"run_fixture1","ts":1750000003970}
+{"type":"stage_enter","agent_id":"nerd_2","stage":"photos","run_id":"run_fixture1","ts":1750000004080}
+{"type":"objection","agent_id":"geek_2","stage":"photos","text":"Eh the colour looks fake in the pic.","run_id":"run_fixture1","ts":1750000004220}
+{"type":"agent_bailed","agent_id":"geek_2","stage":"photos","objection":"Eh the colour looks fake in the pic.","retention_time_s":13,"run_id":"run_fixture1","ts":1750000004280}
+{"type":"stage_enter","agent_id":"insecure_1","stage":"photos","run_id":"run_fixture1","ts":1750000004390}
+{"type":"stage_enter","agent_id":"high_spender_1","stage":"photos","run_id":"run_fixture1","ts":1750000004500}
+{"type":"run_progress","active":8,"bought":0,"bailed":3,"run_id":"run_fixture1","ts":1750000004540}
+{"type":"stage_enter","agent_id":"budget_1","stage":"reviews","run_id":"run_fixture1","ts":1750000004650}
+{"type":"stage_enter","agent_id":"budget_2","stage":"reviews","run_id":"run_fixture1","ts":1750000004760}
+{"type":"stage_enter","agent_id":"xmm_2","stage":"reviews","run_id":"run_fixture1","ts":1750000004870}
+{"type":"objection","agent_id":"auntie_1","stage":"reviews","text":"Seller never reply the bad review, sus.","run_id":"run_fixture1","ts":1750000005010}
+{"type":"agent_bailed","agent_id":"auntie_1","stage":"reviews","objection":"Seller never reply the bad review, sus.","retention_time_s":19,"run_id":"run_fixture1","ts":1750000005070}
+{"type":"objection","agent_id":"nerd_1","stage":"reviews","text":"Only 3 reviews? Cannot trust leh.","run_id":"run_fixture1","ts":1750000005210}
+{"type":"agent_bailed","agent_id":"nerd_1","stage":"reviews","objection":"Only 3 reviews? Cannot trust leh.","retention_time_s":21,"run_id":"run_fixture1","ts":1750000005270}
+{"type":"stage_enter","agent_id":"nerd_2","stage":"reviews","run_id":"run_fixture1","ts":1750000005380}
+{"type":"stage_enter","agent_id":"insecure_1","stage":"reviews","run_id":"run_fixture1","ts":1750000005490}
+{"type":"stage_enter","agent_id":"high_spender_1","stage":"reviews","run_id":"run_fixture1","ts":1750000005600}
+{"type":"run_progress","active":6,"bought":0,"bailed":5,"run_id":"run_fixture1","ts":1750000005640}
+{"type":"objection","agent_id":"budget_1","stage":"price","text":"Can find cheaper at Bugis lah.","run_id":"run_fixture1","ts":1750000005780}
+{"type":"agent_bailed","agent_id":"budget_1","stage":"price","objection":"Can find cheaper at Bugis lah.","retention_time_s":24,"run_id":"run_fixture1","ts":1750000005840}
+{"type":"objection","agent_id":"budget_2","stage":"price","text":"Add shipping also? Over budget liao, next.","run_id":"run_fixture1","ts":1750000005980}
+{"type":"agent_bailed","agent_id":"budget_2","stage":"price","objection":"Add shipping also? Over budget liao, next.","retention_time_s":25,"run_id":"run_fixture1","ts":1750000006040}
+{"type":"stage_enter","agent_id":"xmm_2","stage":"price","run_id":"run_fixture1","ts":1750000006150}
+{"type":"stage_enter","agent_id":"nerd_2","stage":"price","run_id":"run_fixture1","ts":1750000006260}
+{"type":"stage_enter","agent_id":"insecure_1","stage":"price","run_id":"run_fixture1","ts":1750000006370}
+{"type":"stage_enter","agent_id":"high_spender_1","stage":"price","run_id":"run_fixture1","ts":1750000006480}
+{"type":"run_progress","active":4,"bought":0,"bailed":7,"run_id":"run_fixture1","ts":1750000006520}
+{"type":"stage_enter","agent_id":"xmm_2","stage":"cart","run_id":"run_fixture1","ts":1750000006630}
+{"type":"stage_enter","agent_id":"nerd_2","stage":"cart","run_id":"run_fixture1","ts":1750000006740}
+{"type":"stage_enter","agent_id":"insecure_1","stage":"cart","run_id":"run_fixture1","ts":1750000006850}
+{"type":"stage_enter","agent_id":"high_spender_1","stage":"cart","run_id":"run_fixture1","ts":1750000006960}
+{"type":"run_progress","active":4,"bought":0,"bailed":7,"run_id":"run_fixture1","ts":1750000007000}
+{"type":"stage_enter","agent_id":"xmm_2","stage":"checkout","run_id":"run_fixture1","ts":1750000007110}
+{"type":"stage_enter","agent_id":"nerd_2","stage":"checkout","run_id":"run_fixture1","ts":1750000007220}
+{"type":"objection","agent_id":"insecure_1","stage":"checkout","text":"Checkout so many steps, forget it.","run_id":"run_fixture1","ts":1750000007360}
+{"type":"agent_bailed","agent_id":"insecure_1","stage":"checkout","objection":"Checkout so many steps, forget it.","retention_time_s":38,"run_id":"run_fixture1","ts":1750000007420}
+{"type":"stage_enter","agent_id":"high_spender_1","stage":"checkout","run_id":"run_fixture1","ts":1750000007530}
+{"type":"run_progress","active":3,"bought":0,"bailed":8,"run_id":"run_fixture1","ts":1750000007570}
+{"type":"agent_bought","agent_id":"xmm_2","retention_time_s":58,"run_id":"run_fixture1","ts":1750000007700}
+{"type":"agent_bought","agent_id":"nerd_2","retention_time_s":63,"run_id":"run_fixture1","ts":1750000007830}
+{"type":"agent_bought","agent_id":"high_spender_1","retention_time_s":68,"run_id":"run_fixture1","ts":1750000007960}
+{"type":"run_progress","active":0,"bought":3,"bailed":8,"run_id":"run_fixture1","ts":1750000008020}
+{"type":"run_complete","buy_rate":0.27,"report_ready":true,"run_id":"run_fixture1","ts":1750000008100}
