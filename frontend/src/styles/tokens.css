@@ -1,0 +1,42 @@
+/* =============================================================================
+ * DESIGN TOKENS — owned by H1 (PRD 01 §5). H2 imports this file.
+ * Do not introduce a second color system; derive everything from these.
+ * Font @import lives at the top of index.css (must precede all other rules).
+ * ========================================================================== */
+
+:root {
+  --bg: oklch(0.165 0.008 70);
+  --panel: oklch(0.205 0.008 72);
+  --panel-2: oklch(0.235 0.009 72);
+  --line: oklch(0.32 0.01 75);
+  --fg: oklch(0.945 0.012 88);
+  --muted: oklch(0.68 0.014 82);
+  --accent: oklch(0.79 0.14 45);
+  --green: oklch(0.8 0.15 145);
+  --red: oklch(0.72 0.16 25);
+  --radius: 14px;
+
+  /* archetype hues (OVERVIEW §5.2) — kept here so CSS can reference them too */
+  --hue-xmm: 10;
+  --hue-auntie: 75;
+  --hue-nerd: 175;
+  --hue-geek: 300;
+  --hue-insecure: 250;
+  --hue-budget: 145;
+  --hue-high_spender: 40;
+
+  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-ui: "Hanken Grotesk", system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+}
+
+/** archetype color from a hue var: background:var(--arch); style={{['--hue']:10}} */
+.arch-color {
+  color: oklch(0.74 0.135 var(--hue, 0));
+}
+.arch-bg {
+  background: oklch(0.74 0.135 var(--hue, 0));
+}
+.arch-border {
+  border-color: oklch(0.74 0.135 var(--hue, 0));
+}
