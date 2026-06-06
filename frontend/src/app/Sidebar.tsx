@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useSimStore } from "@/store/simStore";
 import { useControlStore } from "@/store/controlStore";
 import { pauseRun, rerun, resumeRun } from "@/store/runController";
@@ -10,11 +9,8 @@ import { StatusBadge } from "@/components/StatusBadge";
  * strip + funnel. Listing identity → price → run controls → status.
  */
 export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
-  const navigate = useNavigate();
   const status = useSimStore((s) => s.status);
-  const runId = useSimStore((s) => s.runId);
   const evListing = useSimStore((s) => s.listing);
-  const reportReady = useSimStore((s) => s.reportReady);
 
   const price = useControlStore((s) => s.price);
   const baseListing = useControlStore((s) => s.listing);
@@ -45,15 +41,6 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
       <PriceChip price={price} basePrice={baseListing.base_price} />
 
       <div className="sidebar-controls">
-        {status === "complete" && reportReady && (
-          <button
-            className="btn btn-accent sidebar-btn"
-            onClick={() => navigate(`/report/${runId ?? "latest"}`)}
-          >
-            View Report →
-          </button>
-        )}
-
         <div className="sidebar-btn-row">
           <button
             className="btn sidebar-btn"
