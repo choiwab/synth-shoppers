@@ -6,37 +6,30 @@ Design (agreed in the H3 grill-me session — diverges from the written PRD 03):
 - The persona is baked into the task prompt (sourced from ``sim.agents.PERSONAS``);
   the agent decides buy/bail/objection ITSELF. H4's probabilistic ``decide()`` is
   only used in mock mode.
-- The agent is constrained to a fixed menu of custom ``Tools`` that mirror the
-  funnel (look_at_photos / read_reviews / check_price / add_to_cart / checkout /
-  confirm_purchase / bail). Each action clicks the matching ``data-action``
-  selector, screenshots, and emits the contract ``AgentEvent`` LIVE so H1's strip
-  updates as the agent moves. The final ``AgentTrace`` is built from the action
-  log (no structured-output LLM round-trip).
+- The agent navigates the listing NATURALLY (browser-use's own scroll/click) — we
+  do NOT fight its element-clicking instinct with custom nav actions. Instead an
+  ``on_step_end`` hook detects which funnel gate is in view (by scroll position)
+  and emits the contract ``stage_enter`` + ``browser_frame`` events LIVE, with a
+  per-gate thumbnail, so H1's strip updates as the agent moves.
+- Only the two *decisions* are custom actions: ``bail(objection)`` and
+  ``confirm_purchase``. The final ``AgentTrace`` is built from the gate log.
 - One isolated headless browser per agent → one independent screenshot stream per
   agent → the "7 monitors" in the agent strip.
 
 browser-use imports are kept inside methods so mock mode / tests / fixtures never
 require Chromium or browser-use to be installed.
 
-VERIFY against your installed browser-use 0.9.x (these are the only runtime
-touchpoints I could not execute here):
-  * ``ChatOpenAI(model=...)``                         — OpenAI LLM wrapper
-  * ``Browser(headless=...)``                         — per-agent session + close()
-  * ``Tools()`` + ``@tools.action(description=...)``  — custom action registry
-  * action arg ``browser_session: BrowserSession``    — exact name required
-  * ``await browser_session.must_get_current_page()`` then
-    ``await page.get_elements_by_css_selector(sel)`` / ``element.click()``
-  * ``await browser_session.take_screenshot()``       — returns base64 PNG
-If a method name differs in your version, the fix is localized to ``_click`` /
-``_screenshot_bytes`` / ``_make_browser`` / ``_close`` below.
+Verified against the installed browser-use 0.9.x: ``ChatOpenAI(model=...)``;
+``Browser(headless=...)`` (alias of ``BrowserSession``) with ``.start()`` /
+``.navigate_to(url)`` / ``.take_screenshot() -> bytes`` / ``.must_get_current_page()``;
+``Page.get_elements_by_css_selector()`` + ``Element.click()``; ``Page.evaluate()``
+(arrow-function form); ``Tools()`` + ``@tools.action`` (``browser_session`` is
+injected by NAME and must stay UNANNOTATED); ``agent.run(on_step_end=...)``.
 """
 
 from __future__ import annotations
 
 import asyncio
-import base64
-import binascii
-import os
 import time
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable
@@ -53,21 +46,24 @@ from contracts import (
     StageEnterEvent,
     StageTrace,
 )
-from sim.agents import PERSONAS
+from sim.agents import DEFAULT_OBJECTIONS, PERSONAS
 from sim.screenshots import save_thumbnail
 
 EmitFn = Callable[[object], Awaitable[None]]
 
-# Funnel gate -> the H2 data-action selector that advances into it (OVERVIEW §5.6).
-GATE_ACTION: dict[GateStage, str] = {
-    "photos": "scroll-gallery",
-    "reviews": "open-reviews",
-    "price": "select-variant",
-    "cart": "add-to-cart",
-    "checkout": "checkout",
-}
 CONFIRM_ACTION = "confirm-order"
-_GATE_INDEX = ["land", "photos", "reviews", "price", "cart", "checkout"]
+_GATE_INDEX: list[GateStage] = ["land", "photos", "reviews", "price", "cart", "checkout"]
+
+# Arrow-function form is REQUIRED by browser-use's Page.evaluate. Returns the
+# data-gate section currently most visible in the viewport.
+_GATE_JS = (
+    "() => { const s = [...document.querySelectorAll('[data-gate]')];"
+    " const vh = window.innerHeight; let best = 'land', score = -1;"
+    " for (const e of s) { const r = e.getBoundingClientRect();"
+    " const v = Math.min(r.bottom, vh) - Math.max(r.top, 0);"
+    " if (v > score) { score = v; best = e.getAttribute('data-gate'); } }"
+    " return best; }"
+)
 
 
 def _now_ms() -> int:
@@ -80,7 +76,7 @@ def _scroll_pct(gate: GateStage) -> float:
 
 @dataclass
 class _Journey:
-    """Per-agent mutable state; the action log we build the AgentTrace from."""
+    """Per-agent mutable state; the gate log we build the AgentTrace from."""
 
     run_id: str
     agent_id: str
@@ -128,6 +124,8 @@ class BrowserUseAgenticDriver:
         headless: bool = True,
         base_url: str | None = None,
     ) -> None:
+        import os
+
         self.listing = listing
         self.model = model
         self.max_steps = max_steps
@@ -156,14 +154,14 @@ class BrowserUseAgenticDriver:
         browser = self._make_browser()
         try:
             # Open the listing ourselves so navigation is deterministic and we can
-            # grab a real `land` thumbnail; the agent then only drives the funnel.
+            # grab a real `land` thumbnail; the agent then drives the funnel itself.
             await self._open(browser, url)
             await self._enter(ctx, "land", await self._capture(ctx, browser, "land"))
 
             tools = self._build_tools(ctx)
             agent = self._make_agent(name, archetype, listing, url, tools, browser)
             try:
-                await agent.run(max_steps=self.max_steps)
+                await agent.run(max_steps=self.max_steps, on_step_end=self._make_step_hook(ctx))
             except Exception as exc:  # agent crash -> degrade to a clean bail
                 if ctx.outcome is None:
                     await self._bail(ctx, ctx.current_gate or "land", f"(agent stopped) {str(exc)[:160]}")
@@ -173,64 +171,48 @@ class BrowserUseAgenticDriver:
         finally:
             await self._close(browser)
 
-    async def _open(self, browser, url: str) -> None:
-        # VERIFY: BrowserSession.start() + navigate_to(url) — confirmed in 0.9.x.
-        if hasattr(browser, "start"):
-            await browser.start()
-        if hasattr(browser, "navigate_to"):
-            await browser.navigate_to(url)
-        else:
-            page = await browser.must_get_current_page()
-            await page.goto(url)
-        await asyncio.sleep(0.6)  # let first paint settle before the land screenshot
+    # ---- gate tracking via a per-step hook (no fighting the agent) --------------
+    def _make_step_hook(self, ctx: _Journey) -> Callable[[object], Awaitable[None]]:
+        async def on_step_end(agent: object) -> None:
+            if ctx.outcome is not None:
+                return
+            session = getattr(agent, "browser_session", None)
+            if session is None:
+                return
+            try:
+                gate = await self._detect_gate(session)
+                cur = _GATE_INDEX.index(ctx.current_gate or "land")
+                nxt = _GATE_INDEX.index(gate)
+                if nxt <= cur:  # no forward progress (or scrolled back) -> nothing to emit
+                    return
+                thumb = await self._capture(ctx, session, gate)
+                for i in range(cur + 1, nxt):  # fill any skipped gates (no thumbnail)
+                    await self._enter(ctx, _GATE_INDEX[i], None)
+                await self._enter(ctx, gate, thumb)
+            except Exception:
+                return
 
-    # ---- custom action registry (the constrained funnel vocabulary) ------------
+        return on_step_end
+
+    async def _detect_gate(self, session) -> GateStage:
+        page = await session.must_get_current_page()
+        value = str(await page.evaluate(_GATE_JS)).strip().strip('"').strip("'")
+        return value if value in _GATE_INDEX else "land"  # type: ignore[return-value]
+
+    # ---- custom DECISION actions (the only ones we register) -------------------
     def _build_tools(self, ctx: _Journey):
         # NOTE: `browser_session` is injected by NAME by browser-use's Tools registry;
         # it must be left UNANNOTATED (annotating it raises a type-conflict error).
         from browser_use import ActionResult, Tools
 
-        # Exclude the default `click` action so the agent CANNOT bypass the funnel by
-        # clicking raw buttons — it must use our gate actions, which emit events.
-        tools = Tools(exclude_actions=["click"])
+        tools = Tools()
 
-        async def gate(browser_session, name: GateStage):
-            if ctx.outcome is not None:
-                return ActionResult(extracted_content="Already finished.", is_done=True)
-            reached = await self._click(browser_session, GATE_ACTION[name])
-            if not reached:
-                await self._bail(ctx, name, f"Couldn't reach the {name} section — the page didn't respond.")
-                return ActionResult(extracted_content=f"{name} unavailable; left the listing.", is_done=True, success=False)
-            url = await self._capture(ctx, browser_session, name)
-            await self._enter(ctx, name, url)
-            return ActionResult(extracted_content=self._gate_summary(name, ctx.listing))
-
-        @tools.action(description="Scroll and study the product photo gallery.")
-        async def look_at_photos(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "photos")
-
-        @tools.action(description="Open and read the customer ratings and reviews.")
-        async def read_reviews(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "reviews")
-
-        @tools.action(description="Check the price and pick a variant.")
-        async def check_price(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "price")
-
-        @tools.action(description="Add the item to the shopping cart.")
-        async def add_to_cart(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "cart")
-
-        @tools.action(description="Proceed to the checkout page.")
-        async def checkout(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "checkout")
-
-        @tools.action(description="Confirm and place the order. Only call this if you genuinely decide to buy.")
+        @tools.action(description="Confirm and place the order. Call this ONLY if you genuinely decide to buy.")
         async def confirm_purchase(browser_session):  # noqa: ANN001
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
             await self._click(browser_session, CONFIRM_ACTION)
-            await self._capture(ctx, browser_session, "checkout")
+            await self._capture(ctx, browser_session, ctx.current_gate or "checkout")
             ctx.outcome = "bought"
             await ctx.emit(AgentBoughtEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, retention_time_s=ctx.elapsed()))
             return ActionResult(extracted_content="Order confirmed — purchased.", is_done=True, success=True)
@@ -267,26 +249,33 @@ class BrowserUseAgenticDriver:
 
     def _task(self, name: str, archetype: PersonaId, listing: ListingConfig, url: str) -> str:
         persona = PERSONAS[archetype]
-        examples = "; ".join(self._objection_examples(archetype))
+        examples = "; ".join(self._objection_examples(archetype)[:3])
         return (
             f"You are {name}, a {persona.display} shopper in Singapore ({persona.tag}).\n"
             f"{persona.blurb}\n\n"
             f"You are already on this Shopee listing page ({url}); do not navigate away.\n\n"
             f"What you can see about the listing:\n{self._facts(listing)}\n\n"
-            "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
-            "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
-            "  confirm_purchase — only if you genuinely decide to buy.\n"
-            "  bail — the moment something puts you off; state your exact objection in character.\n\n"
-            f"Stay fully in character. If you bail, phrase it like these Singlish lines: {examples}\n"
+            "How to shop: browse the listing top to bottom the way you naturally would — "
+            "look at the photos, read the reviews, check the price and shipping, view the cart "
+            "and checkout. Scroll and click the page's buttons to move through it.\n"
+            "When you decide: call confirm_purchase ONLY if you genuinely want to buy, or call "
+            "bail the moment something puts you off.\n"
+            "If you bail, write ONE short objection in your OWN Singlish voice — a single sentence, "
+            f"fully in character. For tone only (do NOT copy these verbatim), people like you say "
+            f"things like: {examples}\n\n"
             f"Decide the way {persona.display} really would for THIS listing."
         )
 
     @staticmethod
     def _objection_examples(archetype: PersonaId) -> list[str]:
+        # Prefer the persona's DISTINCTIVE lines (skip the generic DEFAULT_OBJECTIONS)
+        # so the style hints are characterful. agents.py mixes tuples and the
+        # occasional bare string — handle both.
         out: list[str] = []
-        for value in PERSONAS[archetype].objections.values():
-            # agents.py mixes tuples and the occasional bare string — handle both.
-            out.extend(value if isinstance(value, tuple) else (value,))
+        for gate, value in PERSONAS[archetype].objections.items():
+            for line in value if isinstance(value, tuple) else (value,):
+                if line not in DEFAULT_OBJECTIONS.get(gate, ()):
+                    out.append(line)
         return out[:8]
 
     @staticmethod
@@ -302,27 +291,21 @@ class BrowserUseAgenticDriver:
             f"- Authenticity proof: certificate={a.certificate}, serial={a.serial}, unboxing={a.unboxing}"
         )
 
-    @staticmethod
-    def _gate_summary(gate: GateStage, listing: ListingConfig) -> str:
-        a = listing.authenticity
-        total = listing.price + listing.shipping.fee
-        if gate == "photos":
-            lifestyle = sum(1 for p in listing.photos if p.type == "lifestyle")
-            closeup = sum(1 for p in listing.photos if p.type == "closeup")
-            return f"Photos: {len(listing.photos)} total, {lifestyle} lifestyle, {closeup} close-up."
-        if gate == "reviews":
-            return f"Rating {listing.rating.score}/5 from {listing.rating.count}; seller replies to {listing.seller.response_rate:.0f}%."
-        if gate == "price":
-            return f"Price S${listing.price:.2f} (usual S${listing.base_price:.2f}), + shipping S${listing.shipping.fee:.2f}."
-        if gate == "cart":
-            return f"In cart: S${listing.price:.2f} + S${listing.shipping.fee:.2f} shipping = S${total:.2f}."
-        return f"Checkout total ~S${total:.2f}. Authenticity proof: cert={a.certificate}, serial={a.serial}, unboxing={a.unboxing}."
-
-    # ---- browser-use runtime touchpoints (isolated; see VERIFY in module docstring)
+    # ---- browser-use runtime touchpoints (isolated; verified vs 0.9.x) ---------
     def _make_browser(self):
         from browser_use import Browser
 
         return Browser(headless=self.headless)
+
+    async def _open(self, browser, url: str) -> None:
+        if hasattr(browser, "start"):
+            await browser.start()
+        if hasattr(browser, "navigate_to"):
+            await browser.navigate_to(url)
+        else:
+            page = await browser.must_get_current_page()
+            await page.goto(url)
+        await asyncio.sleep(0.6)  # let first paint settle before the land screenshot
 
     async def _click(self, browser_session, action: str) -> bool:
         selector = f'[data-action="{action}"]'
@@ -332,7 +315,7 @@ class BrowserUseAgenticDriver:
             if not elements:
                 return False
             await elements[0].click()
-            await asyncio.sleep(0.4)  # let the page settle before screenshotting
+            await asyncio.sleep(0.4)
             return True
         except Exception:
             return False
@@ -362,6 +345,9 @@ class BrowserUseAgenticDriver:
         if isinstance(data, (bytes, bytearray)):
             return bytes(data)
         if isinstance(data, str):
+            import base64
+            import binascii
+
             try:
                 return base64.b64decode(data)
             except (binascii.Error, ValueError):
