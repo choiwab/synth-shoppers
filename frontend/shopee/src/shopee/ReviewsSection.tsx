@@ -34,7 +34,10 @@ export function ReviewsSection({ config }: ReviewsSectionProps) {
         </div>
         <div className="sm:ml-auto sm:text-right">
           <p className="text-xs text-ink-soft">Seller response rate</p>
-          <p className={cn('text-lg font-semibold', lowResponse ? 'text-shopee-mall' : 'text-success')}>
+          <p
+            data-field="response-rate"
+            className={cn('text-lg font-semibold', lowResponse ? 'text-shopee-mall' : 'text-success')}
+          >
             {responsePct}%
           </p>
           {lowResponse && <p className="text-xs text-shopee-mall">Low — seller rarely replies</p>}
@@ -70,11 +73,11 @@ export function ReviewsSection({ config }: ReviewsSectionProps) {
                 </div>
                 <span className="ml-auto text-xs text-ink-faint">{r.date}</span>
               </div>
-              <p className="mt-2 text-sm text-ink">{r.text}</p>
+              <p data-field="review-text" className="mt-2 text-sm text-ink">{r.text}</p>
               {r.seller_response ? (
                 <div className="mt-2 border-l-2 border-shopee bg-shopee-bg p-3 text-sm">
                   <p className="mb-1 text-xs font-semibold text-shopee">Seller&apos;s Response</p>
-                  <p className="text-ink-soft">{r.seller_response}</p>
+                  <p data-field="seller-response" className="text-ink-soft">{r.seller_response}</p>
                 </div>
               ) : null}
             </li>

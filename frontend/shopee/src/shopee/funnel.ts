@@ -7,10 +7,13 @@ import type { FunnelStage } from '@/types/contracts'
  * the observable DOM change.
  */
 export type FunnelActionName =
+  | 'open_listing'
   | 'look_at_photos'
+  | 'read_description'
   | 'read_reviews'
   | 'check_price'
   | 'add_to_cart'
+  | 'change_quantity'
   | 'checkout'
   | 'confirm_purchase'
 
