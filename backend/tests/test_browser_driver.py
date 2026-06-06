@@ -10,7 +10,7 @@ from PIL import Image
 from contracts import AgentBoughtEvent, AgentTrace, CrowdConfig, ListingConfig, StageEnterEvent, StageTrace
 from sim.browser_use_driver import BrowserUseAgenticDriver, _Journey, _clean_reason, _clean_sentiment
 from sim.runner import RunState, build_cohort, run_simulation
-from sim.screenshots import save_thumbnail, thumbnail_paths
+from sim.screenshots import THUMB_SIZE, save_thumbnail, thumbnail_paths
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -19,15 +19,15 @@ def load_listing() -> ListingConfig:
     return ListingConfig.model_validate(json.loads((ROOT / "fixtures/listing.sample.json").read_text()))
 
 
-def test_save_thumbnail_writes_160x120_jpeg_and_returns_static_url() -> None:
+def test_save_thumbnail_writes_dashboard_jpeg_and_returns_static_url() -> None:
     raw = io.BytesIO()
     Image.new("RGB", (1280, 800), (10, 20, 30)).save(raw, format="PNG")
     url = save_thumbnail(raw.getvalue(), "budget_1", "photos")
 
-    assert url == "/static/shots/budget_1/photos.jpg"
+    assert url.startswith("/static/shots/budget_1/photos.jpg?v=")
     fs_path, _ = thumbnail_paths("budget_1", "photos")
     with Image.open(fs_path) as out:
-        assert out.size == (160, 120)
+        assert out.size == THUMB_SIZE
         assert out.format == "JPEG"
 
 
@@ -58,12 +58,13 @@ async def test_runner_streams_live_for_emit_aware_driver_without_replay() -> Non
 
 
 def test_task_prompt_reuses_persona_blurb_facts_and_objection_pool() -> None:
-    driver = BrowserUseAgenticDriver(load_listing())
+    listing = load_listing()
+    driver = BrowserUseAgenticDriver(listing)
     task = driver._task("Farhan", "budget", driver.listing, "http://localhost:8080/?listing=x")
 
     assert "Farhan" in task and "Budget-tight" in task
     assert "scrutinize every dollar" in task  # persona blurb from sim.agents
-    assert f"S${driver.listing.price:.2f}" in task and f"S${driver.listing.base_price:.2f}" in task
+    assert f"S${listing.price:.2f}" in task and f"S${listing.base_price:.2f}" in task  # listing facts surfaced
     assert "Over budget liao, next." in task  # objection style example from the pool
 
 

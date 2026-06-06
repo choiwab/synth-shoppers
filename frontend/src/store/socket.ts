@@ -1,5 +1,4 @@
-// Real WebSocket client for H4's stream (OVERVIEW §5.7).
-// Shares the SimSocket interface with mockSocket so the swap is free (PRD §4.7).
+// WebSocket client for H4's backend event stream (OVERVIEW §5.7).
 import type { AgentEvent } from "@/types/contracts";
 import { WS_BASE } from "./api";
 
@@ -7,7 +6,7 @@ export interface SimSocket {
   /** Pause local consumption (incoming events buffer until resume). */
   pause(): void;
   resume(): void;
-  /** Replay-speed multiplier (mock only; real stream is server-paced). */
+  /** Replay-speed multiplier placeholder; backend stream is server-paced. */
   setSpeed(speed: number): void;
   close(): void;
 }
@@ -18,6 +17,7 @@ export function connectSocket(runId: string, sink: Sink): SimSocket {
   let ws: WebSocket | null = null;
   let paused = false;
   let closed = false;
+  let complete = false;
   let backoff = 500;
   const buffer: AgentEvent[] = [];
 
@@ -32,6 +32,7 @@ export function connectSocket(runId: string, sink: Sink): SimSocket {
     } catch {
       return; // ignore malformed frames
     }
+    if (ev.type === "run_complete") complete = true;
     if (paused) buffer.push(ev);
     else sink(ev);
   };
@@ -44,7 +45,7 @@ export function connectSocket(runId: string, sink: Sink): SimSocket {
       backoff = 500;
     };
     ws.onclose = () => {
-      if (closed) return;
+      if (closed || complete) return;
       setTimeout(open, backoff);
       backoff = Math.min(backoff * 2, 8000); // exponential backoff
     };
@@ -62,7 +63,7 @@ export function connectSocket(runId: string, sink: Sink): SimSocket {
       flush();
     },
     setSpeed() {
-      /* real stream is server-paced; no-op */
+      /* backend stream is server-paced; no-op */
     },
     close() {
       closed = true;

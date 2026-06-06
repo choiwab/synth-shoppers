@@ -1,8 +1,7 @@
-"""Thumbnail helper for H3's live browser previews.
+"""Screenshot helper for H3's browser previews.
 
-A captured viewport screenshot (PNG/JPEG bytes) is cropped/resized to the
-160x120 tile H1's agent strip renders, written under /tmp/shots, and returned as
-a /static/shots/... URL.
+A captured viewport screenshot (PNG/JPEG bytes) is resized to a dashboard-sized
+JPEG, written under /tmp/shots, and returned as a /static/shots/... URL.
 
 `/static` is mounted onto /tmp by H4 (`main.py`), so a file written to
 `/tmp/shots/<agent>/<gate>.jpg` is served at `/static/shots/<agent>/<gate>.jpg`.
@@ -18,8 +17,10 @@ import os
 
 from PIL import Image, ImageOps
 
-THUMB_SIZE = (160, 120)
-THUMB_QUALITY = 70
+# Keep enough pixels for the large featured card. The small tiles downscale this,
+# which is much sharper than upscaling a 160x120 thumbnail.
+THUMB_SIZE = (960, 675)
+THUMB_QUALITY = 88
 SHOTS_ROOT = "/tmp/shots"
 STATIC_PREFIX = "/static/shots"
 
@@ -31,15 +32,14 @@ def thumbnail_paths(agent_id: str, gate: str) -> tuple[str, str]:
 
 
 def save_thumbnail(image_bytes: bytes, agent_id: str, gate: str) -> str:
-    """Crop/resize ``image_bytes`` to a 160x120 JPEG tile and return its URL.
+    """Crop/resize ``image_bytes`` to a dashboard JPEG and return its URL.
 
-    Uses ImageOps.fit so the viewport screenshot is centre-cropped to the tile
-    aspect ratio (no distortion) — effectively "cropped to the agent's scroll
-    position", which is what the agent strip wants.
+    Uses ImageOps.fit so the viewport screenshot is centre-cropped to the target
+    aspect ratio with no distortion.
     """
     fs_path, url = thumbnail_paths(agent_id, gate)
     os.makedirs(os.path.dirname(fs_path), exist_ok=True)
     with Image.open(io.BytesIO(image_bytes)) as img:
         tile = ImageOps.fit(img.convert("RGB"), THUMB_SIZE, method=Image.Resampling.LANCZOS)
         tile.save(fs_path, format="JPEG", quality=THUMB_QUALITY)
-    return url
+    return f"{url}?v={int(os.path.getmtime(fs_path) * 1000)}"

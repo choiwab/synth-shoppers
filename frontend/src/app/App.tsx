@@ -5,12 +5,12 @@ import { AgentStrip } from "./AgentStrip";
 import { FunnelTrack } from "./FunnelTrack";
 import { RightRail } from "./RightRail";
 import { TweaksPanel } from "./TweaksPanel";
-import { startRun, teardownRun } from "@/store/runController";
+import { teardownRun } from "@/store/runController";
 
-const STRIP_MIN = 220; // enough vertical room for readable agent monitors
-const STRIP_DEFAULT = 460; // room for the spotlight + six Shopee monitor tiles
-const ROW3_MIN = 280; // keep the funnel useful while giving agents more screen
-const STORAGE_KEY = "synthetic.stripHeight.v2";
+const STRIP_MIN = 120; // header + a sliver of one tile row
+const STRIP_DEFAULT = 300; // room for the spotlight (big featured + 6 small)
+const ROW3_MIN = 320; // keep the funnel (incl. competitor + bail bands) un-cramped
+const STORAGE_KEY = "synthetic.stripHeight";
 
 /** Largest strip height that still leaves ROW3_MIN for the lower row. */
 function maxStrip(): number {
@@ -28,9 +28,7 @@ export function Dashboard() {
   const [dragging, setDragging] = useState(false);
   const drag = useRef<{ startY: number; startH: number } | null>(null);
 
-  // Demo beat 1: dots flow on open. Auto-start a run on mount.
   useEffect(() => {
-    void startRun();
     return () => teardownRun();
   }, []);
 

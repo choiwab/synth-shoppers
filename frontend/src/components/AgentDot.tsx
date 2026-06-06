@@ -2,11 +2,11 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import { ARCHETYPE_HUE } from "@/types/contracts";
-import type { AgentState } from "@/store/simStore";
+import type { FunnelAgentState } from "@/store/simStore";
 
 interface Props {
-  agent: AgentState;
-  onHover: (agent: AgentState, x: number, y: number) => void;
+  agent: FunnelAgentState;
+  onHover: (agent: FunnelAgentState, x: number, y: number) => void;
   onLeave: () => void;
 }
 

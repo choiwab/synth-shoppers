@@ -3,7 +3,6 @@ import { ARCHETYPE_HUE, GATE_LABELS } from "@/types/contracts";
 import { archetypeInitials, archetypeLabel, archetypeTag } from "@/lib/archetype";
 import { resolveAssetUrl } from "@/lib/assetUrl";
 import type { AgentState } from "@/store/simStore";
-import { ShopeeMonitorFrame } from "./ShopeeMonitorFrame";
 
 /**
  * ⛳ INTEGRATION POINT — the big "spotlight" window. The WHOLE window is a single
@@ -12,13 +11,18 @@ import { ShopeeMonitorFrame } from "./ShopeeMonitorFrame";
  * H1 owns only the sizing wrapper: the strip places this in the left cell and
  * keeps `agent` in sync with the selected tile. Everything *inside* the card is
  * yours to build — e.g. a live/enlarged browser view, step trace, screenshots.
- * The default below shows the Shopee interface until H3 supplies the agent's
- * live browser screenshot, then overlays identity/stage context.
+ * The default below (enlarged thumbnail, or avatar + stage + objection, with a
+ * name/archetype/stage overlay) is just a placeholder; replace it freely.
  */
 export function FeaturedAgentView({ agent }: { agent: AgentState }) {
   const hue = ARCHETYPE_HUE[agent.archetype];
   const stageLabel = GATE_LABELS[agent.stage] ?? agent.stage;
   const thumb = resolveAssetUrl(agent.thumbnail_url);
+  const streamLabel = thumb
+    ? "Shopee screenshot"
+    : agent.lastAction || agent.latestThought
+      ? "Action stream"
+      : "Waiting for screenshot";
 
   return (
     <div
@@ -37,12 +41,31 @@ export function FeaturedAgentView({ agent }: { agent: AgentState }) {
           }
         />
       ) : (
-        <ShopeeMonitorFrame agentId={agent.agent_id} persona={agent.archetype} label={stageLabel} />
+        <div className="featured-fallback">
+          <div className="featured-avatar">{archetypeInitials(agent.archetype)}</div>
+          <span className="featured-stage-chip">{stageLabel}</span>
+          {agent.objection && <div className="featured-obj">“{agent.objection}”</div>}
+        </div>
       )}
 
-      {!thumb && agent.objection && <div className="featured-obj floating">“{agent.objection}”</div>}
-
       {agent.outcome === "bought" && <span className="featured-badge">✓</span>}
+
+      <div className="featured-action-panel">
+        <div className="featured-panel-kicker">{streamLabel}</div>
+        <div className="featured-panel-action">
+          {agent.lastAction ?? "Waiting for the backend agent to send its first screenshot"}
+        </div>
+        {agent.latestThought && (
+          <div className="featured-panel-thought">
+            <span>Thinking:</span> {agent.latestThought}
+          </div>
+        )}
+        {agent.latestGoal && (
+          <div className="featured-panel-goal">
+            <span>Next:</span> {agent.latestGoal}
+          </div>
+        )}
+      </div>
 
       {/* identity overlay — keeps the card readable; teammate may restyle/remove */}
       <div className="featured-overlay">

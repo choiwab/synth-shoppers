@@ -4,13 +4,11 @@ import { SAMPLE_LISTING } from "@/lib/sampleListing";
 
 export interface ControlStore {
   personas: PersonaId[]; // enabled archetypes
-  crowdSize: number; // 20..200
   speed: SimSpeed; // 1 | 2 | 4
   price: number; // S$, drives header chip + listing_config.price
   listing: ListingConfig; // base listing config (price is overlaid from `price`)
 
   togglePersona(id: PersonaId): void;
-  setCrowdSize(n: number): void;
   setSpeed(s: SimSpeed): void;
   setPrice(p: number): void;
   setListing(c: ListingConfig): void;
@@ -18,7 +16,6 @@ export interface ControlStore {
 
 export const useControlStore = create<ControlStore>((set) => ({
   personas: [...PERSONA_IDS],
-  crowdSize: 60,
   speed: 1,
   price: SAMPLE_LISTING.price,
   listing: SAMPLE_LISTING,
@@ -32,7 +29,6 @@ export const useControlStore = create<ControlStore>((set) => ({
         personas: has ? s.personas.filter((p) => p !== id) : [...s.personas, id],
       };
     }),
-  setCrowdSize: (n) => set({ crowdSize: Math.round(n) }),
   setSpeed: (s) => set({ speed: s }),
   setPrice: (p) => set({ price: Math.round(p * 10) / 10 }),
   setListing: (c) => set({ listing: c, price: c.price }),

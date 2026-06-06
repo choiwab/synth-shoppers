@@ -1,27 +1,17 @@
-import { useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import clsx from "clsx";
 import { ARCHETYPE_HUE, PERSONA_IDS, type SimSpeed } from "@/types/contracts";
 import { archetypeLabel } from "@/lib/archetype";
 import { useControlStore } from "@/store/controlStore";
-import { startRun } from "@/store/runController";
 
 const SPEEDS: SimSpeed[] = [1, 2, 4];
 
 export function TweaksPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const personas = useControlStore((s) => s.personas);
-  const crowdSize = useControlStore((s) => s.crowdSize);
   const speed = useControlStore((s) => s.speed);
   const price = useControlStore((s) => s.price);
   const basePrice = useControlStore((s) => s.listing.base_price);
-  const { togglePersona, setCrowdSize, setSpeed, setPrice } = useControlStore.getState();
-
-  // Any control change auto-resets and restarts the sim (debounced ~300ms).
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const scheduleRestart = (ms = 300) => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => void startRun(), ms);
-  };
+  const { togglePersona, setSpeed, setPrice } = useControlStore.getState();
 
   return (
     <AnimatePresence>
@@ -71,7 +61,6 @@ export function TweaksPanel({ open, onClose }: { open: boolean; onClose: () => v
                         className={clsx("persona-toggle", !on && "off")}
                         onClick={() => {
                           togglePersona(id);
-                          scheduleRestart();
                         }}
                       >
                         <span
@@ -83,25 +72,6 @@ export function TweaksPanel({ open, onClose }: { open: boolean; onClose: () => v
                     );
                   })}
                 </div>
-              </div>
-
-              {/* crowd size */}
-              <div>
-                <div className="field-label">
-                  <span className="name">Crowd size</span>
-                  <span className="val">{crowdSize}</span>
-                </div>
-                <input
-                  type="range"
-                  min={20}
-                  max={200}
-                  step={5}
-                  value={crowdSize}
-                  onChange={(e) => {
-                    setCrowdSize(Number(e.target.value));
-                    scheduleRestart();
-                  }}
-                />
               </div>
 
               {/* speed */}
@@ -117,14 +87,13 @@ export function TweaksPanel({ open, onClose }: { open: boolean; onClose: () => v
                       className={clsx(speed === s && "on")}
                       onClick={() => {
                         setSpeed(s);
-                        scheduleRestart();
                       }}
                     >
                       {s}×
                     </button>
                   ))}
                 </div>
-                <div className="hint">4× runs in mock mode for a fast demo.</div>
+                <div className="hint">Applies to backend run metadata; screenshots stream at backend pace.</div>
               </div>
 
               {/* price */}
@@ -143,7 +112,6 @@ export function TweaksPanel({ open, onClose }: { open: boolean; onClose: () => v
                   value={price}
                   onChange={(e) => {
                     setPrice(Number(e.target.value));
-                    scheduleRestart();
                   }}
                 />
                 <div className="hint">Baseline S${basePrice.toFixed(2)} · above it tints the chip red.</div>

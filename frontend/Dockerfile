@@ -4,11 +4,9 @@ WORKDIR /app
 
 ARG VITE_API_BASE=http://localhost:8000
 ARG VITE_WS_BASE=ws://localhost:8000
-ARG VITE_MOCK=1
 
 ENV VITE_API_BASE=$VITE_API_BASE \
-    VITE_WS_BASE=$VITE_WS_BASE \
-    VITE_MOCK=$VITE_MOCK
+    VITE_WS_BASE=$VITE_WS_BASE
 
 COPY package*.json ./
 RUN npm ci
