@@ -45,6 +45,7 @@ async def test_runner_emits_buffered_events_and_report() -> None:
     assert "retention_time_s" in first_trace_report["metrics"]
     assert "run_metrics_context" in first_trace_report
     assert run.events[0]["type"] == "run_started"
+    assert run.events[0]["competitors"]
     assert run.events[-1]["type"] == "run_complete"
 
     replay = await run.subscribe()

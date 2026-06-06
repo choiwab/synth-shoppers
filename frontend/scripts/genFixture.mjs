@@ -86,7 +86,7 @@ const boughtUs = crowd.filter(([, , f]) => f.kind === "buy").length;
 push({
   _dt: 0,
   type: "run_started",
-  listing: { title: "CozyKnit Ribbed Merino Beanie — Unisex, 8 Colours", price: 24.9, seller: "MatinKim Official" },
+  listing: { title: "Matin Kim Logo Beanie — Official Korean Knit Hat (Unisex)", price: 24.9, seller: "MatinKim Official" },
   agents_total: crowd.length,
   competitors: COMPETITORS,
 });

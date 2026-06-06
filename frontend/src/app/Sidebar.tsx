@@ -2,7 +2,6 @@ import { useSimStore } from "@/store/simStore";
 import { useControlStore } from "@/store/controlStore";
 import { pauseRun, rerun, resumeRun, startRun } from "@/store/runController";
 import { PriceChip } from "@/components/PriceChip";
-import { StatusBadge } from "@/components/StatusBadge";
 
 const DEFAULT_SHOPEE_BASE = "http://localhost:5174";
 
@@ -86,10 +85,6 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
         >
           View report
         </a>
-      </div>
-
-      <div className="sidebar-foot">
-        <StatusBadge status={status} />
       </div>
     </aside>
   );

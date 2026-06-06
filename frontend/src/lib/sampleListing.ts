@@ -6,11 +6,11 @@ import type { ListingConfig } from "@/types/contracts";
  * / PRD 02 §6). Replace by loading H2's fixture once available — shape matches.
  */
 export const SAMPLE_LISTING: ListingConfig = {
-  id: "matin_kim_beanie_sg",
+  id: "matinkim-beanie",
   title: "Matin Kim Logo Beanie — Official Korean Knit Hat (Unisex)",
-  seller: { name: "Matin Kim Official Store", verified: true, rating: 4.8, response_rate: 96 },
-  price: 45.9,
-  base_price: 45.9,
+  seller: { name: "MatinKim Official", verified: true, rating: 4.7, response_rate: 0.12 },
+  price: 24.9,
+  base_price: 24.9,
   variants: [
     {
       name: "Colour",
@@ -21,8 +21,7 @@ export const SAMPLE_LISTING: ListingConfig = {
     { url: "/assets/beanies/matin-kim-black.jpg", type: "product" },
     { url: "/assets/beanies/matin-kim-cream.jpg", type: "product" },
   ],
-  description:
-    "Matin Kim Logo Beanie — official Korean label. Soft midweight knit with the signature jacquard MATIN logo band. Unisex one-size. 100% authentic, ships with brand tag + authenticity card.\n\nReady stock in Singapore.",
+  description: "Matin Kim logo beanie with a soft Korean streetwear knit. One size, unisex fit.",
   rating: { score: 4.8, count: 312 },
   reviews: [
     { author: "jiae***ng", rating: 5, text: "100% authentic! Came with the brand tag and dust bag.", date: "2026-05-18" },

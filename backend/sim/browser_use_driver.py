@@ -47,6 +47,7 @@ from contracts import (
     AgentBailedEvent,
     AgentBoughtEvent,
     AgentThoughtEvent,
+    CompetitorAnalysisEvent,
     AgentTrace,
     BrowserFrameEvent,
     GateStage,
@@ -60,6 +61,7 @@ from contracts import (
     StageTrace,
 )
 from sim.agents import PERSONAS
+from sim.competitors import SEARCH_QUERY, analyze_competitor, competitors_for_persona
 from sim.decision import decide, synth_purchase_reason, synth_reaction
 from sim.screenshots import save_thumbnail
 
@@ -98,6 +100,18 @@ def _brain_field(brain: object, field: str) -> str | None:
     text = str(value).strip()
     return text or None
 
+
+def _env_bool(name: str, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _vision_detail_level() -> str:
+    raw = os.environ.get("BROWSER_USE_VISION_DETAIL", "high").strip().lower()
+    return raw if raw in {"auto", "low", "high"} else "high"
+
 # Funnel gate -> the H2 data-action selector that advances into it (OVERVIEW §5.6).
 GATE_ACTION: dict[GateStage, str] = {
     "photos": "scroll-gallery",
@@ -114,6 +128,11 @@ _GATE_INDEX = ["land", "photos", "reviews", "price", "cart", "checkout"]
 # checkout button lives on /cart, so we click the cart icon to get there. The driver
 # reuses its normal click path — no special browser-use navigation API needed.
 GATE_NAV: dict[GateStage, str] = {"checkout": 'a[href^="/cart"]'}
+PROPER_IMAGE_BEANIE_CARD = (
+    '[data-listing-card="search-result"]'
+    '[data-is-beanie="true"]'
+    '[data-has-proper-image="true"]'
+)
 
 
 def _now_ms() -> int:
@@ -122,6 +141,21 @@ def _now_ms() -> int:
 
 def _scroll_pct(gate: GateStage) -> float:
     return _GATE_INDEX.index(gate) / (len(_GATE_INDEX) - 1) if gate in _GATE_INDEX else 1.0
+
+
+def _is_proper_image_url(url: str | None) -> bool:
+    candidate = (url or "").strip().lower()
+    if not candidate:
+        return False
+    if candidate.startswith(("data:", "blob:")):
+        return False
+    if "placeholder" in candidate or "stub" in candidate:
+        return False
+    return candidate.startswith("/assets/beanies/") or candidate.startswith("http://") or candidate.startswith("https://")
+
+
+def _listing_has_proper_images(listing: ListingConfig) -> bool:
+    return any(_is_proper_image_url(photo.url) for photo in listing.photos)
 
 
 @dataclass
@@ -199,7 +233,9 @@ class BrowserUseAgenticDriver:
         self.max_steps = max_steps
         self.headless = headless
         self.agent_timeout_s = agent_timeout_s or float(os.environ.get("BROWSER_USE_AGENT_TIMEOUT_S", "12"))
-        self.autonomous = os.environ.get("BROWSER_USE_AUTONOMOUS", "0") == "1"
+        self.autonomous = _env_bool("BROWSER_USE_AUTONOMOUS", True)
+        self.use_vision = _env_bool("BROWSER_USE_VISION", True)
+        self.vision_detail_level = _vision_detail_level()
         # The runner passes the listing *slug* (run.listing.id), not a URL, so we
         # build the page URL from a configurable base. Default points at H3's local
         # stub server; swap to H2's dev server via LISTING_BASE_URL (one-line swap).
@@ -221,13 +257,18 @@ class BrowserUseAgenticDriver:
         url = self._page_url(listing_url, listing, agent_id=agent_id, run_id=run_id, archetype=archetype)
         ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit)
 
+        if not _listing_has_proper_images(listing):
+            ctx.record("land", None, sentiment="reject", comment="Skipping this beanie because it has no proper product images.")
+            await self._bail(ctx, "land", "I only check out beanies with proper product images, not placeholders.", "visual_photos")
+            return ctx.trace()
+
+        if not self.autonomous:
+            return await self._run_guided_browser_fallback(ctx, url, seed)
+
         # land: emitted before the browser navigates, so no thumbnail yet (the first
         # real thumbnail lands at the photos gate).
         ctx.record("land", None)
         await emit(StageEnterEvent(run_id=run_id, ts=_now_ms(), agent_id=agent_id, stage="land"))
-
-        if not self.autonomous:
-            return await self._run_guided_browser_fallback(ctx, url, seed)
 
         browser = self._make_browser()
         try:
@@ -276,10 +317,171 @@ class BrowserUseAgenticDriver:
             except Exception:
                 return False
 
+        async def text_all(page, selector: str, limit: int = 4) -> list[str]:  # noqa: ANN001
+            try:
+                return [
+                    text.strip()
+                    for text in (await page.locator(selector).all_inner_texts())[:limit]
+                    if text.strip()
+                ]
+            except Exception:
+                return []
+
+        async def text_one(page, selector: str) -> str | None:  # noqa: ANN001
+            try:
+                loc = page.locator(selector).first
+                if await loc.count() == 0:
+                    return None
+                text = await loc.inner_text(timeout=1500)
+                return text.strip() or None
+            except Exception:
+                return None
+
+        async def scrape_competitor_facts(page) -> dict[str, object]:  # noqa: ANN001
+            return {
+                "title": await text_one(page, '[data-field="title"]'),
+                "seller": await text_one(page, '[data-field="seller-name"]'),
+                "verified": await text_one(page, '[data-field="seller-verified"]'),
+                "price": await text_one(page, '[data-field="price"]'),
+                "base_price": await text_one(page, '[data-field="base-price"]'),
+                "rating": await text_one(page, '[data-field="rating"]'),
+                "review_count": await text_one(page, '[data-field="review-count"]'),
+                "response_rate": await text_one(page, '[data-field="response-rate"]'),
+                "shipping_fee": await text_one(page, '[data-field="shipping-fee"]'),
+                "shipping_days": await text_one(page, '[data-field="shipping-days"]'),
+                "comments": await text_all(page, '[data-field="review-text"]', limit=4),
+                "seller_responses": await text_all(page, '[data-field="seller-response"]', limit=2),
+            }
+
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page(viewport={"width": 1280, "height": 900})
             try:
+                search_url = self._search_url(
+                    agent_id=ctx.agent_id,
+                    run_id=ctx.run_id,
+                    archetype=ctx.archetype,
+                )
+                await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
+                await page.wait_for_timeout(700)
+                discovery_thumbnail_url = await asyncio.to_thread(
+                    save_thumbnail,
+                    await page.screenshot(full_page=False),
+                    ctx.agent_id,
+                    "discovery_search",
+                )
+                await ctx.emit(
+                    StageEnterEvent(
+                        run_id=ctx.run_id,
+                        ts=_now_ms(),
+                        agent_id=ctx.agent_id,
+                        stage="discovery",
+                        thumbnail_url=discovery_thumbnail_url,
+                    )
+                )
+                await ctx.emit(
+                    BrowserFrameEvent(
+                        run_id=ctx.run_id,
+                        ts=_now_ms(),
+                        agent_id=ctx.agent_id,
+                        thumbnail_url=discovery_thumbnail_url,
+                        scroll_pct=0.0,
+                    )
+                )
+                competitors = competitors_for_persona(ctx.archetype)
+                if competitors:
+                    names = ", ".join(c["name"] for c in competitors)
+                    await ctx.emit(
+                        StageSentimentEvent(
+                            run_id=ctx.run_id,
+                            ts=_now_ms(),
+                            agent_id=ctx.agent_id,
+                            stage="discovery",
+                            sentiment="neutral",
+                            comment=f"Searched '{SEARCH_QUERY}' and compared {names} before judging the Matin Kim listing.",
+                        )
+                    )
+                    for competitor in competitors:
+                        selector = f'[data-listing-id="{competitor["id"]}"]'
+                        try:
+                            if await click(page, f"{PROPER_IMAGE_BEANIE_CARD}{selector}"):
+                                await page.wait_for_load_state("domcontentloaded", timeout=5000)
+                                await page.wait_for_timeout(450)
+                                competitor_land_url = await asyncio.to_thread(
+                                    save_thumbnail,
+                                    await page.screenshot(full_page=False),
+                                    ctx.agent_id,
+                                    f'discovery_{competitor["id"]}_land',
+                                )
+                                await ctx.emit(
+                                    BrowserFrameEvent(
+                                        run_id=ctx.run_id,
+                                        ts=_now_ms(),
+                                        agent_id=ctx.agent_id,
+                                        thumbnail_url=competitor_land_url,
+                                        scroll_pct=0.08,
+                                    )
+                                )
+                                await click(page, '[data-action="open-reviews"]')
+                                await page.wait_for_timeout(350)
+                                competitor_reviews_url = await asyncio.to_thread(
+                                    save_thumbnail,
+                                    await page.screenshot(full_page=False),
+                                    ctx.agent_id,
+                                    f'discovery_{competitor["id"]}_reviews',
+                                )
+                                await ctx.emit(
+                                    BrowserFrameEvent(
+                                        run_id=ctx.run_id,
+                                        ts=_now_ms(),
+                                        agent_id=ctx.agent_id,
+                                        thumbnail_url=competitor_reviews_url,
+                                        scroll_pct=0.18,
+                                    )
+                                )
+                                facts = await scrape_competitor_facts(page)
+                                analysis = analyze_competitor(
+                                    ctx.archetype,
+                                    competitor,
+                                    facts,
+                                    target_price=ctx.listing.price,
+                                )
+                                analysis["thumbnail_url"] = competitor_reviews_url
+                                await ctx.emit(
+                                    CompetitorAnalysisEvent(
+                                        run_id=ctx.run_id,
+                                        ts=_now_ms(),
+                                        agent_id=ctx.agent_id,
+                                        **analysis,
+                                    )
+                                )
+                                await ctx.emit(
+                                    StageSentimentEvent(
+                                        run_id=ctx.run_id,
+                                        ts=_now_ms(),
+                                        agent_id=ctx.agent_id,
+                                        stage="discovery",
+                                        sentiment="neutral",
+                                        comment=str(analysis["verdict"]),
+                                    )
+                                )
+                                await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
+                                await page.wait_for_timeout(300)
+                        except Exception:
+                            await page.goto(search_url, wait_until="domcontentloaded", timeout=8000)
+                            await page.wait_for_timeout(300)
+                else:
+                    await ctx.emit(
+                        StageSentimentEvent(
+                            run_id=ctx.run_id,
+                            ts=_now_ms(),
+                            agent_id=ctx.agent_id,
+                            stage="discovery",
+                            sentiment="neutral",
+                            comment=f"Searched '{SEARCH_QUERY}' and picked the Matin Kim listing from results.",
+                        )
+                    )
+
                 await page.goto(url, wait_until="domcontentloaded", timeout=8000)
                 await page.wait_for_timeout(700)
                 land_thumbnail_url = await asyncio.to_thread(
@@ -287,6 +489,16 @@ class BrowserUseAgenticDriver:
                     await page.screenshot(full_page=False),
                     ctx.agent_id,
                     "land",
+                )
+                ctx.record("land", land_thumbnail_url)
+                await ctx.emit(
+                    StageEnterEvent(
+                        run_id=ctx.run_id,
+                        ts=_now_ms(),
+                        agent_id=ctx.agent_id,
+                        stage="land",
+                        thumbnail_url=land_thumbnail_url,
+                    )
                 )
                 await ctx.emit(
                     BrowserFrameEvent(
@@ -385,6 +597,9 @@ class BrowserUseAgenticDriver:
         async def gate(browser_session, name: GateStage, reaction: str, sentiment: str):
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
+            if name in {"cart", "checkout"} and not _listing_has_proper_images(ctx.listing):
+                await self._bail(ctx, ctx.current_gate or "photos", "I only check out beanies with proper product images, not placeholders.", "visual_photos")
+                return ActionResult(extracted_content="Blocked checkout: listing has no proper product image.", is_done=True, success=False)
             nav = GATE_NAV.get(name)
             if nav:  # e.g. checkout lives on /cart — click the cart icon to get there first
                 await self._click_css(browser_session, nav)
@@ -421,6 +636,9 @@ class BrowserUseAgenticDriver:
         async def confirm_purchase(browser_session, reason: str = ""):  # noqa: ANN001
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
+            if not _listing_has_proper_images(ctx.listing):
+                await self._bail(ctx, ctx.current_gate or "photos", "I only buy beanies with proper product images, not placeholders.", "visual_photos")
+                return ActionResult(extracted_content="Purchase blocked: listing has no proper product image.", is_done=True, success=False)
             await self._click(browser_session, CONFIRM_ACTION)
             url = await self._capture(ctx, browser_session, "checkout")
             ctx.outcome = "bought"
@@ -478,6 +696,8 @@ class BrowserUseAgenticDriver:
             tools=tools,
             browser=browser,
             extend_system_message=self._persona_system_message(name, archetype),
+            use_vision=self.use_vision,
+            vision_detail_level=self.vision_detail_level,
         )
 
     @staticmethod
@@ -489,9 +709,11 @@ class BrowserUseAgenticDriver:
             f"\n\nROLE-PLAY: You are {name}, a {persona.display} shopper in Singapore "
             f"({persona.tag}). {persona.blurb}\n"
             "Stay in character for ALL of your reasoning: in every `thinking` step, react to "
-            "the photos, reviews, price, seller trust and authenticity the way THIS persona "
+            "the visible product images, reviews, price, seller trust and authenticity the way THIS persona "
             "would. When you call a funnel action, fill its `reaction` with a short first-person "
-            "line in your voice and set `sentiment` honestly (love/like/neutral/dislike/reject)."
+            "line in your voice and set `sentiment` honestly (love/like/neutral/dislike/reject). "
+            "Only open, compare, add to cart, or checkout beanie listings that have proper product photos. "
+            "Skip non-beanie results and skip beanies with missing, broken, blank, stub, generated fallback, or placeholder-looking images."
         )
 
     def _on_step(self, ctx: _Journey):
@@ -538,12 +760,16 @@ class BrowserUseAgenticDriver:
             f"You are {name}, a {persona.display} shopper in Singapore ({persona.tag}).\n"
             f"{persona.blurb}\n\n"
             f"Shop this Shopee listing. Start by opening it: {url}\n\n"
+            f"Before judging it, search Shopee for '{SEARCH_QUERY}' and compare relevant alternatives if your persona would naturally comparison-shop.\n\n"
+            "Image rule: only open, compare, add to cart, checkout, or buy beanie listings with proper product photos. "
+            "Do not access non-beanie listings. Do not check out any beanie that has no image, a broken image, a blank/stub image, a generated fallback SVG, or a placeholder-looking image. "
+            "If images do not clearly show the product, skip it or bail at the photos gate.\n\n"
             f"What you can see about the listing:\n{self._facts(listing)}\n\n"
             "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
             "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
             "  At EACH step pass `reaction` (a short first-person line in your voice about what you just\n"
             "  saw) and `sentiment` (love/like/neutral/dislike/reject) — this is how we record what you think.\n"
-            "  confirm_purchase — only if you genuinely decide to buy; pass `reason` (why you're buying).\n"
+            "  confirm_purchase — only if you genuinely decide to buy a beanie AND you have seen proper non-placeholder product photos; pass `reason` (why you're buying).\n"
             "  bail — the moment something puts you off; state your exact objection in character and a\n"
             "  `reason_category` (price_value/trust_authenticity/visual_photos/social_proof_reviews/shipping/other).\n\n"
             f"Stay fully in character. If you bail, phrase it like these Singlish lines: {examples}\n"
@@ -608,6 +834,22 @@ class BrowserUseAgenticDriver:
         }
         query = urllib.parse.urlencode({k: v for k, v in params.items() if v})
         return f"{self.base_url}/shopee/{slug}?{query}"
+
+    def _search_url(
+        self,
+        *,
+        agent_id: str | None = None,
+        run_id: str | None = None,
+        archetype: PersonaId | None = None,
+    ) -> str:
+        params = {
+            "keyword": SEARCH_QUERY,
+            "agent_id": agent_id,
+            "run_id": run_id,
+            "persona": archetype,
+        }
+        query = urllib.parse.urlencode({k: v for k, v in params.items() if v})
+        return f"{self.base_url}/search?{query}"
 
     # ---- browser-use runtime touchpoints (isolated; see VERIFY in module docstring)
     def _make_browser(self):

@@ -49,6 +49,21 @@ export interface Competitor {
   name: string;
 }
 
+export interface CompetitorAnalysis {
+  competitor: string;
+  competitor_name: string;
+  seller?: string | null;
+  verified?: boolean | null;
+  price?: number | null;
+  rating?: string | null;
+  review_count?: number | null;
+  comments: string[];
+  strengths: string[];
+  weaknesses: string[];
+  verdict: string;
+  thumbnail_url?: string | null;
+}
+
 // ----- §5.2 Persona IDs & archetype colors -----------------------------------
 export type PersonaId =
   | "xmm"
@@ -168,6 +183,12 @@ export type AgentEvent =
       converted?: boolean; // did they buy at the competitor
       reason?: string;
     }
+  | ({
+      type: "competitor_analysis";
+      run_id: string;
+      ts: number;
+      agent_id: string;
+    } & CompetitorAnalysis)
   | {
       type: "agent_bailed";
       run_id: string;

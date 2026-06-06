@@ -1,4 +1,4 @@
-{"type":"run_started","listing":{"title":"CozyKnit Ribbed Merino Beanie — Unisex, 8 Colours","price":24.9,"seller":"MatinKim Official"},"agents_total":16,"competitors":[{"id":"ribknit","name":"RibKnit Co"},{"id":"warmthreads","name":"WarmThreads"}],"run_id":"run_fixture1","ts":1750000000000}
+{"type":"run_started","listing":{"title":"Matin Kim Logo Beanie — Official Korean Knit Hat (Unisex)","price":24.9,"seller":"MatinKim Official"},"agents_total":16,"competitors":[{"id":"ribknit","name":"RibKnit Co"},{"id":"warmthreads","name":"WarmThreads"}],"run_id":"run_fixture1","ts":1750000000000}
 {"type":"agent_spawned","agent_id":"budget_1","name":"Ah Beng","archetype":"budget","run_id":"run_fixture1","ts":1750000000080}
 {"type":"agent_spawned","agent_id":"budget_2","name":"Siti","archetype":"budget","run_id":"run_fixture1","ts":1750000000160}
 {"type":"agent_spawned","agent_id":"budget_3","name":"Kumar","archetype":"budget","run_id":"run_fixture1","ts":1750000000240}

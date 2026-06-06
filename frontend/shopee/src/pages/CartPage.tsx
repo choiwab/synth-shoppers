@@ -14,6 +14,7 @@ import {
 } from '@/store/cart'
 import { emitFunnelAction } from '@/shopee/funnel'
 import { withSimSession } from '@/shopee/simSession'
+import { TARGET_SEARCH_PATH } from '@/shopee/searchQuery'
 import { sgd } from '@/lib/utils'
 
 export function CartPage() {
@@ -50,7 +51,7 @@ export function CartPage() {
           <div className="rounded-sm bg-white py-24 text-center">
             <p className="text-lg text-ink-soft">Your shopping cart is empty</p>
             <Link
-              to={withSimSession('/search?keyword=beanie')}
+              to={withSimSession(TARGET_SEARCH_PATH)}
               className="mt-4 inline-block rounded-sm bg-shopee px-8 py-2.5 text-sm font-medium text-white hover:bg-shopee-dark"
             >
               Shop Now
@@ -59,7 +60,7 @@ export function CartPage() {
         ) : (
           <>
             <Link
-              to={withSimSession('/search?keyword=beanie')}
+              to={withSimSession(TARGET_SEARCH_PATH)}
               className="mb-2 inline-flex items-center gap-1 text-sm text-ink-soft hover:text-shopee"
             >
               <ArrowLeft size={15} /> Continue Shopping
