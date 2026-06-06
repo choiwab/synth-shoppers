@@ -54,6 +54,9 @@ export function VariantPicker({ variants, selected, onSelect }: VariantPickerPro
               )
             })}
           </div>
+          <span className="sr-only" data-field="selected-variant">
+            {selected}
+          </span>
         </div>
       ))}
     </div>

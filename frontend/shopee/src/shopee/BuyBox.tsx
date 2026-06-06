@@ -55,13 +55,20 @@ export function BuyBox({ config }: BuyBoxProps) {
     navigate(withSimSession('/cart'))
   }
 
+  function changeQty(nextQty: number) {
+    setQty(Math.max(1, nextQty))
+    emitFunnelAction('change_quantity', 'cart', config.id)
+  }
+
   return (
     <>
       {/* ── price gate ─────────────────────────────────────────────────── */}
       <section data-gate="price" className="mt-4">
         <div className="flex flex-wrap items-center gap-3 rounded-sm bg-shopee-bg px-4 py-3">
           {discounted && (
-            <span className="text-base text-ink-faint line-through">{sgd(config.base_price)}</span>
+            <span data-field="base-price" className="text-base text-ink-faint line-through">
+              {sgd(config.base_price)}
+            </span>
           )}
           <span
             data-field="price"
@@ -70,7 +77,7 @@ export function BuyBox({ config }: BuyBoxProps) {
             {sgd(config.price)}
           </span>
           {discounted && (
-            <span className="rounded-sm bg-shopee px-1.5 py-1 text-xs font-bold text-white">
+            <span data-field="discount-pct" className="rounded-sm bg-shopee px-1.5 py-1 text-xs font-bold text-white">
               {Math.round((1 - config.price / config.base_price) * 100)}% OFF
             </span>
           )}
@@ -106,16 +113,20 @@ export function BuyBox({ config }: BuyBoxProps) {
             <Truck size={16} className="text-success" />
             <span>
               {config.shipping.fee === 0 ? (
-                <strong className="text-success">Free Shipping</strong>
+                <strong data-field="shipping-fee" className="text-success">
+                  Free Shipping
+                </strong>
               ) : (
-                <>Shipping fee {sgd(config.shipping.fee)}</>
+                <>
+                  Shipping fee <span data-field="shipping-fee">{sgd(config.shipping.fee)}</span>
+                </>
               )}{' '}
-              · {config.shipping.days}
+              · <span data-field="shipping-days">{config.shipping.days}</span>
             </span>
           </div>
           <div className="flex items-center gap-2 text-ink-soft">
             <ShieldCheck size={16} className="text-success" />
-            <span>Shopee Guarantee · 15-Day Free Returns</span>
+            <span data-field="checkout-guarantee">Shopee Guarantee · 15-Day Free Returns</span>
           </div>
         </div>
 
@@ -132,7 +143,8 @@ export function BuyBox({ config }: BuyBoxProps) {
             <button
               type="button"
               aria-label="Decrease quantity"
-              onClick={() => setQty((q) => Math.max(1, q - 1))}
+              data-action="decrease-quantity"
+              onClick={() => changeQty(qty - 1)}
               className="flex h-8 w-8 items-center justify-center border border-line text-ink-soft hover:bg-black/[0.03]"
             >
               <Minus size={14} />
@@ -141,27 +153,38 @@ export function BuyBox({ config }: BuyBoxProps) {
               type="number"
               min={1}
               value={qty}
-              onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))}
+              data-field="quantity"
+              onChange={(e) => changeQty(Number(e.target.value) || 1)}
               aria-label="Quantity"
               className="h-8 w-14 border-y border-line text-center text-sm outline-none"
             />
             <button
               type="button"
               aria-label="Increase quantity"
-              onClick={() => setQty((q) => q + 1)}
+              data-action="increase-quantity"
+              onClick={() => changeQty(qty + 1)}
               className="flex h-8 w-8 items-center justify-center border border-line text-ink-soft hover:bg-black/[0.03]"
             >
               <Plus size={14} />
             </button>
           </div>
-          <span className="text-xs text-ink-faint">{28757 - qty} pieces available · IN STOCK</span>
+          <span className="text-xs text-ink-faint">
+            <span data-field="stock-count">{28757 - qty}</span> pieces available ·{' '}
+            <span data-field="stock-status">IN STOCK</span>
+          </span>
         </div>
 
         <div className="mt-6 flex flex-wrap gap-4">
           <Button variant="outline" size="lg" data-action="add-to-cart" onClick={addToCart}>
             <ShoppingCart size={18} /> Add To Cart
           </Button>
-          <Button variant="shopee" size="lg" onClick={buyNow}>
+          <Button
+            variant="shopee"
+            size="lg"
+            data-action="add-to-cart"
+            data-intent="buy-now"
+            onClick={buyNow}
+          >
             Buy Now
           </Button>
         </div>

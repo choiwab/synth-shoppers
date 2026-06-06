@@ -143,7 +143,11 @@ export function CartPage() {
                       <div className="flex items-center justify-center">
                         <button
                           aria-label="Decrease"
-                          onClick={() => setQty(key, i.qty - 1)}
+                          data-action="decrease-quantity"
+                          onClick={() => {
+                            setQty(key, i.qty - 1)
+                            emitFunnelAction('change_quantity', 'cart', i.listingId)
+                          }}
                           className="flex h-7 w-7 items-center justify-center border border-line"
                         >
                           −
@@ -152,19 +156,29 @@ export function CartPage() {
                           type="number"
                           min={1}
                           value={i.qty}
-                          onChange={(e) => setQty(key, Number(e.target.value) || 1)}
+                          data-field="cart-item-quantity"
+                          onChange={(e) => {
+                            setQty(key, Number(e.target.value) || 1)
+                            emitFunnelAction('change_quantity', 'cart', i.listingId)
+                          }}
                           aria-label="Quantity"
                           className="h-7 w-12 border-y border-line text-center outline-none"
                         />
                         <button
                           aria-label="Increase"
-                          onClick={() => setQty(key, i.qty + 1)}
+                          data-action="increase-quantity"
+                          onClick={() => {
+                            setQty(key, i.qty + 1)
+                            emitFunnelAction('change_quantity', 'cart', i.listingId)
+                          }}
                           className="flex h-7 w-7 items-center justify-center border border-line"
                         >
                           +
                         </button>
                       </div>
-                      <span className="text-center font-medium text-shopee">{sgd(i.price * i.qty)}</span>
+                      <span data-field="cart-line-total" className="text-center font-medium text-shopee">
+                        {sgd(i.price * i.qty)}
+                      </span>
                       <div className="flex flex-col items-start gap-1 text-xs">
                         <button
                           onClick={() => removeItem(key)}
@@ -239,7 +253,7 @@ export function CartPage() {
               <div className="ml-auto flex items-center gap-4">
                 <span className="text-sm">
                   Total ({selectedCount} item{selectedCount === 1 ? '' : 's'}):{' '}
-                  <span className="text-2xl font-medium text-shopee">{sgd(total)}</span>
+                  <span data-field="cart-total" className="text-2xl font-medium text-shopee">{sgd(total)}</span>
                 </span>
                 <Button
                   variant="shopee"

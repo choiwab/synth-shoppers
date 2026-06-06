@@ -60,7 +60,7 @@ export function CheckoutFlow() {
       />
 
       {/* delivery address */}
-      <section className="rounded-sm bg-white p-5">
+      <section data-field="delivery-address" className="rounded-sm bg-white p-5">
         <h2 className="mb-3 flex items-center gap-1 text-base font-medium text-shopee">
           <MapPin size={18} /> Delivery Address
         </h2>
@@ -77,7 +77,7 @@ export function CheckoutFlow() {
       </section>
 
       {/* products ordered */}
-      <section className="rounded-sm bg-white">
+      <section data-field="checkout-items" className="rounded-sm bg-white">
         <div className="grid grid-cols-[2fr_1fr_auto_1fr] gap-3 border-b border-line px-5 py-3 text-sm text-ink-soft">
           <span>Products Ordered</span>
           <span className="text-center">Unit Price</span>
@@ -164,15 +164,15 @@ export function CheckoutFlow() {
       {/* totals + place order */}
       <section className="rounded-sm bg-white">
         <div className="space-y-1 border-b border-line px-5 py-4 text-sm">
-          <Row label="Merchandise Subtotal" value={sgd(merchandise)} />
-          <Row label="Shipping Subtotal" value={sgd(shipping)} />
-          <Row label="Shop Voucher" value={`−${sgd(voucher)}`} />
+          <Row label="Merchandise Subtotal" value={sgd(merchandise)} field="checkout-merchandise-subtotal" />
+          <Row label="Shipping Subtotal" value={sgd(shipping)} field="checkout-shipping-subtotal" />
+          <Row label="Shop Voucher" value={`−${sgd(voucher)}`} field="checkout-voucher" />
         </div>
         <div className="flex flex-wrap items-center justify-end gap-4 px-5 py-4">
           <span className="text-sm text-ink-soft">
             Order Total ({itemCount} item{itemCount === 1 ? '' : 's'}):
           </span>
-          <span className="text-2xl font-medium text-shopee">{sgd(orderTotal)}</span>
+          <span data-field="order-total" className="text-2xl font-medium text-shopee">{sgd(orderTotal)}</span>
           <Button
             variant="shopee"
             size="lg"
@@ -208,11 +208,11 @@ function Toggle({ on, onChange }: { on: boolean; onChange: () => void }) {
   )
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value, field }: { label: string; value: string; field: string }) {
   return (
     <div className="flex justify-end gap-12">
       <span className="text-ink-soft">{label}</span>
-      <span className="w-24 text-right">{value}</span>
+      <span data-field={field} className="w-24 text-right">{value}</span>
     </div>
   )
 }

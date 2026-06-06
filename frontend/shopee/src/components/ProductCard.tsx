@@ -3,6 +3,7 @@ import { MapPin } from 'lucide-react'
 import type { ListingConfig } from '@/types/contracts'
 import { ProductImage } from './ProductImage'
 import { StarRating } from './StarRating'
+import { emitFunnelAction } from '@/shopee/funnel'
 import { soldCount, sellerLocation, discountPct, MATINKIM_ID } from '@/shopee/config/loadConfig'
 import { withSimSession } from '@/shopee/simSession'
 import { sgd, compact, cn } from '@/lib/utils'
@@ -23,6 +24,10 @@ export function ProductCard({ config, highlightTarget = false }: ProductCardProp
   return (
     <Link
       to={withSimSession(`/shopee/${config.id}`)}
+      data-action="open-listing"
+      data-listing-id={config.id}
+      data-listing-card="search-result"
+      onClick={() => emitFunnelAction('open_listing', 'land', config.id)}
       className={cn(
         'group relative flex flex-col overflow-hidden border border-transparent bg-white transition hover:-translate-y-px hover:border-shopee hover:shadow-md',
         highlightTarget && isTarget && 'ring-2 ring-shopee',
@@ -47,7 +52,10 @@ export function ProductCard({ config, highlightTarget = false }: ProductCardProp
       </div>
 
       <div className="flex flex-1 flex-col p-2">
-        <p className="line-clamp-2 min-h-[2.5rem] text-xs leading-tight text-ink group-hover:text-shopee">
+        <p
+          data-field="listing-card-title"
+          className="line-clamp-2 min-h-[2.5rem] text-xs leading-tight text-ink group-hover:text-shopee"
+        >
           {config.title}
         </p>
 
@@ -64,16 +72,20 @@ export function ProductCard({ config, highlightTarget = false }: ProductCardProp
 
         <div className="mt-1.5 flex items-baseline gap-1">
           {config.base_price > config.price && (
-            <span className="text-[11px] text-ink-faint line-through">{sgd(config.base_price)}</span>
+            <span data-field="listing-card-base-price" className="text-[11px] text-ink-faint line-through">
+              {sgd(config.base_price)}
+            </span>
           )}
-          <span className="text-base font-medium text-shopee">{sgd(config.price)}</span>
+          <span data-field="listing-card-price" className="text-base font-medium text-shopee">
+            {sgd(config.price)}
+          </span>
         </div>
 
         <div className="mt-1 flex items-center gap-2 text-[11px] text-ink-soft">
           <StarRating score={config.rating.score} size={11} />
-          <span>{compact(sold)} sold</span>
+          <span data-field="listing-card-sold">{compact(sold)} sold</span>
         </div>
-        <div className="mt-1 flex items-center gap-0.5 text-[11px] text-ink-faint">
+        <div data-field="listing-card-location" className="mt-1 flex items-center gap-0.5 text-[11px] text-ink-faint">
           <MapPin size={10} /> {sellerLocation(config)}
         </div>
       </div>
