@@ -1,316 +1,316 @@
-{"type":"run_started","run_id":"run_sample","ts":1780711894467,"listing":{"title":"Matin Kim Logo Beanie - Trendy Korean Winter Knit Hat","price":36.9,"seller":"Seoul Street SG"},"agents_total":28}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"high_spender_1","name":"Ethan","archetype":"high_spender"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"auntie_1","name":"Auntie May","archetype":"auntie"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"nerd_1","name":"Wei Jie","archetype":"nerd"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"geek_4","name":"Ben","archetype":"geek"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"xmm_3","name":"Mei Qi","archetype":"xmm"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"auntie_3","name":"Auntie Lee","archetype":"auntie"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"geek_3","name":"Ryan","archetype":"geek"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"nerd_2","name":"Daryl","archetype":"nerd"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"insecure_3","name":"Rachel","archetype":"insecure"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"geek_1","name":"Kai","archetype":"geek"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"budget_3","name":"Aqil","archetype":"budget"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"insecure_4","name":"Yun Xuan","archetype":"insecure"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"insecure_2","name":"Nadia","archetype":"insecure"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"xmm_2","name":"Chloe","archetype":"xmm"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"insecure_1","name":"Siti","archetype":"insecure"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"xmm_1","name":"Jia En","archetype":"xmm"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"xmm_4","name":"Shermin","archetype":"xmm"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"geek_2","name":"Zach","archetype":"geek"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"auntie_2","name":"Mdm Tan","archetype":"auntie"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"high_spender_4","name":"Isabelle","archetype":"high_spender"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"nerd_3","name":"Jun Hao","archetype":"nerd"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"nerd_4","name":"Marcus","archetype":"nerd"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"high_spender_3","name":"Brandon","archetype":"high_spender"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"budget_4","name":"Hui Min","archetype":"budget"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"auntie_4","name":"Mdm Goh","archetype":"auntie"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"budget_2","name":"Xin Yi","archetype":"budget"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"budget_1","name":"Farhan","archetype":"budget"}
-{"type":"agent_spawned","run_id":"run_sample","ts":1780711894467,"agent_id":"high_spender_2","name":"Valerie","archetype":"high_spender"}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894468,"agent_id":"high_spender_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894468,"agent_id":"high_spender_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894468,"agent_id":"auntie_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_1/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894468,"agent_id":"auntie_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_1/land.png","scroll_pct":0.0}
-{"type":"objection","run_id":"run_sample","ts":1780711894469,"agent_id":"auntie_1","stage":"land","text":"Hmm, not feeling this shop page."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894469,"agent_id":"auntie_1","stage":"land","objection":"Hmm, not feeling this shop page.","retention_time_s":1.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894469,"agent_id":"nerd_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894469,"agent_id":"nerd_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_4/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_4/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_3/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_3/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"auntie_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"auntie_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"nerd_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_2/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"nerd_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_2/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"insecure_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_1/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_1/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"budget_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_3/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"budget_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_3/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"insecure_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"insecure_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"insecure_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"insecure_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"insecure_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_1/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_1/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_2/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_2/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"auntie_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"high_spender_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"nerd_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"nerd_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"nerd_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"high_spender_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_3/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"high_spender_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_3/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"budget_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"budget_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"auntie_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_4/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"auntie_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_4/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"budget_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"budget_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"budget_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"budget_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"high_spender_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/land.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/land.png","scroll_pct":0.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"high_spender_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"high_spender_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"nerd_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"nerd_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_4/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_4/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_4","stage":"photos","text":"Can't tell the knit gauge from these."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894470,"agent_id":"geek_4","stage":"photos","objection":"Can't tell the knit gauge from these.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_3/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_3/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_3","stage":"photos","text":"Photos damn ugly leh, vibe not there."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894470,"agent_id":"xmm_3","stage":"photos","objection":"Photos damn ugly leh, vibe not there.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"auntie_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"auntie_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"nerd_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_2/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"nerd_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_2/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894471,"agent_id":"nerd_2","stage":"photos","text":"Can't inspect the fabric properly from these photos."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894471,"agent_id":"nerd_2","stage":"photos","objection":"Can't inspect the fabric properly from these photos.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"insecure_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_1/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_1/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_1","stage":"photos","text":"Can't tell the knit gauge from these."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_1","stage":"photos","objection":"Can't tell the knit gauge from these.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"budget_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_3/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"budget_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_3/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894471,"agent_id":"budget_3","stage":"photos","text":"Photos not convincing enough."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894471,"agent_id":"budget_3","stage":"photos","objection":"Photos not convincing enough.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"insecure_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"insecure_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"insecure_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"insecure_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"xmm_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"insecure_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"xmm_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_1/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"xmm_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_1/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894471,"agent_id":"xmm_1","stage":"photos","text":"Photos damn ugly leh, vibe not there."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894471,"agent_id":"xmm_1","stage":"photos","objection":"Photos damn ugly leh, vibe not there.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"xmm_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_2/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_2/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_2","stage":"photos","text":"Can't tell the knit gauge from these."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894471,"agent_id":"geek_2","stage":"photos","objection":"Can't tell the knit gauge from these.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"auntie_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"high_spender_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894471,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894471,"agent_id":"nerd_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"nerd_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"nerd_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_3/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_3/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_3","stage":"photos","text":"Photos not convincing enough."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_3","stage":"photos","objection":"Photos not convincing enough.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"budget_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"budget_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"auntie_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_4/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"auntie_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_4/photos.png","scroll_pct":0.2}
-{"type":"objection","run_id":"run_sample","ts":1780711894472,"agent_id":"auntie_4","stage":"photos","text":"Photos not convincing enough."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894472,"agent_id":"auntie_4","stage":"photos","objection":"Photos not convincing enough.","retention_time_s":2.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"budget_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"budget_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"budget_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"budget_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/photos.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/photos.png","scroll_pct":0.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_1","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/reviews.png","scroll_pct":0.4}
-{"type":"objection","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_1","stage":"reviews","text":"Even I need some trust signal lah."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894472,"agent_id":"high_spender_1","stage":"reviews","objection":"Even I need some trust signal lah.","retention_time_s":3.6}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894472,"active":27,"bought":0,"bailed":1}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"nerd_1","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"nerd_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"auntie_3","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"auntie_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/reviews.png","scroll_pct":0.4}
-{"type":"objection","run_id":"run_sample","ts":1780711894472,"agent_id":"auntie_3","stage":"reviews","text":"Seller never reply reviews, not safe."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894472,"agent_id":"auntie_3","stage":"reviews","objection":"Seller never reply reviews, not safe.","retention_time_s":3.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"geek_3","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_3","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/reviews.png","scroll_pct":0.4}
-{"type":"objection","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_4","stage":"reviews","text":"So many scams nowadays... what if fake?"}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_4","stage":"reviews","objection":"So many scams nowadays... what if fake?","retention_time_s":3.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/reviews.png","scroll_pct":0.4}
-{"type":"objection","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_2","stage":"reviews","text":"Reviews don't make me feel safe."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894472,"agent_id":"insecure_2","stage":"reviews","objection":"Reviews don't make me feel safe.","retention_time_s":3.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_3","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_1","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/reviews.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/reviews.png","scroll_pct":0.4}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_1","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/price.png","scroll_pct":0.6}
-{"type":"objection","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_1","stage":"price","text":"Price not justified by the specs."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_1","stage":"price","objection":"Price not justified by the specs.","retention_time_s":4.8}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":26,"bought":0,"bailed":2}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":25,"bought":0,"bailed":3}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":24,"bought":0,"bailed":4}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":23,"bought":0,"bailed":5}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":22,"bought":0,"bailed":6}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":21,"bought":0,"bailed":7}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":20,"bought":0,"bailed":8}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":19,"bought":0,"bailed":9}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":18,"bought":0,"bailed":10}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":17,"bought":0,"bailed":11}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"geek_3","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/price.png","scroll_pct":0.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_3","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/price.png","scroll_pct":0.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/price.png","scroll_pct":0.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/price.png","scroll_pct":0.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/price.png","scroll_pct":0.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/price.png","scroll_pct":0.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/price.png","scroll_pct":0.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_3","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/price.png","scroll_pct":0.6}
-{"type":"objection","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_3","stage":"price","text":"Price not justified by the specs."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_3","stage":"price","objection":"Price not justified by the specs.","retention_time_s":4.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/price.png","scroll_pct":0.6}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_4","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/price.png","scroll_pct":0.6}
-{"type":"objection","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_4","stage":"price","text":"Over budget liao, next."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_4","stage":"price","objection":"Over budget liao, next.","retention_time_s":4.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_2","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/price.png","scroll_pct":0.6}
-{"type":"objection","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_2","stage":"price","text":"Add shipping also? Forget it."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_2","stage":"price","objection":"Add shipping also? Forget it.","retention_time_s":4.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_1","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/price.png","scroll_pct":0.6}
-{"type":"objection","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_1","stage":"price","text":"Over budget liao, next."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894473,"agent_id":"budget_1","stage":"price","objection":"Over budget liao, next.","retention_time_s":4.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/price.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/price.png","scroll_pct":0.6}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":16,"bought":0,"bailed":12}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":15,"bought":0,"bailed":13}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":14,"bought":0,"bailed":14}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":13,"bought":0,"bailed":15}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"geek_3","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_3","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/cart.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/cart.png","scroll_pct":0.8}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"geek_3","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/checkout.png","scroll_pct":1.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_3","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/checkout.png","scroll_pct":1.0}
-{"type":"objection","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_3","stage":"checkout","text":"No authenticity proof, I scared kena fake."}
-{"type":"agent_bailed","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_3","stage":"checkout","objection":"No authenticity proof, I scared kena fake.","retention_time_s":7.2}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/checkout.png","scroll_pct":1.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/checkout.png","scroll_pct":1.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/checkout.png","scroll_pct":1.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/checkout.png","scroll_pct":1.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/checkout.png","scroll_pct":1.0}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":12,"bought":0,"bailed":16}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":11,"bought":0,"bailed":17}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":10,"bought":0,"bailed":18}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":9,"bought":0,"bailed":19}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/checkout.png","scroll_pct":1.0}
-{"type":"stage_enter","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/checkout.png"}
-{"type":"browser_frame","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/checkout.png","scroll_pct":1.0}
-{"type":"agent_bought","run_id":"run_sample","ts":1780711894473,"agent_id":"geek_3","retention_time_s":7.2}
-{"type":"agent_bought","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_2","retention_time_s":7.2}
-{"type":"agent_bought","run_id":"run_sample","ts":1780711894473,"agent_id":"insecure_1","retention_time_s":7.2}
-{"type":"agent_bought","run_id":"run_sample","ts":1780711894473,"agent_id":"xmm_4","retention_time_s":7.2}
-{"type":"agent_bought","run_id":"run_sample","ts":1780711894473,"agent_id":"auntie_2","retention_time_s":7.2}
-{"type":"agent_bought","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_4","retention_time_s":7.2}
-{"type":"agent_bought","run_id":"run_sample","ts":1780711894473,"agent_id":"nerd_4","retention_time_s":7.2}
-{"type":"agent_bought","run_id":"run_sample","ts":1780711894473,"agent_id":"high_spender_2","retention_time_s":7.2}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":8,"bought":0,"bailed":20}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894473,"active":7,"bought":1,"bailed":20}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894474,"active":6,"bought":2,"bailed":20}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894474,"active":5,"bought":3,"bailed":20}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894474,"active":4,"bought":4,"bailed":20}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894474,"active":3,"bought":5,"bailed":20}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894474,"active":2,"bought":6,"bailed":20}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894474,"active":1,"bought":7,"bailed":20}
-{"type":"run_progress","run_id":"run_sample","ts":1780711894474,"active":0,"bought":8,"bailed":20}
-{"type":"run_complete","run_id":"run_sample","ts":1780711894474,"buy_rate":0.286,"report_ready":true}
+{"type":"run_started","run_id":"run_sample","ts":1780717112072,"listing":{"title":"Matin Kim Logo Beanie - Trendy Korean Winter Knit Hat","price":36.9,"seller":"Seoul Street SG"},"agents_total":28}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"high_spender_1","name":"Ethan","archetype":"high_spender"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"auntie_1","name":"Auntie May","archetype":"auntie"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"nerd_1","name":"Wei Jie","archetype":"nerd"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"geek_4","name":"Ben","archetype":"geek"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"xmm_3","name":"Mei Qi","archetype":"xmm"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"auntie_3","name":"Auntie Lee","archetype":"auntie"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"geek_3","name":"Ryan","archetype":"geek"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"nerd_2","name":"Daryl","archetype":"nerd"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"insecure_3","name":"Rachel","archetype":"insecure"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"geek_1","name":"Kai","archetype":"geek"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"budget_3","name":"Aqil","archetype":"budget"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"insecure_4","name":"Yun Xuan","archetype":"insecure"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"insecure_2","name":"Nadia","archetype":"insecure"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"xmm_2","name":"Chloe","archetype":"xmm"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"insecure_1","name":"Siti","archetype":"insecure"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"xmm_1","name":"Jia En","archetype":"xmm"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"xmm_4","name":"Shermin","archetype":"xmm"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"geek_2","name":"Zach","archetype":"geek"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"auntie_2","name":"Mdm Tan","archetype":"auntie"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"high_spender_4","name":"Isabelle","archetype":"high_spender"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"nerd_3","name":"Jun Hao","archetype":"nerd"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"nerd_4","name":"Marcus","archetype":"nerd"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"high_spender_3","name":"Brandon","archetype":"high_spender"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"budget_4","name":"Hui Min","archetype":"budget"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"auntie_4","name":"Mdm Goh","archetype":"auntie"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"budget_2","name":"Xin Yi","archetype":"budget"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"budget_1","name":"Farhan","archetype":"budget"}
+{"type":"agent_spawned","run_id":"run_sample","ts":1780717112072,"agent_id":"high_spender_2","name":"Valerie","archetype":"high_spender"}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112072,"agent_id":"high_spender_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112072,"agent_id":"high_spender_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112072,"agent_id":"auntie_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_1/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112072,"agent_id":"auntie_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_1/land.png","scroll_pct":0.0}
+{"type":"objection","run_id":"run_sample","ts":1780717112074,"agent_id":"auntie_1","stage":"land","text":"Hmm, not feeling this shop page."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112074,"agent_id":"auntie_1","stage":"land","objection":"Hmm, not feeling this shop page.","retention_time_s":1.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112074,"agent_id":"nerd_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112074,"agent_id":"nerd_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_4/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_4/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_3/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_3/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_2/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_2/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_1/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_1/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_3/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_3/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_1/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_1/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_2/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_2/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_3","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_3/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_3/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_4","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_4/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_4/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_1","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_2","stage":"land","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/land.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/land.png","scroll_pct":0.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_4/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_4/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_4","stage":"photos","text":"Can't tell the knit gauge from these."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_4","stage":"photos","objection":"Can't tell the knit gauge from these.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_3/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_3/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_3","stage":"photos","text":"Photos damn ugly leh, vibe not there."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_3","stage":"photos","objection":"Photos damn ugly leh, vibe not there.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_2/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_2/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_2","stage":"photos","text":"Can't inspect the fabric properly from these photos."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_2","stage":"photos","objection":"Can't inspect the fabric properly from these photos.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_1/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_1/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_1","stage":"photos","text":"Can't tell the knit gauge from these."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_1","stage":"photos","objection":"Can't tell the knit gauge from these.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_3/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_3/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_3","stage":"photos","text":"Photos not convincing enough."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112075,"agent_id":"budget_3","stage":"photos","objection":"Photos not convincing enough.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_1/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_1/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_1","stage":"photos","text":"Photos damn ugly leh, vibe not there."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_1","stage":"photos","objection":"Photos damn ugly leh, vibe not there.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_2/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_2/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_2","stage":"photos","text":"Can't tell the knit gauge from these."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112075,"agent_id":"geek_2","stage":"photos","objection":"Can't tell the knit gauge from these.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_3","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_3/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_3/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_3","stage":"photos","text":"Photos not convincing enough."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112075,"agent_id":"high_spender_3","stage":"photos","objection":"Photos not convincing enough.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_4","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_4/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_4/photos.png","scroll_pct":0.2}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_4","stage":"photos","text":"Photos not convincing enough."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_4","stage":"photos","objection":"Photos not convincing enough.","retention_time_s":2.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_1","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_2","stage":"photos","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/photos.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/photos.png","scroll_pct":0.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_1","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_1/reviews.png","scroll_pct":0.4}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_1","stage":"reviews","text":"Even I need some trust signal lah."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_1","stage":"reviews","objection":"Even I need some trust signal lah.","retention_time_s":3.6}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":27,"bought":0,"bailed":1}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_1","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_3","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_3/reviews.png","scroll_pct":0.4}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_3","stage":"reviews","text":"Seller never reply reviews, not safe."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_3","stage":"reviews","objection":"Seller never reply reviews, not safe.","retention_time_s":3.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"geek_3","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_3","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_4/reviews.png","scroll_pct":0.4}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_4","stage":"reviews","text":"So many scams nowadays... what if fake?"}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_4","stage":"reviews","objection":"So many scams nowadays... what if fake?","retention_time_s":3.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_2/reviews.png","scroll_pct":0.4}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_2","stage":"reviews","text":"Reviews don't make me feel safe."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_2","stage":"reviews","objection":"Reviews don't make me feel safe.","retention_time_s":3.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"xmm_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_1","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"xmm_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_3","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_4","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_1","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_2","stage":"reviews","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/reviews.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/reviews.png","scroll_pct":0.4}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_1","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_1/price.png","scroll_pct":0.6}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_1","stage":"price","text":"Price not justified by the specs."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_1","stage":"price","objection":"Price not justified by the specs.","retention_time_s":4.8}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":26,"bought":0,"bailed":2}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":25,"bought":0,"bailed":3}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":24,"bought":0,"bailed":4}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":23,"bought":0,"bailed":5}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":22,"bought":0,"bailed":6}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":21,"bought":0,"bailed":7}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":20,"bought":0,"bailed":8}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":19,"bought":0,"bailed":9}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":18,"bought":0,"bailed":10}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112076,"active":17,"bought":0,"bailed":11}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"geek_3","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/price.png","scroll_pct":0.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_3","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/price.png","scroll_pct":0.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"xmm_2","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/price.png","scroll_pct":0.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_1","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/price.png","scroll_pct":0.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"xmm_4","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/price.png","scroll_pct":0.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_2","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/price.png","scroll_pct":0.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_4","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/price.png","scroll_pct":0.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_3","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_3/price.png","scroll_pct":0.6}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_3","stage":"price","text":"Price not justified by the specs."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_3","stage":"price","objection":"Price not justified by the specs.","retention_time_s":4.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_4","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/price.png","scroll_pct":0.6}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_4","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_4/price.png","scroll_pct":0.6}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_4","stage":"price","text":"Over budget liao, next."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_4","stage":"price","objection":"Over budget liao, next.","retention_time_s":4.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_2","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_2/price.png","scroll_pct":0.6}
+{"type":"objection","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_2","stage":"price","text":"Add shipping also? Forget it."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112076,"agent_id":"budget_2","stage":"price","objection":"Add shipping also? Forget it.","retention_time_s":4.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"budget_1","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"budget_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/budget_1/price.png","scroll_pct":0.6}
+{"type":"objection","run_id":"run_sample","ts":1780717112077,"agent_id":"budget_1","stage":"price","text":"Over budget liao, next."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112077,"agent_id":"budget_1","stage":"price","objection":"Over budget liao, next.","retention_time_s":4.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_2","stage":"price","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/price.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/price.png","scroll_pct":0.6}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":16,"bought":0,"bailed":12}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":15,"bought":0,"bailed":13}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":14,"bought":0,"bailed":14}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":13,"bought":0,"bailed":15}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"geek_3","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_3","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_2","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_1","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_4","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"auntie_2","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_4","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"nerd_4","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_2","stage":"cart","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/cart.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/cart.png","scroll_pct":0.8}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"geek_3","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"geek_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/geek_3/checkout.png","scroll_pct":1.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_3","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_3","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_3/checkout.png","scroll_pct":1.0}
+{"type":"objection","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_3","stage":"checkout","text":"No authenticity proof, I scared kena fake."}
+{"type":"agent_bailed","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_3","stage":"checkout","objection":"No authenticity proof, I scared kena fake.","retention_time_s":7.2}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_2","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_2/checkout.png","scroll_pct":1.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_1","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_1","thumbnail_url":"/static/mock/matin_kim_beanie_sg/insecure_1/checkout.png","scroll_pct":1.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_4","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/xmm_4/checkout.png","scroll_pct":1.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"auntie_2","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"auntie_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/auntie_2/checkout.png","scroll_pct":1.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_4","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_4/checkout.png","scroll_pct":1.0}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":12,"bought":0,"bailed":16}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":11,"bought":0,"bailed":17}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":10,"bought":0,"bailed":18}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":9,"bought":0,"bailed":19}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"nerd_4","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"nerd_4","thumbnail_url":"/static/mock/matin_kim_beanie_sg/nerd_4/checkout.png","scroll_pct":1.0}
+{"type":"stage_enter","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_2","stage":"checkout","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/checkout.png"}
+{"type":"browser_frame","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_2","thumbnail_url":"/static/mock/matin_kim_beanie_sg/high_spender_2/checkout.png","scroll_pct":1.0}
+{"type":"agent_bought","run_id":"run_sample","ts":1780717112077,"agent_id":"geek_3","retention_time_s":7.2}
+{"type":"agent_bought","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_2","retention_time_s":7.2}
+{"type":"agent_bought","run_id":"run_sample","ts":1780717112077,"agent_id":"insecure_1","retention_time_s":7.2}
+{"type":"agent_bought","run_id":"run_sample","ts":1780717112077,"agent_id":"xmm_4","retention_time_s":7.2}
+{"type":"agent_bought","run_id":"run_sample","ts":1780717112077,"agent_id":"auntie_2","retention_time_s":7.2}
+{"type":"agent_bought","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_4","retention_time_s":7.2}
+{"type":"agent_bought","run_id":"run_sample","ts":1780717112077,"agent_id":"nerd_4","retention_time_s":7.2}
+{"type":"agent_bought","run_id":"run_sample","ts":1780717112077,"agent_id":"high_spender_2","retention_time_s":7.2}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":8,"bought":0,"bailed":20}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":7,"bought":1,"bailed":20}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":6,"bought":2,"bailed":20}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":5,"bought":3,"bailed":20}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":4,"bought":4,"bailed":20}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":3,"bought":5,"bailed":20}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":2,"bought":6,"bailed":20}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":1,"bought":7,"bailed":20}
+{"type":"run_progress","run_id":"run_sample","ts":1780717112077,"active":0,"bought":8,"bailed":20}
+{"type":"run_complete","run_id":"run_sample","ts":1780717112077,"buy_rate":0.286,"report_ready":true}

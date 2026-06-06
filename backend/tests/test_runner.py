@@ -34,6 +34,9 @@ async def test_runner_emits_buffered_events_and_report() -> None:
 
     assert run.complete
     assert run.report is not None
+    assert run.report.browsing_metrics["unique_buyers"] == sum(1 for agent in run.agents if agent.outcome == "bought")
+    assert run.report.browsing_metrics["click_rate"] >= run.report.browsing_metrics["read_rate"]
+    assert run.report.browsing_metrics["dropoff_reason_distribution"]
     assert run.events[0]["type"] == "run_started"
     assert run.events[-1]["type"] == "run_complete"
 
@@ -57,12 +60,24 @@ async def test_rerun_patch_can_improve_budget_outcome_deterministically() -> Non
     crowd = CrowdConfig(personas=["budget"], crowd_size=12, speed=4, seed=9)
     cohort = build_cohort(crowd.personas, crowd.crowd_size, 9)
     baseline = RunState("run_base", 9, listing, crowd, "mock", cohort=cohort)
-    rerun = RunState("run_rerun", 9, patched, crowd, "mock", parent_run_id="run_base", cohort=cohort)
-
-    await asyncio.gather(run_simulation(baseline), run_simulation(rerun))
+    await run_simulation(baseline)
+    rerun = RunState(
+        "run_rerun",
+        9,
+        patched,
+        crowd,
+        "mock",
+        parent_run_id="run_base",
+        cohort=cohort,
+        parent_report=baseline.report,
+    )
+    await run_simulation(rerun)
     assert baseline.report is not None
     assert rerun.report is not None
     assert len(baseline.agents) == len(rerun.agents)
+    assert rerun.report.browsing_metrics["buyer_uplift"] is not None
+    assert rerun.report.browsing_metrics["order_uplift"] is not None
+    assert rerun.report.browsing_metrics["per_persona_uplift"] is not None
 
 
 @pytest.mark.asyncio

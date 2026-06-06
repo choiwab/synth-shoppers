@@ -64,6 +64,7 @@ class RunState:
     subscribers: list[asyncio.Queue[dict[str, Any] | None]] = field(default_factory=list)
     agents: list[AgentTrace] = field(default_factory=list)
     report: ViabilityReport | None = None
+    parent_report: ViabilityReport | None = None
     complete: bool = False
 
     async def emit(self, event: AgentEvent) -> None:
@@ -124,6 +125,7 @@ class SimulationRegistry:
             mode=parent.mode,
             parent_run_id=parent.run_id,
             cohort=parent.cohort,
+            parent_report=parent.report,
         )
         self.runs[run.run_id] = run
         driver = self.real_driver_factory(listing) if run.mode == "real" and self.real_driver_factory else None
@@ -332,7 +334,12 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
             )
         )
 
-    run.report = build_report(run.run_id, sorted(run.agents, key=lambda a: a.agent_id), run.listing.base_price)
+    run.report = build_report(
+        run.run_id,
+        sorted(run.agents, key=lambda a: a.agent_id),
+        run.listing.base_price,
+        parent_report=run.parent_report,
+    )
     run.complete = True
     await run.emit(
         RunCompleteEvent(

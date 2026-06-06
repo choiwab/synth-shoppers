@@ -13,7 +13,12 @@ from contracts import (
 from sim.recommendations import FIELD_BY_STAGE, build_recommendations_from_counts
 
 
-def build_report(run_id: str, agents: list[AgentTrace], recommended_price: float) -> ViabilityReport:
+def build_report(
+    run_id: str,
+    agents: list[AgentTrace],
+    recommended_price: float,
+    parent_report: ViabilityReport | None = None,
+) -> ViabilityReport:
     total = len(agents)
     bought = sum(1 for agent in agents if agent.outcome == "bought")
     buy_rate = bought / total if total else 0.0
@@ -77,6 +82,13 @@ def build_report(run_id: str, agents: list[AgentTrace], recommended_price: float
 
     recommendations: list[Recommendation] = build_recommendations_from_counts(stage_counts, Counter())
     market_fit_score = round(min(100, max(0, buy_rate * 70 + (len(by_arch) - len(risk_archetypes)) / max(len(by_arch), 1) * 30)))
+    browsing_metrics = build_browsing_metrics(
+        agents=agents,
+        bought=bought,
+        objection_heatmap=objection_heatmap,
+        archetypes=archetypes,
+        parent_report=parent_report,
+    )
 
     # Layer 2: the "what they said" feed + why-bought, straight off the traces.
     comments: list[dict] = []
@@ -118,6 +130,7 @@ def build_report(run_id: str, agents: list[AgentTrace], recommended_price: float
             "decision": "go" if market_fit_score >= 55 else "no_go",
             "confidence": round(0.55 + min(total, 60) / 60 * 0.35, 2),
         },
+        browsing_metrics=browsing_metrics,
         funnel=funnel,
         archetypes=archetypes,
         objection_heatmap=objection_heatmap,
@@ -130,3 +143,64 @@ def build_report(run_id: str, agents: list[AgentTrace], recommended_price: float
         dropoff_reasons=dropoff_reasons,
     )
 
+
+def build_browsing_metrics(
+    agents: list[AgentTrace],
+    bought: int,
+    objection_heatmap: list[dict],
+    archetypes: list[dict],
+    parent_report: ViabilityReport | None = None,
+) -> dict:
+    total = len(agents)
+    orders = bought
+    entered = lambda stage: sum(1 for agent in agents if any(trace.stage == stage for trace in agent.stage_trace))
+    engaged = sum(1 for agent in agents if len(agent.stage_trace) >= 2)
+    dropoff_total = sum(item["bail_count"] for item in objection_heatmap)
+
+    metrics = {
+        "unique_buyers": bought,
+        "orders": orders,
+        "buyer_uplift": None,
+        "order_uplift": None,
+        "click_rate": round(entered("photos") / total, 3) if total else 0,
+        "read_rate": round(entered("reviews") / total, 3) if total else 0,
+        "engagement_rate": round(engaged / total, 3) if total else 0,
+        "average_basket_cost": None,
+        "dropoff_reason_distribution": [
+            {
+                "reason": item["field"],
+                "count": item["bail_count"],
+                "share": round(item["bail_count"] / dropoff_total, 3) if dropoff_total else 0,
+            }
+            for item in objection_heatmap
+        ],
+        "objection_resolution_rate": None,
+        "per_persona_uplift": None,
+    }
+
+    if not parent_report:
+        return metrics
+
+    parent_metrics = parent_report.browsing_metrics or {}
+    parent_buyers = parent_metrics.get("unique_buyers", sum(1 for agent in parent_report.agents if agent.outcome == "bought"))
+    parent_orders = parent_metrics.get("orders", parent_buyers)
+    metrics["buyer_uplift"] = bought - parent_buyers
+    metrics["order_uplift"] = orders - parent_orders
+
+    parent_by_persona = {row["archetype"]: row for row in parent_report.archetypes}
+    metrics["per_persona_uplift"] = [
+        {
+            "archetype": row["archetype"],
+            "buy_rate_delta": round(row["buy_rate"] - parent_by_persona.get(row["archetype"], {}).get("buy_rate", 0), 3),
+            "buyers_delta": row["bought"] - parent_by_persona.get(row["archetype"], {}).get("bought", 0),
+        }
+        for row in archetypes
+    ]
+
+    if parent_report.objection_heatmap:
+        parent_top = parent_report.objection_heatmap[0]
+        current_top_count = next((item["bail_count"] for item in objection_heatmap if item["field"] == parent_top["field"]), 0)
+        parent_count = parent_top["bail_count"]
+        metrics["objection_resolution_rate"] = round(max(parent_count - current_top_count, 0) / parent_count, 3) if parent_count else None
+
+    return metrics
