@@ -38,25 +38,64 @@ import base64
 import binascii
 import os
 import time
+import urllib.parse
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable
 
 from contracts import (
+    REASON_BY_STAGE,
     AgentBailedEvent,
     AgentBoughtEvent,
+    AgentThoughtEvent,
     AgentTrace,
     BrowserFrameEvent,
     GateStage,
     ListingConfig,
     ObjectionEvent,
     PersonaId,
+    ReasonCategory,
+    Sentiment,
     StageEnterEvent,
+    StageSentimentEvent,
     StageTrace,
 )
 from sim.agents import PERSONAS
 from sim.screenshots import save_thumbnail
 
 EmitFn = Callable[[object], Awaitable[None]]
+
+_VALID_SENTIMENTS: frozenset[str] = frozenset({"love", "like", "neutral", "dislike", "reject"})
+
+
+def _clean_sentiment(value: str | None) -> Sentiment:
+    """Coerce the LLM's free-text sentiment to a valid label; default to neutral."""
+    candidate = (value or "").strip().lower()
+    return candidate if candidate in _VALID_SENTIMENTS else "neutral"  # type: ignore[return-value]
+
+
+_VALID_REASONS: frozenset[str] = frozenset(
+    {"price_value", "trust_authenticity", "visual_photos", "social_proof_reviews", "shipping", "other"}
+)
+
+
+def _clean_reason(value: str | None, gate: GateStage) -> ReasonCategory:
+    """Honor a valid, specific LLM reason category; else fall back to the stage default
+    (more informative than a bare 'other')."""
+    candidate = (value or "").strip().lower()
+    if candidate in _VALID_REASONS and candidate != "other":
+        return candidate  # type: ignore[return-value]
+    return REASON_BY_STAGE.get(gate, "other")
+
+
+def _brain_field(brain: object, field: str) -> str | None:
+    """Read a field off a browser-use ``AgentBrain`` (pydantic obj) or dict, safely."""
+    value = getattr(brain, field, None)
+    if value is None and isinstance(brain, dict):
+        value = brain.get(field)
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
 
 # Funnel gate -> the H2 data-action selector that advances into it (OVERVIEW §5.6).
 GATE_ACTION: dict[GateStage, str] = {
@@ -68,6 +107,12 @@ GATE_ACTION: dict[GateStage, str] = {
 }
 CONFIRM_ACTION = "confirm-order"
 _GATE_INDEX = ["land", "photos", "reviews", "price", "cart", "checkout"]
+
+# Gates whose data-action lives on a DIFFERENT route than the product page: click
+# this CSS selector first to navigate there (verified drivable end-to-end). The
+# checkout button lives on /cart, so we click the cart icon to get there. The driver
+# reuses its normal click path — no special browser-use navigation API needed.
+GATE_NAV: dict[GateStage, str] = {"checkout": 'a[href="/cart"]'}
 
 
 def _now_ms() -> int:
@@ -93,14 +138,31 @@ class _Journey:
     outcome: str | None = None  # None until the agent buys/bails
     bail_stage: GateStage | None = None
     objection: str | None = None
+    bail_reason: ReasonCategory | None = None  # categorized dropout reason
+    purchase_reason: str | None = None  # why a buyer committed (Layer 2)
     _traces: list[StageTrace] = field(default_factory=list)
+    _thoughts: list[dict] = field(default_factory=list)  # Layer 1 raw CoT log
 
     def elapsed(self) -> float:
         return round(time.monotonic() - self._start, 2)
 
-    def record(self, gate: GateStage, screenshot_url: str | None) -> None:
+    def record(
+        self,
+        gate: GateStage,
+        screenshot_url: str | None,
+        sentiment: Sentiment | None = None,
+        comment: str | None = None,
+    ) -> None:
         self.current_gate = gate
-        self._traces.append(StageTrace(stage=gate, time_s=self.elapsed(), screenshot_url=screenshot_url))
+        self._traces.append(
+            StageTrace(
+                stage=gate,
+                time_s=self.elapsed(),
+                screenshot_url=screenshot_url,
+                sentiment=sentiment,
+                comment=comment,
+            )
+        )
 
     def trace(self) -> AgentTrace:
         outcome = self.outcome or "bailed"
@@ -113,6 +175,8 @@ class _Journey:
             objection=self.objection if outcome == "bailed" else None,
             retention_time_s=self.elapsed(),
             stage_trace=list(self._traces) or [StageTrace(stage="land", time_s=self.elapsed())],
+            purchase_reason=self.purchase_reason if outcome == "bought" else None,
+            bail_reason=self.bail_reason if outcome == "bailed" else None,
         )
 
 
@@ -150,7 +214,7 @@ class BrowserUseAgenticDriver:
         run_id: str,
         emit: EmitFn,
     ) -> AgentTrace:
-        url = f"{self.base_url}/?listing={listing_url}"
+        url = self._page_url(listing_url, listing)
         ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit)
 
         # land: emitted before the browser navigates, so no thumbnail yet (the first
@@ -163,7 +227,7 @@ class BrowserUseAgenticDriver:
             tools = self._build_tools(ctx)
             agent = self._make_agent(name, archetype, listing, url, tools, browser)
             try:
-                await agent.run(max_steps=self.max_steps)
+                await agent.run(max_steps=self.max_steps, on_step_end=self._on_step(ctx))
             except Exception as exc:  # agent crash -> degrade to a clean bail
                 if ctx.outcome is None:
                     await self._bail(ctx, ctx.current_gate or "land", f"(agent stopped) {str(exc)[:160]}")
@@ -181,76 +245,158 @@ class BrowserUseAgenticDriver:
 
         tools = Tools()
 
-        async def gate(browser_session, name: GateStage):
+        # Every gate tool elicits the agent's in-character reaction + sentiment, so we
+        # capture what each persona thinks/feels AT each stage (Layer 2), not just where
+        # it went. `reaction` is a short quote; `sentiment` is one of love/like/neutral/
+        # dislike/reject. browser_session stays UNANNOTATED (injected by name).
+        async def gate(browser_session, name: GateStage, reaction: str, sentiment: str):
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
+            nav = GATE_NAV.get(name)
+            if nav:  # e.g. checkout lives on /cart — click the cart icon to get there first
+                await self._click_css(browser_session, nav)
+                await asyncio.sleep(0.4)
             reached = await self._click(browser_session, GATE_ACTION[name])
             if not reached:
                 await self._bail(ctx, name, f"Couldn't reach the {name} section — the page didn't respond.")
                 return ActionResult(extracted_content=f"{name} unavailable; left the listing.", is_done=True, success=False)
             url = await self._capture(ctx, browser_session, name)
-            await self._enter(ctx, name, url)
+            await self._enter(ctx, name, url, sentiment=_clean_sentiment(sentiment), comment=reaction or None)
             return ActionResult(extracted_content=self._gate_summary(name, ctx.listing))
 
-        @tools.action(description="Scroll and study the product photo gallery.")
-        async def look_at_photos(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "photos")
+        @tools.action(description="Look at the product photo gallery. Pass `reaction` (your in-character take on the photos) and `sentiment` (love/like/neutral/dislike/reject).")
+        async def look_at_photos(browser_session, reaction: str = "", sentiment: Sentiment = "neutral"):  # noqa: ANN001
+            return await gate(browser_session, "photos", reaction, sentiment)
 
-        @tools.action(description="Open and read the customer ratings and reviews.")
-        async def read_reviews(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "reviews")
+        @tools.action(description="Open and read the ratings and reviews. Pass `reaction` (your in-character take on the reviews/seller trust) and `sentiment`.")
+        async def read_reviews(browser_session, reaction: str = "", sentiment: Sentiment = "neutral"):  # noqa: ANN001
+            return await gate(browser_session, "reviews", reaction, sentiment)
 
-        @tools.action(description="Check the price and pick a variant.")
-        async def check_price(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "price")
+        @tools.action(description="Check the price and pick a variant. Pass `reaction` (your in-character take on the price/value) and `sentiment`.")
+        async def check_price(browser_session, reaction: str = "", sentiment: Sentiment = "neutral"):  # noqa: ANN001
+            return await gate(browser_session, "price", reaction, sentiment)
 
-        @tools.action(description="Add the item to the shopping cart.")
-        async def add_to_cart(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "cart")
+        @tools.action(description="Add the item to the shopping cart. Pass `reaction` (your in-character take as you add it) and `sentiment`.")
+        async def add_to_cart(browser_session, reaction: str = "", sentiment: Sentiment = "neutral"):  # noqa: ANN001
+            return await gate(browser_session, "cart", reaction, sentiment)
 
-        @tools.action(description="Proceed to the checkout page.")
-        async def checkout(browser_session):  # noqa: ANN001
-            return await gate(browser_session, "checkout")
+        @tools.action(description="Proceed to the checkout page. Pass `reaction` (your in-character take on checkout trust/total) and `sentiment`.")
+        async def checkout(browser_session, reaction: str = "", sentiment: Sentiment = "neutral"):  # noqa: ANN001
+            return await gate(browser_session, "checkout", reaction, sentiment)
 
-        @tools.action(description="Confirm and place the order. Only call this if you genuinely decide to buy.")
-        async def confirm_purchase(browser_session):  # noqa: ANN001
+        @tools.action(description="Confirm and place the order. Only call this if you genuinely decide to buy. Pass `reason` — your in-character reason for buying.")
+        async def confirm_purchase(browser_session, reason: str = ""):  # noqa: ANN001
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
             await self._click(browser_session, CONFIRM_ACTION)
-            await self._capture(ctx, browser_session, "checkout")
+            url = await self._capture(ctx, browser_session, "checkout")
             ctx.outcome = "bought"
+            ctx.purchase_reason = reason or None
+            if reason:
+                # surface the buy rationale in the live sentiment/comment feed too
+                await ctx.emit(StageSentimentEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage="checkout", sentiment="love", comment=reason))
             await ctx.emit(AgentBoughtEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, retention_time_s=ctx.elapsed()))
             return ActionResult(extracted_content="Order confirmed — purchased.", is_done=True, success=True)
 
-        @tools.action(description="Leave the listing without buying. Give your exact in-character objection.")
-        async def bail(browser_session, objection: str):  # noqa: ANN001
+        @tools.action(description="Leave the listing without buying. Give your exact in-character `objection`, and a `reason_category` (price_value/trust_authenticity/visual_photos/social_proof_reviews/shipping/other).")
+        async def bail(browser_session, objection: str, reason_category: ReasonCategory = "other"):  # noqa: ANN001
             await self._capture(ctx, browser_session, ctx.current_gate or "land")
-            await self._bail(ctx, ctx.current_gate or "land", objection)
+            await self._bail(ctx, ctx.current_gate or "land", objection, reason_category)
             return ActionResult(extracted_content=f"Left without buying: {objection}", is_done=True, success=True)
 
         return tools
 
     # ---- live emission helpers -------------------------------------------------
-    async def _enter(self, ctx: _Journey, gate: GateStage, thumbnail_url: str | None) -> None:
-        ctx.record(gate, thumbnail_url)
+    async def _enter(
+        self,
+        ctx: _Journey,
+        gate: GateStage,
+        thumbnail_url: str | None,
+        sentiment: Sentiment | None = None,
+        comment: str | None = None,
+    ) -> None:
+        ctx.record(gate, thumbnail_url, sentiment=sentiment, comment=comment)
         await ctx.emit(StageEnterEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, thumbnail_url=thumbnail_url))
         if thumbnail_url:
             await ctx.emit(
                 BrowserFrameEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, thumbnail_url=thumbnail_url, scroll_pct=_scroll_pct(gate))
             )
+        if sentiment and comment:
+            await ctx.emit(StageSentimentEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, sentiment=sentiment, comment=comment))
 
-    async def _bail(self, ctx: _Journey, gate: GateStage, objection: str) -> None:
+    async def _bail(self, ctx: _Journey, gate: GateStage, objection: str, reason_category: str | None = None) -> None:
         if ctx.outcome is not None:
             return
-        ctx.outcome, ctx.bail_stage, ctx.objection = "bailed", gate, objection
+        reason = _clean_reason(reason_category, gate)
+        ctx.outcome, ctx.bail_stage, ctx.objection, ctx.bail_reason = "bailed", gate, objection, reason
+        await ctx.emit(StageSentimentEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, sentiment="reject", comment=objection))
         await ctx.emit(ObjectionEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, text=objection))
-        await ctx.emit(AgentBailedEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, objection=objection, retention_time_s=ctx.elapsed()))
+        await ctx.emit(
+            AgentBailedEvent(run_id=ctx.run_id, ts=_now_ms(), agent_id=ctx.agent_id, stage=gate, objection=objection, retention_time_s=ctx.elapsed(), reason_category=reason)
+        )
 
     # ---- prompt assembly (reuses H4's PERSONAS) --------------------------------
     def _make_agent(self, name: str, archetype: PersonaId, listing: ListingConfig, url: str, tools, browser):
         from browser_use import Agent, ChatOpenAI
 
-        return Agent(task=self._task(name, archetype, listing, url), llm=ChatOpenAI(model=self.model), tools=tools, browser=browser)
+        return Agent(
+            task=self._task(name, archetype, listing, url),
+            llm=ChatOpenAI(model=self.model),
+            tools=tools,
+            browser=browser,
+            extend_system_message=self._persona_system_message(name, archetype),
+        )
+
+    @staticmethod
+    def _persona_system_message(name: str, archetype: PersonaId) -> str:
+        """Inject the persona into the SYSTEM prompt so the agent's own chain-of-thought
+        (Layer 1) reasons in character, not just the task prompt."""
+        persona = PERSONAS[archetype]
+        return (
+            f"\n\nROLE-PLAY: You are {name}, a {persona.display} shopper in Singapore "
+            f"({persona.tag}). {persona.blurb}\n"
+            "Stay in character for ALL of your reasoning: in every `thinking` step, react to "
+            "the photos, reviews, price, seller trust and authenticity the way THIS persona "
+            "would. When you call a funnel action, fill its `reaction` with a short first-person "
+            "line in your voice and set `sentiment` honestly (love/like/neutral/dislike/reject)."
+        )
+
+    def _on_step(self, ctx: _Journey):
+        """Return an ``on_step_end`` hook that captures browser-use's own per-step
+        reasoning (AgentBrain) and streams it as ``AgentThoughtEvent`` (Layer 1).
+
+        Only NEW thoughts are emitted (we track how many we've seen). The hook is
+        fully defensive: observability must never break the agent run.
+        """
+        seen = {"n": 0}
+
+        async def hook(agent) -> None:  # noqa: ANN001 — browser-use passes the Agent
+            try:
+                thoughts = agent.history.model_thoughts()
+                if not thoughts or len(thoughts) <= seen["n"]:
+                    return
+                seen["n"] = len(thoughts)
+                brain = thoughts[-1]
+                thinking = _brain_field(brain, "thinking") or _brain_field(brain, "next_goal")
+                if not thinking:
+                    return
+                stage = ctx.current_gate or "land"
+                ctx._thoughts.append({"stage": stage, "thinking": thinking})
+                await ctx.emit(
+                    AgentThoughtEvent(
+                        run_id=ctx.run_id,
+                        ts=_now_ms(),
+                        agent_id=ctx.agent_id,
+                        stage=stage,
+                        thinking=thinking,
+                        evaluation=_brain_field(brain, "evaluation_previous_goal"),
+                        next_goal=_brain_field(brain, "next_goal"),
+                    )
+                )
+            except Exception:
+                return  # never let a reasoning-capture hiccup kill the journey
+
+        return hook
 
     def _task(self, name: str, archetype: PersonaId, listing: ListingConfig, url: str) -> str:
         persona = PERSONAS[archetype]
@@ -262,8 +408,11 @@ class BrowserUseAgenticDriver:
             f"What you can see about the listing:\n{self._facts(listing)}\n\n"
             "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
             "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
-            "  confirm_purchase — only if you genuinely decide to buy.\n"
-            "  bail — the moment something puts you off; state your exact objection in character.\n\n"
+            "  At EACH step pass `reaction` (a short first-person line in your voice about what you just\n"
+            "  saw) and `sentiment` (love/like/neutral/dislike/reject) — this is how we record what you think.\n"
+            "  confirm_purchase — only if you genuinely decide to buy; pass `reason` (why you're buying).\n"
+            "  bail — the moment something puts you off; state your exact objection in character and a\n"
+            "  `reason_category` (price_value/trust_authenticity/visual_photos/social_proof_reviews/shipping/other).\n\n"
             f"Stay fully in character. If you bail, phrase it like these Singlish lines: {examples}\n"
             f"Decide the way {persona.display} really would for THIS listing."
         )
@@ -305,6 +454,13 @@ class BrowserUseAgenticDriver:
             return f"In cart: S${listing.price:.2f} + S${listing.shipping.fee:.2f} shipping = S${total:.2f}."
         return f"Checkout total ~S${total:.2f}. Authenticity proof: cert={a.certificate}, serial={a.serial}, unboxing={a.unboxing}."
 
+    def _page_url(self, slug: str, listing: ListingConfig) -> str:
+        """The React product route + the listing config, so the agent browses exactly
+        the listing we're simulating (and mutated reruns render). ``loadConfig.ts`` reads
+        ``?config=<base64 of UTF-8 JSON>``; URL-quote it so ``+ / =`` survive URLSearchParams."""
+        cfg = base64.b64encode(listing.model_dump_json().encode("utf-8")).decode("ascii")
+        return f"{self.base_url}/shopee/{slug}?config={urllib.parse.quote(cfg, safe='')}"
+
     # ---- browser-use runtime touchpoints (isolated; see VERIFY in module docstring)
     def _make_browser(self):
         from browser_use import Browser
@@ -312,7 +468,12 @@ class BrowserUseAgenticDriver:
         return Browser(headless=self.headless)
 
     async def _click(self, browser_session, action: str) -> bool:
-        selector = f'[data-action="{action}"]'
+        """Click the funnel action button by its data-action hook."""
+        return await self._click_css(browser_session, f'[data-action="{action}"]')
+
+    async def _click_css(self, browser_session, selector: str) -> bool:
+        """Click the first element matching a CSS selector (used for both data-action
+        buttons and route links like the cart icon)."""
         try:
             page = await browser_session.must_get_current_page()
             elements = await page.get_elements_by_css_selector(selector)

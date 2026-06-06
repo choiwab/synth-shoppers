@@ -10,6 +10,7 @@ from typing import Any, Callable
 
 from contracts import (
     GATE_ORDER,
+    REASON_BY_STAGE,
     AgentBailedEvent,
     AgentBoughtEvent,
     AgentEvent,
@@ -25,11 +26,12 @@ from contracts import (
     RunResponse,
     RunStartedEvent,
     StageEnterEvent,
+    StageSentimentEvent,
     StageTrace,
     ViabilityReport,
 )
 from sim.agents import PERSONAS
-from sim.decision import decide
+from sim.decision import decide, synth_purchase_reason, synth_reaction
 from sim.mock_driver import AgenticJourneyDriver, BrowserDriver, MockBrowserDriver
 from sim.report import build_report
 
@@ -211,6 +213,7 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                             stage=trace.bail_stage or trace.stage_trace[-1].stage,
                             objection=objection,
                             retention_time_s=trace.retention_time_s,
+                            reason_category=trace.bail_reason,
                         )
                     )
                 else:
@@ -231,7 +234,17 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                 for stage in GATE_ORDER:
                     page = await driver.goto_gate(session, stage)
                     elapsed = round(time.monotonic() - start + len(stage_trace) * 1.2, 2)
-                    stage_trace.append(StageTrace(stage=stage, time_s=elapsed, screenshot_url=page.screenshot_url))
+                    decision = decide(run.seed, agent.agent_id, agent.archetype, stage, run.listing)
+                    bailing = decision.action == "bail"
+                    if bailing:
+                        comment = decision.objection or "Not convinced enough to buy."
+                        sentiment = "reject"
+                    else:
+                        sentiment, comment = synth_reaction(agent.archetype, stage, decision.probability)
+
+                    stage_trace.append(
+                        StageTrace(stage=stage, time_s=elapsed, screenshot_url=page.screenshot_url, sentiment=sentiment, comment=comment)
+                    )
                     await run.emit(
                         StageEnterEvent(
                             run_id=run.run_id,
@@ -251,20 +264,23 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                                 scroll_pct=page.scroll_pct,
                             )
                         )
+                    await run.emit(
+                        StageSentimentEvent(run_id=run.run_id, ts=now_ms(), agent_id=agent.agent_id, stage=stage, sentiment=sentiment, comment=comment)
+                    )
 
-                    decision = decide(run.seed, agent.agent_id, agent.archetype, stage, run.listing)
-                    if decision.action == "bail":
+                    if bailing:
                         retention = round(time.monotonic() - start + len(stage_trace) * 1.2, 2)
-                        objection = decision.objection or "Not convinced enough to buy."
-                        await run.emit(ObjectionEvent(run_id=run.run_id, ts=now_ms(), agent_id=agent.agent_id, stage=stage, text=objection))
+                        reason = REASON_BY_STAGE.get(stage, "other")
+                        await run.emit(ObjectionEvent(run_id=run.run_id, ts=now_ms(), agent_id=agent.agent_id, stage=stage, text=comment))
                         await run.emit(
                             AgentBailedEvent(
                                 run_id=run.run_id,
                                 ts=now_ms(),
                                 agent_id=agent.agent_id,
                                 stage=stage,
-                                objection=objection,
+                                objection=comment,
                                 retention_time_s=retention,
+                                reason_category=reason,
                             )
                         )
                         return AgentTrace(
@@ -273,13 +289,18 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                             archetype=agent.archetype,
                             outcome="bailed",
                             bail_stage=stage,
-                            objection=objection,
+                            objection=comment,
                             retention_time_s=retention,
                             stage_trace=stage_trace,
+                            bail_reason=reason,
                         )
                     await asyncio.sleep(0 if run.crowd.speed == 4 else 0.05 / run.crowd.speed)
 
                 retention = round(time.monotonic() - start + len(stage_trace) * 1.2, 2)
+                reason = synth_purchase_reason(agent.archetype)
+                await run.emit(
+                    StageSentimentEvent(run_id=run.run_id, ts=now_ms(), agent_id=agent.agent_id, stage="checkout", sentiment="love", comment=reason)
+                )
                 await run.emit(AgentBoughtEvent(run_id=run.run_id, ts=now_ms(), agent_id=agent.agent_id, retention_time_s=retention))
                 return AgentTrace(
                     agent_id=agent.agent_id,
@@ -288,6 +309,7 @@ async def run_simulation(run: RunState, driver: BrowserDriver | AgenticJourneyDr
                     outcome="bought",
                     retention_time_s=retention,
                     stage_trace=stage_trace,
+                    purchase_reason=reason,
                 )
             finally:
                 await driver.close(session)

@@ -8,7 +8,7 @@ import pytest
 from PIL import Image
 
 from contracts import AgentBoughtEvent, AgentTrace, CrowdConfig, ListingConfig, StageEnterEvent, StageTrace
-from sim.browser_use_driver import BrowserUseAgenticDriver
+from sim.browser_use_driver import BrowserUseAgenticDriver, _Journey, _clean_reason, _clean_sentiment
 from sim.runner import RunState, build_cohort, run_simulation
 from sim.screenshots import save_thumbnail, thumbnail_paths
 
@@ -73,3 +73,91 @@ def test_objection_examples_handle_bare_string_entries() -> None:
     examples = BrowserUseAgenticDriver._objection_examples("xmm")
     assert "Cute, but this price must really look premium." in examples
     assert all(len(e) > 2 for e in examples)
+
+
+# ── reasoning capture (Layer 1 + Layer 2) ────────────────────────────────────
+
+
+def test_clean_sentiment_and_reason_coerce() -> None:
+    assert _clean_sentiment("LOVE ") == "love"
+    assert _clean_sentiment("meh") == "neutral"
+    assert _clean_sentiment(None) == "neutral"
+    # a valid specific reason is honored (incl. shipping, which has no stage default);
+    # "other"/junk/None falls back to the stage-derived reason.
+    assert _clean_reason("shipping", "price") == "shipping"
+    assert _clean_reason("other", "photos") == "visual_photos"
+    assert _clean_reason(None, "checkout") == "trust_authenticity"
+
+
+def test_journey_trace_carries_reasoning_fields() -> None:
+    async def _noop(_event):  # pragma: no cover - trivial
+        return None
+
+    ctx = _Journey(run_id="r", agent_id="budget_1", name="Farhan", archetype="budget", listing=load_listing(), emit=_noop)
+    ctx.record("photos", "/s/p.jpg", sentiment="dislike", comment="Photos plain leh")
+    ctx.outcome = "bought"
+    ctx.purchase_reason = "Okay lah, checkout."
+    trace = ctx.trace()
+
+    assert trace.stage_trace[0].sentiment == "dislike"
+    assert trace.stage_trace[0].comment == "Photos plain leh"
+    assert trace.outcome == "bought" and trace.purchase_reason == "Okay lah, checkout."
+    assert trace.bail_reason is None  # buyers have no bail reason
+
+
+@pytest.mark.asyncio
+async def test_on_step_hook_emits_agent_thought() -> None:
+    events: list = []
+
+    async def capture(event):
+        events.append(event)
+
+    driver = BrowserUseAgenticDriver(load_listing())
+    ctx = _Journey(run_id="r", agent_id="budget_1", name="Farhan", archetype="budget", listing=driver.listing, emit=capture)
+    ctx.current_gate = "photos"
+
+    class FakeBrain:
+        thinking = "These photos look cheap, not feeling it."
+        evaluation_previous_goal = "Opened the gallery."
+        next_goal = "Read the reviews next."
+
+    class FakeHistory:
+        def model_thoughts(self):
+            return [FakeBrain()]
+
+    class FakeAgent:
+        history = FakeHistory()
+
+    hook = driver._on_step(ctx)
+    await hook(FakeAgent())
+
+    thoughts = [e for e in events if getattr(e, "type", None) == "agent_thought"]
+    assert len(thoughts) == 1
+    assert thoughts[0].stage == "photos"
+    assert "cheap" in thoughts[0].thinking
+    assert thoughts[0].next_goal == "Read the reviews next."
+
+
+@pytest.mark.asyncio
+async def test_mock_run_populates_sentiment_diagnostics_and_dropoff() -> None:
+    crowd = CrowdConfig(personas=["xmm", "budget", "insecure"], crowd_size=12, speed=4, seed=11)
+    run = RunState(
+        run_id="run_mock", seed=11, listing=load_listing(), crowd=crowd, mode="mock",
+        cohort=build_cohort(crowd.personas, crowd.crowd_size, 11),
+    )
+    await run_simulation(run)
+
+    assert "stage_sentiment" in [e["type"] for e in run.events]
+    for agent in run.agents:
+        for trace in agent.stage_trace:
+            assert trace.sentiment is not None and trace.comment
+
+    report = run.report
+    assert report is not None
+    assert report.comments
+    assert any(row.get("sentiment_arc") for row in report.archetypes)
+    assert "engagement_rate" in report.diagnostics and "review_read_rate" in report.diagnostics
+    assert report.diagnostics["click_rate"] is None  # honest until Tier-2 impression stage
+    if any(a.outcome == "bailed" for a in run.agents):
+        assert report.dropoff_reasons
+        assert all(0.0 <= row["share"] <= 1.0 for row in report.dropoff_reasons)

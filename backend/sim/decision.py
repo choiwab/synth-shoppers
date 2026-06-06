@@ -4,7 +4,7 @@ import hashlib
 import random
 from dataclasses import dataclass
 
-from contracts import GateStage, ListingConfig, PersonaId
+from contracts import GateStage, ListingConfig, PersonaId, Sentiment
 from sim.agents import PERSONAS, stage_objections
 
 
@@ -100,3 +100,38 @@ def decide(seed: int, agent_id: str, persona_id: PersonaId, stage: GateStage, li
             threshold=threshold,
         )
     return Decision(action="continue", stage=stage, objection=None, probability=probability, threshold=threshold)
+
+
+# ── Mock-mode reasoning stand-ins ────────────────────────────────────────────
+# Mock mode has no LLM, so we synthesize the per-gate sentiment/comment + buy
+# reason that the real driver elicits, to keep the report/UI shape identical.
+
+_CONTINUE_LINES: dict[GateStage, str] = {
+    "land": "Okay, let me take a look at this.",
+    "photos": "Photos are passable lah, let me see more.",
+    "reviews": "Reviews so-so but okay, continue first.",
+    "price": "Price still workable for now.",
+    "cart": "Added to cart, still considering.",
+    "checkout": "Alright, proceeding to checkout.",
+}
+
+
+def synth_reaction(persona_id: PersonaId, stage: GateStage, probability: float) -> tuple[Sentiment, str]:
+    """Synthetic per-gate sentiment + comment for an agent that did NOT bail here.
+
+    Sentiment tracks how close the persona was to leaving (its bail probability):
+    comfortable -> like, lukewarm -> neutral, tempted-but-stayed -> dislike.
+    """
+    if probability < 0.12:
+        sentiment: Sentiment = "like"
+    elif probability < 0.35:
+        sentiment = "neutral"
+    else:
+        sentiment = "dislike"
+    return sentiment, _CONTINUE_LINES[stage]
+
+
+def synth_purchase_reason(persona_id: PersonaId) -> str:
+    """Synthetic in-character buy reason for the mock path."""
+    persona = PERSONAS[persona_id]
+    return f"Good enough for a {persona.display} like me — checking out."
