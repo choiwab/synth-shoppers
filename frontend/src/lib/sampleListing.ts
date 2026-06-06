@@ -18,9 +18,8 @@ export const SAMPLE_LISTING: ListingConfig = {
     },
   ],
   photos: [
-    { url: "", type: "product" },
-    { url: "", type: "product" },
-    { url: "", type: "lifestyle" },
+    { url: "/assets/beanies/matin-kim-black.jpg", type: "product" },
+    { url: "/assets/beanies/matin-kim-cream.jpg", type: "product" },
   ],
   description: "Matin Kim logo beanie with a soft Korean streetwear knit. One size, unisex fit.",
   rating: { score: 4.8, count: 312 },

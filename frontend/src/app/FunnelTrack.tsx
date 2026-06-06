@@ -24,8 +24,6 @@ export function FunnelTrack() {
     [funnelSignature],
   );
   const bailsByGate = useSimStore((s) => s.bailsByGate);
-  const competitors = useSimStore((s) => s.competitors);
-  const competitorOrder = useSimStore((s) => s.competitorOrder);
   const counts = useSimStore((s) => s.counts);
   const status = useSimStore((s) => s.status);
   const [hover, setHover] = useState<Hover | null>(null);
@@ -64,7 +62,6 @@ export function FunnelTrack() {
       ).length,
     [agents],
   );
-  const reachPct = marketTotal ? Math.round((considered / marketTotal) * 100) : 0;
 
   const onHover = (agent: FunnelAgentState, x: number, y: number) =>
     setHover({ agent, x, y });
@@ -75,10 +72,10 @@ export function FunnelTrack() {
   return (
     <section className="panel funnel">
       <div className="section-head">
-        <span className="section-title">Funnel Track · market → drop-off</span>
+        <span className="section-title">Funnel Analysis</span>
         <div className="head-pills">
           <span className="count-pill reach-pill" title="Share of the market that reached our listing">
-            considered us {reachPct}% ({considered}/{marketTotal})
+            considered {considered}/{marketTotal}
           </span>
           <span className="count-pill">
             {bought.length} bought · {Object.values(bailsByGate).reduce((a, b) => a + b, 0)} bailed
@@ -101,9 +98,8 @@ export function FunnelTrack() {
         <LayoutGroup>
           <div className="funnel-body">
             <div className="gates-wrap">
-              {/* upper band: market intake → 6 gates */}
               <div className="flow-row">
-                <div className="market-col">
+                <div className="gate-col market-col">
                   <div className="gate-head">
                     <div className="gate-num">0</div>
                     <div className="gate-name">Market</div>
@@ -132,66 +128,25 @@ export function FunnelTrack() {
                             <AgentDot key={a.agent_id} agent={a} onHover={onHover} onLeave={onLeave} />
                           ))}
                         </AnimatePresence>
+                        {bailedByGate[gate].length > 0 && (
+                          <div className="gate-bail-stack">
+                            <div className="sediment-dots">
+                              {bailedByGate[gate].slice(0, 12).map((a) => (
+                                <span
+                                  key={a.agent_id}
+                                  className="sediment-dot"
+                                  style={{ ["--hue" as string]: ARCHETYPE_HUE[a.archetype] }}
+                                  onMouseEnter={(e) => onHover(a, e.clientX, e.clientY)}
+                                  onMouseLeave={onLeave}
+                                />
+                              ))}
+                            </div>
+                            <div className="drop-chip">↓ {bailsByGate[gate]} bailed</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
-                </div>
-              </div>
-
-              {/* lower band: competitor leakage (under market) | bail sediment (under gates) */}
-              <div className="leak-row">
-                <div className="competitors">
-                  <div className="eyebrow" style={{ marginBottom: 6 }}>
-                    Went to competitors
-                  </div>
-                  {competitorOrder.length === 0 ? (
-                    <div className="muted comp-empty">No competitor leakage yet</div>
-                  ) : (
-                    <div className="comp-list">
-                      {competitorOrder.map((id) => {
-                        const stat = competitors[id];
-                        return (
-                          <div
-                            className="competitor-line"
-                            key={id}
-                            title={`${stat.name}: ${stat.landed} landed, ${stat.bought} bought`}
-                          >
-                            <span className="comp-name">{stat.name}</span>
-                            <span className="comp-reach mono">
-                              land {stat.landed} →{" "}
-                              <span className="comp-won">✓ {stat.bought}</span>
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                <div className="sediment">
-                  <div className="eyebrow" style={{ marginBottom: 6 }}>
-                    Where they bailed
-                  </div>
-                  <div className="sediment-cols">
-                    {GATES.map((gate) => (
-                      <div className="sediment-col" key={gate}>
-                        <div className="sediment-dots">
-                          {bailedByGate[gate].slice(0, 18).map((a) => (
-                            <span
-                              key={a.agent_id}
-                              className="sediment-dot"
-                              style={{ ["--hue" as string]: ARCHETYPE_HUE[a.archetype] }}
-                              onMouseEnter={(e) => onHover(a, e.clientX, e.clientY)}
-                              onMouseLeave={onLeave}
-                            />
-                          ))}
-                        </div>
-                        {bailsByGate[gate] > 0 && (
-                          <div className="drop-chip">↓ {bailsByGate[gate]} bailed</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>

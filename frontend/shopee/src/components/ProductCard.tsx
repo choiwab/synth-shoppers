@@ -20,7 +20,12 @@ export function ProductCard({ config, highlightTarget = false }: ProductCardProp
   const colour = config.variants[0]?.options[0]
   const isTarget = config.id === MATINKIM_ID
   const freeShipping = config.shipping.fee === 0
-  const hasImage = config.photos.some((photo) => Boolean(photo.url))
+  const hasProperImage = config.photos.some((photo) => {
+    const url = photo.url.trim().toLowerCase()
+    return Boolean(url) && !url.startsWith('data:') && !url.startsWith('blob:') && !url.includes('placeholder') && !url.includes('stub')
+  })
+  const hasImage = hasProperImage
+  const isBeanie = `${config.title} ${config.category.join(' ')}`.toLowerCase().includes('beanie')
 
   return (
     <Link
@@ -28,6 +33,8 @@ export function ProductCard({ config, highlightTarget = false }: ProductCardProp
       data-action="open-listing"
       data-listing-id={config.id}
       data-has-image={hasImage ? 'true' : 'false'}
+      data-has-proper-image={hasProperImage ? 'true' : 'false'}
+      data-is-beanie={isBeanie ? 'true' : 'false'}
       data-listing-card="search-result"
       onClick={() => emitFunnelAction('open_listing', 'land', config.id)}
       className={cn(

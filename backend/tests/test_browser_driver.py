@@ -8,7 +8,7 @@ import pytest
 from PIL import Image
 
 from contracts import AgentBoughtEvent, AgentTrace, CompetitorAnalysisEvent, CrowdConfig, ListingConfig, StageEnterEvent, StageTrace
-from sim.browser_use_driver import BrowserUseAgenticDriver, _Journey, _clean_reason, _clean_sentiment
+from sim.browser_use_driver import BrowserUseAgenticDriver, _Journey, _clean_reason, _clean_sentiment, _is_proper_image_url
 from sim.competitors import analyze_competitor
 from sim.runner import RunState, build_cohort, run_simulation
 from sim.screenshots import THUMB_SIZE, save_thumbnail, thumbnail_paths
@@ -69,9 +69,53 @@ def test_task_prompt_reuses_persona_blurb_facts_and_objection_pool() -> None:
     assert "Farhan" in task and "Budget-tight" in task
     assert "scrutinize every dollar" in task  # persona blurb from sim.agents
     assert f"S${listing.price:.2f}" in task and f"S${listing.base_price:.2f}" in task  # listing facts surfaced
-    assert "only open, compare, add to cart, checkout, or buy listings with visible product images" in task
-    assert "confirm_purchase — only if you genuinely decide to buy AND you have seen clear product images" in task
+    assert "only open, compare, add to cart, checkout, or buy beanie listings with proper product photos" in task
+    assert "Do not access non-beanie listings" in task
+    assert "generated fallback SVG" in task
+    assert "confirm_purchase — only if you genuinely decide to buy a beanie AND you have seen proper non-placeholder product photos" in task
     assert "Over budget liao, next." in task  # objection style example from the pool
+
+
+def test_proper_image_url_rejects_placeholders_and_fallbacks() -> None:
+    assert _is_proper_image_url("/assets/beanies/matin-kim-black.jpg")
+    assert _is_proper_image_url("https://example.com/beanie.jpg")
+    assert not _is_proper_image_url("")
+    assert not _is_proper_image_url("data:image/svg+xml;base64,abc")
+    assert not _is_proper_image_url("blob:http://localhost/x")
+    assert not _is_proper_image_url("/assets/beanies/placeholder.jpg")
+    assert not _is_proper_image_url("/assets/beanies/stub-beanie.jpg")
+
+
+@pytest.mark.asyncio
+async def test_driver_bails_before_browser_when_listing_has_no_proper_images() -> None:
+    events: list = []
+
+    async def capture(event):
+        events.append(event.model_dump())
+
+    listing = load_listing()
+    no_image_listing = listing.model_copy(
+        update={"photos": [photo.model_copy(update={"url": "data:image/svg+xml;base64,abc"}) for photo in listing.photos]},
+        deep=True,
+    )
+    driver = BrowserUseAgenticDriver(no_image_listing, base_url="http://localhost:5174")
+
+    trace = await driver.run_journey(
+        listing_url=no_image_listing.id,
+        agent_id="budget_1",
+        name="Farhan",
+        archetype="budget",
+        listing=no_image_listing,
+        seed=7,
+        run_id="run_no_images",
+        emit=capture,
+    )
+
+    assert trace.outcome == "bailed"
+    assert trace.bail_stage == "land"
+    assert trace.bail_reason == "visual_photos"
+    assert any(event["type"] == "agent_bailed" for event in events)
+    assert "proper product images" in events[-1]["objection"]
 
 
 def test_page_url_scopes_browser_session_per_agent() -> None:

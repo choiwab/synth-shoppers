@@ -128,6 +128,11 @@ _GATE_INDEX = ["land", "photos", "reviews", "price", "cart", "checkout"]
 # checkout button lives on /cart, so we click the cart icon to get there. The driver
 # reuses its normal click path — no special browser-use navigation API needed.
 GATE_NAV: dict[GateStage, str] = {"checkout": 'a[href^="/cart"]'}
+PROPER_IMAGE_BEANIE_CARD = (
+    '[data-listing-card="search-result"]'
+    '[data-is-beanie="true"]'
+    '[data-has-proper-image="true"]'
+)
 
 
 def _now_ms() -> int:
@@ -136,6 +141,21 @@ def _now_ms() -> int:
 
 def _scroll_pct(gate: GateStage) -> float:
     return _GATE_INDEX.index(gate) / (len(_GATE_INDEX) - 1) if gate in _GATE_INDEX else 1.0
+
+
+def _is_proper_image_url(url: str | None) -> bool:
+    candidate = (url or "").strip().lower()
+    if not candidate:
+        return False
+    if candidate.startswith(("data:", "blob:")):
+        return False
+    if "placeholder" in candidate or "stub" in candidate:
+        return False
+    return candidate.startswith("/assets/beanies/") or candidate.startswith("http://") or candidate.startswith("https://")
+
+
+def _listing_has_proper_images(listing: ListingConfig) -> bool:
+    return any(_is_proper_image_url(photo.url) for photo in listing.photos)
 
 
 @dataclass
@@ -236,6 +256,11 @@ class BrowserUseAgenticDriver:
     ) -> AgentTrace:
         url = self._page_url(listing_url, listing, agent_id=agent_id, run_id=run_id, archetype=archetype)
         ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit)
+
+        if not _listing_has_proper_images(listing):
+            ctx.record("land", None, sentiment="reject", comment="Skipping this beanie because it has no proper product images.")
+            await self._bail(ctx, "land", "I only check out beanies with proper product images, not placeholders.", "visual_photos")
+            return ctx.trace()
 
         if not self.autonomous:
             return await self._run_guided_browser_fallback(ctx, url, seed)
@@ -379,7 +404,7 @@ class BrowserUseAgenticDriver:
                     for competitor in competitors:
                         selector = f'[data-listing-id="{competitor["id"]}"]'
                         try:
-                            if await click(page, f'{selector}[data-has-image="true"]'):
+                            if await click(page, f"{PROPER_IMAGE_BEANIE_CARD}{selector}"):
                                 await page.wait_for_load_state("domcontentloaded", timeout=5000)
                                 await page.wait_for_timeout(450)
                                 competitor_land_url = await asyncio.to_thread(
@@ -572,6 +597,9 @@ class BrowserUseAgenticDriver:
         async def gate(browser_session, name: GateStage, reaction: str, sentiment: str):
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
+            if name in {"cart", "checkout"} and not _listing_has_proper_images(ctx.listing):
+                await self._bail(ctx, ctx.current_gate or "photos", "I only check out beanies with proper product images, not placeholders.", "visual_photos")
+                return ActionResult(extracted_content="Blocked checkout: listing has no proper product image.", is_done=True, success=False)
             nav = GATE_NAV.get(name)
             if nav:  # e.g. checkout lives on /cart — click the cart icon to get there first
                 await self._click_css(browser_session, nav)
@@ -608,6 +636,9 @@ class BrowserUseAgenticDriver:
         async def confirm_purchase(browser_session, reason: str = ""):  # noqa: ANN001
             if ctx.outcome is not None:
                 return ActionResult(extracted_content="Already finished.", is_done=True)
+            if not _listing_has_proper_images(ctx.listing):
+                await self._bail(ctx, ctx.current_gate or "photos", "I only buy beanies with proper product images, not placeholders.", "visual_photos")
+                return ActionResult(extracted_content="Purchase blocked: listing has no proper product image.", is_done=True, success=False)
             await self._click(browser_session, CONFIRM_ACTION)
             url = await self._capture(ctx, browser_session, "checkout")
             ctx.outcome = "bought"
@@ -681,8 +712,8 @@ class BrowserUseAgenticDriver:
             "the visible product images, reviews, price, seller trust and authenticity the way THIS persona "
             "would. When you call a funnel action, fill its `reaction` with a short first-person "
             "line in your voice and set `sentiment` honestly (love/like/neutral/dislike/reject). "
-            "Only open, compare, add to cart, or checkout listings that have visible product images. "
-            "Skip search results with missing, broken, blank, or placeholder-looking images."
+            "Only open, compare, add to cart, or checkout beanie listings that have proper product photos. "
+            "Skip non-beanie results and skip beanies with missing, broken, blank, stub, generated fallback, or placeholder-looking images."
         )
 
     def _on_step(self, ctx: _Journey):
@@ -730,14 +761,15 @@ class BrowserUseAgenticDriver:
             f"{persona.blurb}\n\n"
             f"Shop this Shopee listing. Start by opening it: {url}\n\n"
             f"Before judging it, search Shopee for '{SEARCH_QUERY}' and compare relevant alternatives if your persona would naturally comparison-shop.\n\n"
-            "Image rule: only open, compare, add to cart, checkout, or buy listings with visible product images. "
-            "If a listing has no image, a broken image, a blank placeholder, or images that do not show the product clearly, skip it or bail at the photos gate.\n\n"
+            "Image rule: only open, compare, add to cart, checkout, or buy beanie listings with proper product photos. "
+            "Do not access non-beanie listings. Do not check out any beanie that has no image, a broken image, a blank/stub image, a generated fallback SVG, or a placeholder-looking image. "
+            "If images do not clearly show the product, skip it or bail at the photos gate.\n\n"
             f"What you can see about the listing:\n{self._facts(listing)}\n\n"
             "How to shop — use ONLY these actions to move through the funnel (do not free-click to navigate):\n"
             "  look_at_photos -> read_reviews -> check_price -> add_to_cart -> checkout, in that order.\n"
             "  At EACH step pass `reaction` (a short first-person line in your voice about what you just\n"
             "  saw) and `sentiment` (love/like/neutral/dislike/reject) — this is how we record what you think.\n"
-            "  confirm_purchase — only if you genuinely decide to buy AND you have seen clear product images; pass `reason` (why you're buying).\n"
+            "  confirm_purchase — only if you genuinely decide to buy a beanie AND you have seen proper non-placeholder product photos; pass `reason` (why you're buying).\n"
             "  bail — the moment something puts you off; state your exact objection in character and a\n"
             "  `reason_category` (price_value/trust_authenticity/visual_photos/social_proof_reviews/shipping/other).\n\n"
             f"Stay fully in character. If you bail, phrase it like these Singlish lines: {examples}\n"
