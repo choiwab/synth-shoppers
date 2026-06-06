@@ -2,6 +2,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import { ARCHETYPE_HUE } from "@/types/contracts";
+import { useSpotlight } from "@/store/spotlightStore";
 import type { FunnelAgentState } from "@/store/simStore";
 
 interface Props {
@@ -29,6 +30,7 @@ function AgentDotBase({ agent, onHover, onLeave }: Props) {
       onMouseEnter={(e) => onHover(agent, e.clientX, e.clientY)}
       onMouseMove={(e) => onHover(agent, e.clientX, e.clientY)}
       onMouseLeave={onLeave}
+      onClick={() => useSpotlight.getState().pick(agent.agent_id)}
     />
   );
 }

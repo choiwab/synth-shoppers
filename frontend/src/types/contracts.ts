@@ -49,6 +49,21 @@ export interface Competitor {
   name: string;
 }
 
+export interface CompetitorAnalysis {
+  competitor: string;
+  competitor_name: string;
+  seller?: string | null;
+  verified?: boolean | null;
+  price?: number | null;
+  rating?: string | null;
+  review_count?: number | null;
+  comments: string[];
+  strengths: string[];
+  weaknesses: string[];
+  verdict: string;
+  thumbnail_url?: string | null;
+}
+
 // ----- §5.2 Persona IDs & archetype colors -----------------------------------
 export type PersonaId =
   | "xmm"
@@ -170,6 +185,12 @@ export type AgentEvent =
       converted?: boolean; // did they buy at the competitor
       reason?: string;
     }
+  | ({
+      type: "competitor_analysis";
+      run_id: string;
+      ts: number;
+      agent_id: string;
+    } & CompetitorAnalysis)
   | {
       type: "agent_bailed";
       run_id: string;
@@ -284,7 +305,15 @@ export interface AgentTrace {
   bail_stage?: FunnelStage;
   objection?: string;
   retention_time_s: number;
-  stage_trace: { stage: FunnelStage; time_s: number; screenshot_url?: string }[];
+  stage_trace: {
+    stage: FunnelStage;
+    time_s: number;
+    screenshot_url?: string;
+    sentiment?: "love" | "like" | "neutral" | "dislike" | "reject";
+    comment?: string;
+  }[];
+  purchase_reason?: string;
+  bail_reason?: string;
   // Competitive attribution (real-mode free browsing)
   landed_on_target?: boolean;
   chosen_listing_id?: string | null;
@@ -302,11 +331,45 @@ export interface CompetitionSummary {
   divert_by_stage?: { stage: FunnelStage; count: number }[];
 }
 
+export interface AgentTraceReport {
+  agent_id: string;
+  name: string;
+  archetype: PersonaId;
+  outcome: "bought" | "bailed";
+  status_label: string;
+  summary: string;
+  retention_time_s: number;
+  completed_gates: number;
+  total_gates: number;
+  progress_pct: number;
+  stage_path: FunnelStage[];
+  last_stage?: FunnelStage;
+  bail_stage?: FunnelStage;
+  bail_reason?: string;
+  objection?: string;
+  purchase_reason?: string;
+  key_reason?: string;
+  metrics: Record<string, unknown>;
+  run_metrics_context: Record<string, unknown>;
+  comments: Array<{ stage: FunnelStage; sentiment?: string; comment: string; time_s: number }>;
+  screenshots: Array<{ stage: FunnelStage; screenshot_url: string; time_s: number }>;
+  stage_trace: Array<{
+    order: number;
+    stage: FunnelStage;
+    time_s: number;
+    delta_s: number;
+    screenshot_url?: string;
+    sentiment?: "love" | "like" | "neutral" | "dislike" | "reject";
+    comment?: string;
+  }>;
+}
+
 export interface ViabilityReport {
   run_id: string;
   market_fit_score: number;
   recommended_price: number;
   go_no_go: { decision: "go" | "no_go"; confidence: number };
+  browsing_metrics?: Record<string, unknown>;
   funnel: { stage: FunnelStage; entered: number; bailed: number; bail_rate: number }[];
   archetypes: {
     archetype: PersonaId;
@@ -321,6 +384,11 @@ export interface ViabilityReport {
   risk_archetypes: PersonaId[];
   recommendations: Recommendation[];
   agents: AgentTrace[];
+  comments?: Array<Record<string, unknown>>;
+  purchase_reasons?: Array<Record<string, unknown>>;
+  agent_trace_reports?: AgentTraceReport[];
+  diagnostics?: Record<string, unknown>;
+  dropoff_reasons?: Array<Record<string, unknown>>;
   /** Competitive attribution for the tracked listing (real mode; empty in mock). */
   competition?: CompetitionSummary;
 }

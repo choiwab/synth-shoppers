@@ -4,11 +4,22 @@ import { ARCHETYPE_HUE, type PersonaId } from "@/types/contracts";
 import { archetypeInitials, archetypeLabel, archetypeTag } from "@/lib/archetype";
 import { useSimStore } from "@/store/simStore";
 import { useControlStore } from "@/store/controlStore";
+import { useSpotlight } from "@/store/spotlightStore";
 
 export function PersonaRoster() {
   const roster = useSimStore((s) => s.roster);
   const status = useSimStore((s) => s.status);
+  const agents = useSimStore((s) => s.agents);
   const enabled = useControlStore((s) => s.personas);
+  const pick = useSpotlight((s) => s.pick);
+
+  // spotlight the first-spawned agent of a clicked archetype
+  const spotlightArchetype = (id: PersonaId) => {
+    const rep = Object.values(agents)
+      .filter((a) => a.archetype === id)
+      .sort((a, b) => a.spawnOrder - b.spawnOrder)[0];
+    if (rep) pick(rep.agent_id);
+  };
 
   const rows = useMemo(() => {
     const list = enabled.map((id) => {
@@ -29,7 +40,15 @@ export function PersonaRoster() {
       </div>
       <div className="roster-list">
         {rows.map((r) => (
-          <div className="roster-row" key={r.id}>
+          <div
+            className="roster-row"
+            key={r.id}
+            role="button"
+            tabIndex={0}
+            title={`Spotlight a ${archetypeLabel(r.id)} agent`}
+            onClick={() => spotlightArchetype(r.id)}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && spotlightArchetype(r.id)}
+          >
             <div
               className="roster-avatar"
               style={{ ["--hue" as string]: ARCHETYPE_HUE[r.id] }}

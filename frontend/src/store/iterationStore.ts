@@ -20,11 +20,15 @@ export interface Iteration {
 
 interface IterationStore {
   iterations: Iteration[];
+  autoActive: boolean; // an Auto-improve ×N loop is running
+  autoTarget: number; // how many total runs that loop targets
   startIteration(runId: string, listing: ListingConfig, appliedChanges?: ProposedChange[]): void;
   completeIteration(runId: string, buyRate: number): void;
   setReport(runId: string, report: ViabilityReport): void;
   setAnalysis(runId: string, analysis: ListingAnalysis): void;
   setError(runId: string, error: string): void;
+  startAuto(target: number): void;
+  endAuto(): void;
   clear(): void;
 }
 
@@ -36,6 +40,8 @@ function patch(runId: string, fields: Partial<Iteration>) {
 
 export const useIterationStore = create<IterationStore>((set) => ({
   iterations: [],
+  autoActive: false,
+  autoTarget: 0,
 
   startIteration: (runId, listing, appliedChanges) =>
     set((s) => ({
@@ -49,6 +55,8 @@ export const useIterationStore = create<IterationStore>((set) => ({
   setReport: (runId, report) => set(patch(runId, { report })),
   setAnalysis: (runId, analysis) => set(patch(runId, { analysis, status: "ready" })),
   setError: (runId, error) => set(patch(runId, { error, status: "error" })),
+  startAuto: (target) => set({ autoActive: true, autoTarget: target }),
+  endAuto: () => set({ autoActive: false }),
   clear: () => set({ iterations: [] }),
 }));
 

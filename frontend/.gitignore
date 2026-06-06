@@ -5,3 +5,6 @@ dist
 .env
 *.local
 .DS_Store
+
+# Vite config temp artifacts
+vite.config.ts.timestamp-*

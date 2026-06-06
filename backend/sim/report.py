@@ -6,6 +6,7 @@ from contracts import (
     GATE_ORDER,
     SENTIMENT_SCORE,
     AgentTrace,
+    StageTrace,
     PersonaId,
     Recommendation,
     ViabilityReport,
@@ -121,6 +122,12 @@ def build_report(
         {"reason": reason, "count": count, "share": round(count / reasoned_bails, 3) if reasoned_bails else 0.0}
         for reason, count in reason_counts.most_common()
     ]
+    agent_trace_reports = build_agent_trace_reports(
+        agents=agents,
+        browsing_metrics=browsing_metrics,
+        diagnostics=diagnostics,
+        dropoff_reasons=dropoff_reasons,
+    )
 
     competition = build_competition(agents)
 
@@ -141,6 +148,7 @@ def build_report(
         agents=agents,
         comments=comments,
         purchase_reasons=purchase_reasons,
+        agent_trace_reports=agent_trace_reports,
         diagnostics=diagnostics,
         dropoff_reasons=dropoff_reasons,
         competition=competition,
@@ -244,3 +252,127 @@ def build_browsing_metrics(
         metrics["objection_resolution_rate"] = round(max(parent_count - current_top_count, 0) / parent_count, 3) if parent_count else None
 
     return metrics
+
+
+def build_agent_trace_reports(
+    agents: list[AgentTrace],
+    browsing_metrics: dict,
+    diagnostics: dict,
+    dropoff_reasons: list[dict],
+) -> list[dict]:
+    total_gates = len(GATE_ORDER)
+    return [
+        build_agent_trace_report(
+            agent=agent,
+            total_gates=total_gates,
+            browsing_metrics=browsing_metrics,
+            diagnostics=diagnostics,
+            dropoff_reasons=dropoff_reasons,
+        )
+        for agent in agents
+    ]
+
+
+def build_agent_trace_report(
+    agent: AgentTrace,
+    total_gates: int,
+    browsing_metrics: dict,
+    diagnostics: dict,
+    dropoff_reasons: list[dict],
+) -> dict:
+    stages = list(agent.stage_trace)
+    completed_gates = len({trace.stage for trace in stages if trace.stage in GATE_ORDER})
+    stage_path = [trace.stage for trace in stages]
+    last_stage = stage_path[-1] if stage_path else agent.bail_stage
+    comments = [
+        {
+            "stage": trace.stage,
+            "sentiment": trace.sentiment,
+            "comment": trace.comment,
+            "time_s": trace.time_s,
+        }
+        for trace in stages
+        if trace.comment
+    ]
+    screenshots = [
+        {"stage": trace.stage, "screenshot_url": trace.screenshot_url, "time_s": trace.time_s}
+        for trace in stages
+        if trace.screenshot_url
+    ]
+    stage_rows = [_stage_row(trace, index, stages) for index, trace in enumerate(stages)]
+    avg_stage_time = round(agent.retention_time_s / max(len(stages), 1), 2) if stages else agent.retention_time_s
+    key_reason = agent.purchase_reason if agent.outcome == "bought" else agent.objection
+    converted = agent.outcome == "bought"
+
+    return {
+        "agent_id": agent.agent_id,
+        "name": agent.name,
+        "archetype": agent.archetype,
+        "outcome": agent.outcome,
+        "status_label": "Bought" if converted else f"Bailed at {agent.bail_stage or last_stage or 'unknown'}",
+        "summary": _agent_summary(agent, completed_gates, total_gates, key_reason),
+        "retention_time_s": agent.retention_time_s,
+        "completed_gates": completed_gates,
+        "total_gates": total_gates,
+        "progress_pct": round(completed_gates / total_gates, 3) if total_gates else 0.0,
+        "stage_path": stage_path,
+        "last_stage": last_stage,
+        "bail_stage": agent.bail_stage,
+        "bail_reason": agent.bail_reason,
+        "objection": agent.objection,
+        "purchase_reason": agent.purchase_reason,
+        "key_reason": key_reason,
+        "metrics": {
+            "converted": converted,
+            "dropped": not converted,
+            "engaged": len(stages) >= 2,
+            "read_reviews": _entered(stages, "reviews"),
+            "checked_price": _entered(stages, "price"),
+            "added_to_cart": _entered(stages, "cart"),
+            "checked_out": _entered(stages, "checkout"),
+            "stage_count": len(stages),
+            "avg_stage_time_s": avg_stage_time,
+            "retention_time_s": agent.retention_time_s,
+            "dropoff_stage": agent.bail_stage,
+            "dropoff_reason": agent.bail_reason,
+        },
+        "run_metrics_context": {
+            "unique_buyers": browsing_metrics.get("unique_buyers"),
+            "orders": browsing_metrics.get("orders"),
+            "click_rate": browsing_metrics.get("click_rate"),
+            "read_rate": browsing_metrics.get("read_rate"),
+            "engagement_rate": browsing_metrics.get("engagement_rate"),
+            "diagnostics": diagnostics,
+            "dropoff_reasons": dropoff_reasons,
+        },
+        "comments": comments,
+        "screenshots": screenshots,
+        "stage_trace": stage_rows,
+    }
+
+
+def _stage_row(trace: StageTrace, index: int, stages: list[StageTrace]) -> dict:
+    prev_time = stages[index - 1].time_s if index > 0 else 0.0
+    return {
+        "order": index + 1,
+        "stage": trace.stage,
+        "time_s": trace.time_s,
+        "delta_s": round(max(trace.time_s - prev_time, 0), 2),
+        "screenshot_url": trace.screenshot_url,
+        "sentiment": trace.sentiment,
+        "comment": trace.comment,
+    }
+
+
+def _entered(stages: list[StageTrace], stage: str) -> bool:
+    return any(trace.stage == stage for trace in stages)
+
+
+def _agent_summary(agent: AgentTrace, completed_gates: int, total_gates: int, key_reason: str | None) -> str:
+    persona = agent.archetype.replace("_", " ")
+    if agent.outcome == "bought":
+        tail = f" Bought after reaching {completed_gates}/{total_gates} gates."
+    else:
+        tail = f" Dropped at {agent.bail_stage or 'unknown'} after {completed_gates}/{total_gates} gates."
+    reason = f" Reason: {key_reason}" if key_reason else ""
+    return f"{agent.name} ({persona}) spent {agent.retention_time_s}s in the listing.{tail}{reason}"

@@ -1,4 +1,5 @@
 import type { ListingConfig, ViabilityReport } from '@/types/contracts'
+import { apiUrl } from '@/lib/api'
 
 const REPORT_FIXTURE_URL = '/fixtures/report.sample.json'
 
@@ -10,7 +11,7 @@ const REPORT_FIXTURE_URL = '/fixtures/report.sample.json'
 export async function loadReport(runId?: string): Promise<ViabilityReport | null> {
   if (runId && runId !== 'sample') {
     try {
-      const res = await fetch(`/api/simulation/${runId}/report`)
+      const res = await fetch(apiUrl(`/simulation/${runId}/report`))
       if (res.ok) return (await res.json()) as ViabilityReport
     } catch {
       /* fall through to fixture */
@@ -36,7 +37,7 @@ export async function rerunSimulation(
   fromRecommendation?: string,
 ): Promise<{ run_id: string; stubbed: boolean }> {
   try {
-    const res = await fetch(`/api/simulation/${runId}/rerun`, {
+    const res = await fetch(apiUrl(`/simulation/${runId}/rerun`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ listing_config: config, from_recommendation: fromRecommendation }),

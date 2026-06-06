@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { useDemoAction } from '@/lib/demoAction'
 import { withSimSession } from '@/shopee/simSession'
+import { TARGET_SEARCH_PATH } from '@/shopee/searchQuery'
 
 const FOOTER_ROUTES: Record<string, string> = {
   'Flash Deals': '/',
-  'Shopee Mall': '/search?keyword=beanie',
+  'Shopee Mall': TARGET_SEARCH_PATH,
   Payment: '/checkout',
   'Order Tracking': '/cart',
 }

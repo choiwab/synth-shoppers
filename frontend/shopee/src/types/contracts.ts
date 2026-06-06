@@ -218,6 +218,8 @@ export interface StageTraceStep {
   stage: FunnelStage
   time_s: number
   screenshot_url?: string
+  sentiment?: 'love' | 'like' | 'neutral' | 'dislike' | 'reject'
+  comment?: string
 }
 
 export type AgentOutcome = 'bought' | 'bailed'
@@ -231,6 +233,8 @@ export interface AgentTrace {
   objection?: string
   retention_time_s: number
   stage_trace: StageTraceStep[] // records ONLY the tracked listing's gates
+  purchase_reason?: string
+  bail_reason?: string
   // Competitive attribution (real-mode free browsing)
   landed_on_target?: boolean
   chosen_listing_id?: string | null
@@ -248,6 +252,41 @@ export interface CompetitionSummary {
   divert_by_stage?: { stage: FunnelStage; count: number }[]
 }
 
+export interface AgentTraceReportStage {
+  order: number
+  stage: FunnelStage
+  time_s: number
+  delta_s: number
+  screenshot_url?: string
+  sentiment?: 'love' | 'like' | 'neutral' | 'dislike' | 'reject'
+  comment?: string
+}
+
+export interface AgentTraceReport {
+  agent_id: string
+  name: string
+  archetype: PersonaId
+  outcome: AgentOutcome
+  status_label: string
+  summary: string
+  retention_time_s: number
+  completed_gates: number
+  total_gates: number
+  progress_pct: number
+  stage_path: FunnelStage[]
+  last_stage?: FunnelStage
+  bail_stage?: FunnelStage
+  bail_reason?: string
+  objection?: string
+  purchase_reason?: string
+  key_reason?: string
+  metrics: Record<string, unknown>
+  run_metrics_context: Record<string, unknown>
+  comments: Array<{ stage: FunnelStage; sentiment?: string; comment: string; time_s: number }>
+  screenshots: Array<{ stage: FunnelStage; screenshot_url: string; time_s: number }>
+  stage_trace: AgentTraceReportStage[]
+}
+
 export interface GoNoGo {
   decision: 'go' | 'no_go'
   confidence: number // 0..1
@@ -258,12 +297,18 @@ export interface ViabilityReport {
   market_fit_score: number // 0..100
   recommended_price: number
   go_no_go: GoNoGo
+  browsing_metrics?: Record<string, unknown>
   funnel: FunnelRow[]
   archetypes: ArchetypeRow[]
   objection_heatmap: ObjectionRow[]
   risk_archetypes: PersonaId[]
   recommendations: Recommendation[]
   agents: AgentTrace[]
+  comments?: Array<Record<string, unknown>>
+  purchase_reasons?: Array<Record<string, unknown>>
+  agent_trace_reports?: AgentTraceReport[]
+  diagnostics?: Record<string, unknown>
+  dropoff_reasons?: Array<Record<string, unknown>>
   /** Competitive attribution for the tracked listing (real mode; empty in mock). */
   competition?: CompetitionSummary
 }

@@ -2,8 +2,13 @@ import { useSimStore } from "@/store/simStore";
 import { useControlStore } from "@/store/controlStore";
 import { pauseRun, rerun, resumeRun, startRun } from "@/store/runController";
 import { PriceChip } from "@/components/PriceChip";
-import { StatusBadge } from "@/components/StatusBadge";
-import { useIterationStore, latestReadyIteration } from "@/store/iterationStore";
+
+const DEFAULT_SHOPEE_BASE = "http://localhost:5174";
+
+function reportUrl(runId: string): string {
+  const base = (import.meta.env.VITE_SHOPEE_BASE ?? DEFAULT_SHOPEE_BASE).replace(/\/$/, "");
+  return `${base}/report/${encodeURIComponent(runId)}`;
+}
 
 /**
  * Left rail (was the top header). Vertical to reclaim vertical space for the
@@ -12,10 +17,11 @@ import { useIterationStore, latestReadyIteration } from "@/store/iterationStore"
 export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
   const status = useSimStore((s) => s.status);
   const evListing = useSimStore((s) => s.listing);
+  const runId = useSimStore((s) => s.runId);
+  const reportReady = useSimStore((s) => s.reportReady);
 
   const price = useControlStore((s) => s.price);
   const baseListing = useControlStore((s) => s.listing);
-  const proposalReady = useIterationStore((s) => !!latestReadyIteration(s));
 
   const title = evListing?.title ?? baseListing.title;
   const seller = evListing?.seller ?? baseListing.seller.name;
@@ -24,6 +30,7 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
   const paused = status === "paused";
   const running = status === "running" || status === "paused";
   const canRun = status === "idle" || status === "complete" || status === "error";
+  const canViewReport = Boolean(runId && reportReady);
 
   return (
     <aside className="panel sidebar">
@@ -45,7 +52,7 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
 
       <div className="sidebar-controls">
         <button
-          className="btn sidebar-btn"
+          className="btn btn-accent sidebar-btn"
           disabled={!canRun}
           onClick={() => void startRun()}
         >
@@ -66,12 +73,18 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
 
         <button className="btn sidebar-btn" onClick={onOpenTweaks}>
           ⚙ Tweaks
-          {proposalReady && <span className="tweaks-ready-dot" title="A listing improvement is ready" />}
         </button>
-      </div>
 
-      <div className="sidebar-foot">
-        <StatusBadge status={status} />
+        <a
+          className="btn sidebar-btn"
+          href={runId ? reportUrl(runId) : undefined}
+          aria-disabled={!canViewReport}
+          onClick={(event) => {
+            if (!canViewReport) event.preventDefault();
+          }}
+        >
+          View report
+        </a>
       </div>
     </aside>
   );

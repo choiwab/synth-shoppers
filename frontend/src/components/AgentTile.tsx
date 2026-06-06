@@ -1,9 +1,11 @@
 import { memo } from "react";
 import clsx from "clsx";
 import { ARCHETYPE_HUE, GATE_LABELS } from "@/types/contracts";
-import { archetypeInitials, archetypeTag } from "@/lib/archetype";
+import { archetypeTag } from "@/lib/archetype";
+import { sentimentColor } from "@/lib/sentiment";
 import { resolveAssetUrl } from "@/lib/assetUrl";
 import type { AgentState } from "@/store/simStore";
+import { ShopeeMonitorFrame } from "./ShopeeMonitorFrame";
 
 interface Props {
   agent: AgentState;
@@ -11,17 +13,18 @@ interface Props {
 
 /**
  * One preview tile. Thumbnail mode when H3 supplies a frame; otherwise the
- * first-class fallback (avatar + name + stage + last action). Never blank.
+ * editable Shopee HTML preview is shown. Never blank.
  * Memoized on the fields that affect render (PRD 01 §4.2 performance note).
  */
 function AgentTileBase({ agent }: Props) {
   const hue = ARCHETYPE_HUE[agent.archetype];
   const stageLabel = GATE_LABELS[agent.stage] ?? agent.stage;
+  const sentiment = sentimentColor(agent.latestSentiment);
 
   return (
     <div
-      className={clsx("agent-tile", agent.outcome)}
-      style={{ ["--hue" as string]: hue }}
+      className={clsx("agent-tile", agent.outcome, sentiment && "has-sentiment")}
+      style={{ ["--hue" as string]: hue, ["--sent" as string]: sentiment ?? "transparent" }}
     >
       {agent.thumbnail_url ? (
         <>
@@ -40,9 +43,8 @@ function AgentTileBase({ agent }: Props) {
         </>
       ) : (
         <div className="tile-fallback">
-          <div className="tile-avatar">{archetypeInitials(agent.archetype)}</div>
-          <div className="tile-stage-label">{stageLabel}</div>
-          {agent.lastAction && <div className="tile-action">{agent.lastAction}</div>}
+          <ShopeeMonitorFrame agentId={agent.agent_id} persona={agent.archetype} label={stageLabel} />
+          {agent.lastAction && <div className="tile-action-overlay">{agent.lastAction}</div>}
         </div>
       )}
 
@@ -66,5 +68,6 @@ export const AgentTile = memo(
     a.agent.thumbnail_url === b.agent.thumbnail_url &&
     a.agent.scroll_pct === b.agent.scroll_pct &&
     a.agent.lastAction === b.agent.lastAction &&
-    a.agent.latestThought === b.agent.latestThought,
+    a.agent.latestThought === b.agent.latestThought &&
+    a.agent.latestSentiment === b.agent.latestSentiment,
 );

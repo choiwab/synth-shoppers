@@ -48,8 +48,8 @@ export async function startRun(): Promise<void> {
   try {
     const { run_id } = await startSimulation({
       listing_config: listing,
-      crowd: { personas: c.personas, crowd_size: c.personas.length * c.perPersona, speed: c.speed },
-      mode: c.mode,
+      crowd: { personas: c.personas, crowd_size: c.personas.length, speed: c.speed },
+      mode: "real",
     });
     attach(run_id, listing);
   } catch (error) {
@@ -75,8 +75,8 @@ export async function rerun(fromRecommendation?: string): Promise<void> {
         })
       : await startSimulation({
           listing_config: listing,
-          crowd: { personas: c.personas, crowd_size: c.personas.length * c.perPersona, speed: c.speed },
-          mode: c.mode,
+          crowd: { personas: c.personas, crowd_size: c.personas.length, speed: c.speed },
+          mode: "real",
         });
     attach(run_id, listing);
   } catch (error) {
