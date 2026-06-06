@@ -43,7 +43,7 @@ export function Sidebar({ onOpenTweaks }: { onOpenTweaks: () => void }) {
 
       <div className="sidebar-controls">
         <button
-          className="btn sidebar-btn"
+          className="btn btn-accent sidebar-btn"
           disabled={!canRun}
           onClick={() => void startRun()}
         >
