@@ -2,11 +2,12 @@ import { Link } from 'react-router-dom'
 import { CheckCircle2 } from 'lucide-react'
 import { ShopeeHeader } from '@/components/ShopeeHeader'
 import { ShopeeFooter } from '@/components/ShopeeFooter'
+import { scopedStorageKey, withSimSession } from '@/shopee/simSession'
 import { sgd } from '@/lib/utils'
 
 function readLastOrder(): { orderNo: string; total: number; itemCount: number } | null {
   try {
-    const raw = sessionStorage.getItem('shopee-last-order')
+    const raw = sessionStorage.getItem(scopedStorageKey('shopee-last-order'))
     return raw ? JSON.parse(raw) : null
   } catch {
     return null
@@ -45,7 +46,7 @@ export function OrderConfirmedPage() {
           )}
 
           <Link
-            to="/"
+            to={withSimSession('/')}
             className="mt-6 inline-block rounded-sm bg-shopee px-8 py-2.5 text-sm font-medium text-white hover:bg-shopee-dark"
           >
             Continue Shopping

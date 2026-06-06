@@ -113,7 +113,7 @@ _GATE_INDEX = ["land", "photos", "reviews", "price", "cart", "checkout"]
 # this CSS selector first to navigate there (verified drivable end-to-end). The
 # checkout button lives on /cart, so we click the cart icon to get there. The driver
 # reuses its normal click path — no special browser-use navigation API needed.
-GATE_NAV: dict[GateStage, str] = {"checkout": 'a[href="/cart"]'}
+GATE_NAV: dict[GateStage, str] = {"checkout": 'a[href^="/cart"]'}
 
 
 def _now_ms() -> int:
@@ -218,7 +218,7 @@ class BrowserUseAgenticDriver:
         run_id: str,
         emit: EmitFn,
     ) -> AgentTrace:
-        url = self._page_url(listing_url, listing)
+        url = self._page_url(listing_url, listing, agent_id=agent_id, run_id=run_id, archetype=archetype)
         ctx = _Journey(run_id=run_id, agent_id=agent_id, name=name, archetype=archetype, listing=listing, emit=emit)
 
         # land: emitted before the browser navigates, so no thumbnail yet (the first
@@ -587,12 +587,27 @@ class BrowserUseAgenticDriver:
             return f"In cart: S${listing.price:.2f} + S${listing.shipping.fee:.2f} shipping = S${total:.2f}."
         return f"Checkout total ~S${total:.2f}. Authenticity proof: cert={a.certificate}, serial={a.serial}, unboxing={a.unboxing}."
 
-    def _page_url(self, slug: str, listing: ListingConfig) -> str:
+    def _page_url(
+        self,
+        slug: str,
+        listing: ListingConfig,
+        *,
+        agent_id: str | None = None,
+        run_id: str | None = None,
+        archetype: PersonaId | None = None,
+    ) -> str:
         """The React product route + the listing config, so the agent browses exactly
         the listing we're simulating (and mutated reruns render). ``loadConfig.ts`` reads
         ``?config=<base64 of UTF-8 JSON>``; URL-quote it so ``+ / =`` survive URLSearchParams."""
         cfg = base64.b64encode(listing.model_dump_json().encode("utf-8")).decode("ascii")
-        return f"{self.base_url}/shopee/{slug}?config={urllib.parse.quote(cfg, safe='')}"
+        params = {
+            "config": cfg,
+            "agent_id": agent_id,
+            "run_id": run_id,
+            "persona": archetype,
+        }
+        query = urllib.parse.urlencode({k: v for k, v in params.items() if v})
+        return f"{self.base_url}/shopee/{slug}?{query}"
 
     # ---- browser-use runtime touchpoints (isolated; see VERIFY in module docstring)
     def _make_browser(self):

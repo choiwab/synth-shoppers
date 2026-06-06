@@ -5,6 +5,7 @@ import { ShopeeHeader } from '@/components/ShopeeHeader'
 import { ShopeeFooter } from '@/components/ShopeeFooter'
 import { ShopeePage } from '@/shopee/ShopeePage'
 import { loadListing } from '@/shopee/config/loadConfig'
+import { withSimSession } from '@/shopee/simSession'
 
 export function ProductPageRoute() {
   const { listingId = '' } = useParams()
@@ -39,7 +40,7 @@ function ProductLoader({ listingId }: { listingId: string }) {
     return (
       <div className="py-24 text-center">
         <p className="text-lg text-ink">Product not found.</p>
-        <Link to="/" className="mt-3 inline-block text-shopee hover:underline">
+        <Link to={withSimSession('/')} className="mt-3 inline-block text-shopee hover:underline">
           ← Back to Shopee
         </Link>
       </div>

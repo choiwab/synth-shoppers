@@ -68,6 +68,23 @@ def test_task_prompt_reuses_persona_blurb_facts_and_objection_pool() -> None:
     assert "Over budget liao, next." in task  # objection style example from the pool
 
 
+def test_page_url_scopes_browser_session_per_agent() -> None:
+    driver = BrowserUseAgenticDriver(load_listing(), base_url="http://localhost:5174")
+    url = driver._page_url(
+        driver.listing.id,
+        driver.listing,
+        agent_id="budget_1",
+        run_id="run_abc",
+        archetype="budget",
+    )
+
+    assert url.startswith(f"http://localhost:5174/shopee/{driver.listing.id}?")
+    assert "agent_id=budget_1" in url
+    assert "run_id=run_abc" in url
+    assert "persona=budget" in url
+    assert "config=" in url
+
+
 def test_objection_examples_handle_bare_string_entries() -> None:
     # xmm's price objection in agents.py is a bare string (no trailing comma);
     # it must not be iterated character-by-character.

@@ -11,6 +11,7 @@ import { ShopeeFooter } from '@/components/ShopeeFooter'
 import { HeroCarousel } from '@/components/HeroCarousel'
 import { SimpleProductCard } from '@/components/SimpleProductCard'
 import { FLASH_DEALS, DISCOVER } from '@/shopee/data/discover'
+import { withSimSession } from '@/shopee/simSession'
 import { shuffle } from '@/lib/utils'
 
 const CATEGORIES: { label: string; icon: typeof Shirt }[] = [
@@ -57,14 +58,14 @@ export function HomePage() {
           <HeroCarousel />
           <div className="grid grid-rows-2 gap-2">
             <Link
-              to="/search?keyword=beanie"
+              to={withSimSession('/search?keyword=beanie')}
               className="flex flex-col justify-center rounded-sm bg-gradient-to-br from-[#ff6f3c] to-[#ee4d2d] p-5 text-white"
             >
               <p className="text-lg font-bold">Buy Shopee E-Vouchers</p>
               <p className="text-xs opacity-90">Up to 20% off your next order</p>
             </Link>
             <Link
-              to="/search?keyword=beanie"
+              to={withSimSession('/search?keyword=beanie')}
               className="flex flex-col justify-center rounded-sm bg-gradient-to-br from-[#ffce3d] to-[#ff8a00] p-5 text-white"
             >
               <p className="text-lg font-bold">6.6 Great Shopee Sale</p>
@@ -92,7 +93,7 @@ export function HomePage() {
             {CATEGORIES.map(({ label, icon: Icon }) => (
               <Link
                 key={label}
-                to={`/search?keyword=${encodeURIComponent(label)}`}
+                to={withSimSession(`/search?keyword=${encodeURIComponent(label)}`)}
                 className="flex flex-col items-center gap-2 border-b border-r border-line p-3 text-center transition hover:shadow-md"
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-shopee-light/50">
@@ -117,7 +118,10 @@ export function HomePage() {
                 </span>
               ))}
             </div>
-            <Link to="/search?keyword=beanie" className="ml-auto flex items-center text-sm text-shopee hover:underline">
+            <Link
+              to={withSimSession('/search?keyword=beanie')}
+              className="ml-auto flex items-center text-sm text-shopee hover:underline"
+            >
               See All <ChevronRight size={14} />
             </Link>
           </div>
