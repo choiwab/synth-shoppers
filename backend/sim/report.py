@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 
-from contracts import GATE_ORDER, AgentTrace, PersonaId, Recommendation, ViabilityReport
+from contracts import (
+    GATE_ORDER,
+    SENTIMENT_SCORE,
+    AgentTrace,
+    PersonaId,
+    Recommendation,
+    ViabilityReport,
+)
 from sim.recommendations import FIELD_BY_STAGE, build_recommendations_from_counts
 
 
@@ -41,6 +48,19 @@ def build_report(
         rate = group_bought / len(group)
         if rate < 0.25:
             risk_archetypes.append(archetype)  # type: ignore[arg-type]
+        # Layer 2: per-gate sentiment arc for this persona — where it warms up / sours.
+        sentiment_arc = []
+        for stage in GATE_ORDER:
+            scores = [
+                SENTIMENT_SCORE[trace.sentiment]
+                for agent in group
+                for trace in agent.stage_trace
+                if trace.stage == stage and trace.sentiment
+            ]
+            if scores:
+                sentiment_arc.append(
+                    {"stage": stage, "avg_sentiment": round(sum(scores) / len(scores), 3), "n": len(scores)}
+                )
         archetypes.append(
             {
                 "archetype": archetype,
@@ -50,6 +70,7 @@ def build_report(
                 "buy_rate": round(rate, 3),
                 "avg_retention_s": round(sum(agent.retention_time_s for agent in group) / len(group), 2),
                 "top_objection": objections.most_common(1)[0][0] if objections else None,
+                "sentiment_arc": sentiment_arc,
             }
         )
 
@@ -69,6 +90,38 @@ def build_report(
         parent_report=parent_report,
     )
 
+    # Layer 2: the "what they said" feed + why-bought, straight off the traces.
+    comments: list[dict] = []
+    purchase_reasons: list[dict] = []
+    for agent in agents:
+        head = {"agent_id": agent.agent_id, "name": agent.name, "archetype": agent.archetype}
+        for trace in agent.stage_trace:
+            if trace.comment:
+                comments.append({**head, "stage": trace.stage, "sentiment": trace.sentiment, "comment": trace.comment})
+        if agent.outcome == "bailed" and agent.objection:
+            comments.append({**head, "stage": agent.bail_stage, "sentiment": "reject", "comment": agent.objection})
+        if agent.outcome == "bought" and agent.purchase_reason:
+            purchase_reasons.append({**head, "reason": agent.purchase_reason})
+            comments.append({**head, "stage": "checkout", "sentiment": "love", "comment": agent.purchase_reason})
+
+    # Relative diagnostics (read/engagement) off the funnel; click_rate needs the
+    # Tier-2 impression stage so it stays None rather than a fake 1.0.
+    entered_by_stage = {row["stage"]: row["entered"] for row in funnel}
+    landed = entered_by_stage.get("land", 0) or total
+    diagnostics = {
+        "review_read_rate": round(entered_by_stage.get("reviews", 0) / landed, 3) if landed else 0.0,
+        "engagement_rate": round(entered_by_stage.get("price", 0) / landed, 3) if landed else 0.0,
+        "click_rate": None,
+    }
+
+    # Dropoff-reason distribution (share bailed per categorized reason).
+    reason_counts = Counter(agent.bail_reason for agent in agents if agent.bail_reason)
+    reasoned_bails = sum(reason_counts.values())
+    dropoff_reasons = [
+        {"reason": reason, "count": count, "share": round(count / reasoned_bails, 3) if reasoned_bails else 0.0}
+        for reason, count in reason_counts.most_common()
+    ]
+
     return ViabilityReport(
         run_id=run_id,
         market_fit_score=market_fit_score,
@@ -84,6 +137,10 @@ def build_report(
         risk_archetypes=risk_archetypes,
         recommendations=recommendations,
         agents=agents,
+        comments=comments,
+        purchase_reasons=purchase_reasons,
+        diagnostics=diagnostics,
+        dropoff_reasons=dropoff_reasons,
     )
 
 

@@ -1,0 +1,87 @@
+{
+  "$comment": "H2→H3 contract (OVERVIEW §5.6). Maps each browser-use custom action to the stable selector it clicks, the gate it belongs to, the funnel stage it reaches, and the observable DOM change that confirms success. Identical on shopee-stub.html and the real /shopee/matinkim-beanie page. Never rename a hook without pinging H3.",
+  "listing_id": "matin_kim_beanie_sg",
+  "entry": {
+    "deep_link": "/?listing=<slug>",
+    "redirects_to": "/shopee/<slug>",
+    "product_route": "/shopee/:listingId",
+    "note": "The browser-use driver navigates to {base}/?listing=<slug>; the SPA redirects to the product page. The land/photos/reviews/price/cart hooks all live on that product page. checkout becomes reachable there (sticky bar) once an item is in the cart, and also on /cart; confirm-order lives on /checkout."
+  },
+  "selectors": {
+    "root": "[data-listing-id]",
+    "gate": "[data-gate=\"<land|photos|reviews|price|cart|checkout>\"]",
+    "field": "[data-field=\"<title|price|rating|review-count|seller-name>\"]"
+  },
+  "events": {
+    "dom_event": "funnel:action",
+    "dom_event_detail": { "action": "string", "stage": "string", "listingId": "string" },
+    "post_message": { "source": "shopee", "type": "funnel", "action": "string", "stage": "string", "listingId": "string" },
+    "note": "Both fire on every action click. H3 may listen to either to confirm + time a step; they are advisory — the authoritative success signal is the observable DOM change."
+  },
+  "actions": [
+    {
+      "action": "look_at_photos",
+      "selector": "[data-action=\"scroll-gallery\"]",
+      "gate": "photos",
+      "stage": "photos",
+      "observable": "active gallery photo advances: [data-field=\"gallery-index\"] increments and the selected thumb ([aria-selected=\"true\"]) moves.",
+      "emits": "stage_enter(photos)"
+    },
+    {
+      "action": "read_reviews",
+      "selector": "[data-action=\"open-reviews\"]",
+      "gate": "reviews",
+      "stage": "reviews",
+      "observable": "reviews body expands ([data-reviews-body] loses [hidden]); button [aria-expanded] flips to true; seller response rate visible.",
+      "emits": "stage_enter(reviews)"
+    },
+    {
+      "action": "check_price",
+      "selector": "[data-action=\"select-variant\"]",
+      "gate": "price",
+      "stage": "price",
+      "observable": "clicked variant gets [aria-pressed=\"true\"]; [data-field=\"selected-variant\"] updates; price ([data-field=\"price\"]) is visible.",
+      "emits": "stage_enter(price)"
+    },
+    {
+      "action": "add_to_cart",
+      "selector": "[data-action=\"add-to-cart\"]",
+      "gate": "cart",
+      "stage": "cart",
+      "observable": "toast appears; cart badge [data-field=\"cart-count\"] increments.",
+      "emits": "stage_enter(cart)"
+    },
+    {
+      "action": "checkout",
+      "selector": "[data-action=\"checkout\"]",
+      "gate": "checkout",
+      "stage": "checkout",
+      "observable": "real app: present on the product page sticky bar (after add-to-cart) AND on /cart; clicking navigates to /checkout (URL changes, [data-gate=\"checkout\"] + [data-action=\"confirm-order\"] present on the new page). stub: scrolls to the checkout section.",
+      "emits": "stage_enter(checkout)"
+    },
+    {
+      "action": "confirm_purchase",
+      "selector": "[data-action=\"confirm-order\"]",
+      "gate": "checkout",
+      "stage": "bought",
+      "observable": "real app: navigates to /order-confirmed (order number visible). stub: [data-order-status] becomes visible.",
+      "emits": "agent_bought"
+    },
+    {
+      "action": "bail",
+      "selector": null,
+      "gate": null,
+      "stage": "bailed",
+      "observable": "no UI hook — agent-side decision.",
+      "emits": "agent_bailed(stage, objection)"
+    }
+  ],
+  "fields": [
+    { "field": "title", "selector": "[data-field=\"title\"]" },
+    { "field": "price", "selector": "[data-field=\"price\"]" },
+    { "field": "rating", "selector": "[data-field=\"rating\"]" },
+    { "field": "review-count", "selector": "[data-field=\"review-count\"]" },
+    { "field": "seller-name", "selector": "[data-field=\"seller-name\"]" }
+  ],
+  "gates": ["land", "photos", "reviews", "price", "cart", "checkout"]
+}

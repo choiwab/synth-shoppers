@@ -3,9 +3,10 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 from pydantic import ValidationError
 
-from contracts import RerunSimulationRequest, RunResponse, StartSimulationRequest, ViabilityReport
+from contracts import RerunSimulationRequest, RunResponse, StartSimulationRequest, UpliftReport, ViabilityReport
 from sim.patching import PatchError, apply_config_patch
 from sim.runner import registry
+from sim.uplift import compute_uplift
 
 router = APIRouter()
 
@@ -25,6 +26,23 @@ async def get_report(run_id: str) -> ViabilityReport:
     if not run.report:
         raise HTTPException(status_code=202, detail="report is not ready")
     return run.report
+
+
+@router.get("/simulation/{run_id}/uplift", response_model=UpliftReport)
+async def get_uplift(run_id: str) -> UpliftReport:
+    """Compare a (treatment) run against its parent (control). Only meaningful for a
+    rerun, which reuses the parent's cohort+seed so agents match 1:1."""
+    run = registry.get(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="run not found")
+    if not run.parent_run_id:
+        raise HTTPException(status_code=400, detail="run has no parent to compare against")
+    parent = registry.get(run.parent_run_id)
+    if not parent:
+        raise HTTPException(status_code=404, detail="parent run not found")
+    if not run.report or not parent.report:
+        raise HTTPException(status_code=202, detail="reports are not ready")
+    return compute_uplift(parent.report, run.report)
 
 
 @router.post("/simulation/{run_id}/rerun", response_model=RunResponse)

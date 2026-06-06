@@ -9,8 +9,41 @@ FunnelStage = Literal["land", "photos", "reviews", "price", "cart", "checkout", 
 GateStage = Literal["land", "photos", "reviews", "price", "cart", "checkout"]
 PersonaId = Literal["xmm", "auntie", "nerd", "geek", "insecure", "budget", "high_spender"]
 RunMode = Literal["mock", "real"]
+# In-the-moment shopper feeling an agent voices at a gate (Layer 2 reasoning).
+Sentiment = Literal["love", "like", "neutral", "dislike", "reject"]
 
 GATE_ORDER: list[GateStage] = ["land", "photos", "reviews", "price", "cart", "checkout"]
+
+# Sentiment mapped to a [-1, 1] score so the report can average it into an arc.
+SENTIMENT_SCORE: dict[Sentiment, float] = {
+    "love": 1.0,
+    "like": 0.5,
+    "neutral": 0.0,
+    "dislike": -0.5,
+    "reject": -1.0,
+}
+
+# Why an agent dropped out — a coarse, stable taxonomy for dropoff distributions
+# and objection-resolution (tied to a Recommendation's targeted field).
+ReasonCategory = Literal[
+    "price_value",
+    "trust_authenticity",
+    "visual_photos",
+    "social_proof_reviews",
+    "shipping",
+    "other",
+]
+
+# Stage-derived fallback for bail_reason (mock mode is deterministic; real mode
+# elicits the category from the LLM but falls back to this).
+REASON_BY_STAGE: dict[GateStage, ReasonCategory] = {
+    "land": "other",
+    "photos": "visual_photos",
+    "reviews": "social_proof_reviews",
+    "price": "price_value",
+    "cart": "price_value",
+    "checkout": "trust_authenticity",
+}
 
 
 class Seller(BaseModel):
@@ -154,6 +187,7 @@ class AgentBailedEvent(BaseModel):
     stage: FunnelStage
     objection: str
     retention_time_s: float
+    reason_category: ReasonCategory | None = None
 
 
 class AgentBoughtEvent(BaseModel):
@@ -181,6 +215,31 @@ class RunCompleteEvent(BaseModel):
     report_ready: bool
 
 
+class StageSentimentEvent(BaseModel):
+    """Layer 2: the in-character shopper opinion an agent voices at a gate."""
+
+    type: Literal["stage_sentiment"] = "stage_sentiment"
+    run_id: str
+    ts: int
+    agent_id: str
+    stage: FunnelStage
+    sentiment: Sentiment
+    comment: str
+
+
+class AgentThoughtEvent(BaseModel):
+    """Layer 1: browser-use's own per-step reasoning (AgentBrain), real mode only."""
+
+    type: Literal["agent_thought"] = "agent_thought"
+    run_id: str
+    ts: int
+    agent_id: str
+    stage: FunnelStage
+    thinking: str
+    evaluation: str | None = None
+    next_goal: str | None = None
+
+
 AgentEvent = (
     RunStartedEvent
     | AgentSpawnedEvent
@@ -191,6 +250,8 @@ AgentEvent = (
     | AgentBoughtEvent
     | RunProgressEvent
     | RunCompleteEvent
+    | StageSentimentEvent
+    | AgentThoughtEvent
 )
 
 
@@ -198,6 +259,8 @@ class StageTrace(BaseModel):
     stage: GateStage
     time_s: float
     screenshot_url: str | None = None
+    sentiment: Sentiment | None = None  # Layer 2: how the agent felt at this gate
+    comment: str | None = None  # Layer 2: what the agent said in character at this gate
 
 
 class AgentTrace(BaseModel):
@@ -209,6 +272,8 @@ class AgentTrace(BaseModel):
     objection: str | None = None
     retention_time_s: float
     stage_trace: list[StageTrace]
+    purchase_reason: str | None = None  # why a buyer committed (None for bailers)
+    bail_reason: ReasonCategory | None = None  # categorized dropout reason (None for buyers)
 
 
 class Recommendation(BaseModel):
@@ -233,3 +298,30 @@ class ViabilityReport(BaseModel):
     risk_archetypes: list[PersonaId]
     recommendations: list[Recommendation]
     agents: list[AgentTrace]
+    # Layer 2 reasoning rollups (optional → empty for legacy/mock fixtures).
+    # `archetypes[].sentiment_arc` carries the per-gate sentiment curve per persona.
+    comments: list[dict[str, Any]] = Field(default_factory=list)
+    purchase_reasons: list[dict[str, Any]] = Field(default_factory=list)
+    # Relative diagnostics (review_read_rate, engagement_rate, click_rate) and the
+    # dropout-reason distribution. click_rate is None until the Tier-2 impression stage.
+    diagnostics: dict[str, Any] = Field(default_factory=dict)
+    dropoff_reasons: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class UpliftReport(BaseModel):
+    """Control-vs-treatment comparison. Exact (not estimated) because a rerun reuses
+    the parent's cohort + seed, so agents match 1:1 by agent_id."""
+
+    control_run_id: str
+    treatment_run_id: str
+    # each: {control, treatment, delta, delta_pp}
+    buyer_uplift: dict[str, float]
+    order_uplift: dict[str, float]
+    # [{archetype, buy_rate_control, buy_rate_treatment, delta_pp, verdict}]
+    per_persona: list[dict[str, Any]]
+    # [{stage, entered_delta, bail_rate_delta}]
+    funnel_delta: list[dict[str, Any]]
+    # [{field, targeted, resolved, rate}] — did the tested fix kill its objection?
+    objection_resolution: list[dict[str, Any]]
+    dropoff_reasons_control: list[dict[str, Any]]
+    dropoff_reasons_treatment: list[dict[str, Any]]

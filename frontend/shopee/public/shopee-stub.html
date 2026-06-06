@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopee Stub — matin_kim_beanie_sg (H3 selector contract)</title>
+    <!--
+      shopee-stub.html — DAY-1 deliverable for H3 (OVERVIEW §5.6).
+
+      A single static page carrying the EXACT data-gate / data-action / data-field
+      hooks the browser-use runtime depends on, with no React/build step. H3 builds
+      and tests the 7 custom actions against this file, then points the same actions
+      at the real React page (/shopee/matinkim-beanie) — the hooks are identical.
+
+      Every data-action click here:
+        1. produces a visible DOM state change (so success is assertable), and
+        2. emits a funnel signal two ways:
+           - window CustomEvent  "funnel:action"  detail {action, stage, listingId}
+           - window.postMessage  {source:"shopee", type:"funnel", action, stage, listingId}
+
+      The machine-readable mapping lives in /funnel-actions.json.
+      Custom action → selector:
+        look_at_photos   → [data-action="scroll-gallery"]   → stage photos
+        read_reviews     → [data-action="open-reviews"]      → stage reviews
+        check_price      → [data-action="select-variant"]    → stage price
+        add_to_cart      → [data-action="add-to-cart"]       → stage cart
+        checkout         → [data-action="checkout"]          → stage checkout
+        confirm_purchase → [data-action="confirm-order"]     → bought
+        bail(objection)  → agent-side, no UI hook
+    -->
+    <style>
+      :root {
+        --shopee: #ee4d2d;
+        --bg: #f5f5f5;
+        --line: rgba(0, 0, 0, 0.09);
+        --ink: rgba(0, 0, 0, 0.87);
+        --soft: rgba(0, 0, 0, 0.54);
+        --gold: #ffce3d;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Roboto, -apple-system, 'Segoe UI', Arial, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        font-size: 14px;
+      }
+      header {
+        background: var(--shopee);
+        color: #fff;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      header .logo { font-size: 22px; font-weight: 700; }
+      .cart { position: relative; font-size: 22px; }
+      .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -12px;
+        background: #fff;
+        color: var(--shopee);
+        border-radius: 10px;
+        min-width: 18px;
+        height: 18px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 5px;
+      }
+      main { max-width: 1100px; margin: 16px auto; padding: 0 16px; }
+      section {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 16px;
+        margin-bottom: 12px;
+      }
+      h2 { font-size: 13px; text-transform: uppercase; color: var(--soft); margin: 0 0 10px; letter-spacing: 0.04em; }
+      .title { font-size: 20px; font-weight: 500; margin: 0 0 8px; }
+      .rating { color: var(--shopee); font-weight: 600; }
+      .muted { color: var(--soft); }
+      .price { color: var(--shopee); font-size: 30px; font-weight: 600; }
+      .gallery { display: flex; gap: 8px; align-items: center; }
+      .gallery .main-photo {
+        width: 220px; height: 220px; border: 1px solid var(--line);
+        display: flex; align-items: center; justify-content: center;
+        background: #fafafa; font-size: 13px; color: var(--soft);
+      }
+      .thumbs { display: flex; gap: 6px; }
+      .thumb { width: 44px; height: 44px; border: 1px solid var(--line); background: #fafafa; }
+      .thumb[aria-selected='true'] { border-color: var(--shopee); border-width: 2px; }
+      .variants { display: flex; gap: 8px; flex-wrap: wrap; }
+      .variant {
+        border: 1px solid var(--line); background: #fff; padding: 6px 12px;
+        border-radius: 3px; cursor: pointer; font-size: 13px;
+      }
+      .variant[aria-pressed='true'] { border-color: var(--shopee); color: var(--shopee); background: #fff5f2; }
+      button.cta {
+        border: 1px solid var(--shopee); background: #fff5f2; color: var(--shopee);
+        padding: 10px 20px; border-radius: 3px; cursor: pointer; font-size: 14px;
+      }
+      button.cta.solid { background: var(--shopee); color: #fff; }
+      .reviews-body[hidden] { display: none; }
+      .review { border-top: 1px solid var(--line); padding: 10px 0; }
+      .seller-response { background: #fafafa; border-left: 3px solid var(--shopee); padding: 8px; margin-top: 6px; font-size: 13px; }
+      #toast {
+        position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.78); color: #fff; padding: 18px 28px;
+        border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+      }
+      #toast.show { opacity: 1; }
+      .ok { color: #26aa99; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="logo">Shopee</span>
+      <a href="#cart" class="cart" aria-label="Cart">🛒<span class="cart-badge" data-field="cart-count">0</span></a>
+    </header>
+
+    <main data-listing-id="matin_kim_beanie_sg">
+      <!-- ── land ───────────────────────────────────────────────────────── -->
+      <section data-gate="land">
+        <h2>Listing</h2>
+        <p class="title" data-field="title">
+          Matin Kim Logo Beanie - Trendy Korean Winter Knit Hat
+        </p>
+        <p>
+          <span class="rating" data-field="rating">4.3</span> ★ ·
+          <span data-field="review-count">18</span> Ratings ·
+          Sold by <strong data-field="seller-name">Seoul Street SG</strong>
+          <span class="muted"> · Shopee SG</span>
+        </p>
+      </section>
+
+      <!-- ── photos ─────────────────────────────────────────────────────── -->
+      <section data-gate="photos">
+        <h2>Photos</h2>
+        <div class="gallery">
+          <div class="main-photo">
+            Photo <span data-field="gallery-index">1</span> / <span data-field="gallery-total">3</span>
+            (<span data-field="gallery-type">product</span>)
+          </div>
+          <div class="thumbs" data-gallery-thumbs>
+            <div class="thumb" aria-selected="true"></div>
+            <div class="thumb"></div>
+            <div class="thumb"></div>
+          </div>
+        </div>
+        <p style="margin-top: 12px">
+          <button class="cta" data-action="scroll-gallery">View next photo ›</button>
+        </p>
+      </section>
+
+      <!-- ── reviews ────────────────────────────────────────────────────── -->
+      <section data-gate="reviews">
+        <h2>Ratings &amp; Reviews</h2>
+        <p>
+          <span class="rating">4.3 ★</span> ·
+          Seller response rate: <strong data-field="response-rate">42%</strong>
+        </p>
+        <button class="cta" data-action="open-reviews" aria-expanded="false">See all reviews</button>
+        <div class="reviews-body" data-reviews-body hidden>
+          <div class="review">
+            <strong>buyer123</strong> · 4★<br />
+            Looks okay but delivery took a bit long.
+          </div>
+          <div class="review">
+            <strong>sgfashion</strong> · 5★<br />
+            Cute beanie, but photos don't show fit clearly.
+          </div>
+        </div>
+      </section>
+
+      <!-- ── price ──────────────────────────────────────────────────────── -->
+      <section data-gate="price">
+        <h2>Price</h2>
+        <p class="price" data-field="price">S$36.90</p>
+        <p class="muted">Shipping: <span data-field="shipping-fee">S$3.50</span> · 3-5 days</p>
+        <p><strong>Colour</strong> — selected: <span data-field="selected-variant">—</span></p>
+        <div class="variants" data-variant-group>
+          <button class="variant" data-action="select-variant" data-variant="Black">Black</button>
+          <button class="variant" data-action="select-variant" data-variant="Grey">Grey</button>
+          <button class="variant" data-action="select-variant" data-variant="Cream">Cream</button>
+          <button class="variant" data-action="select-variant" data-variant="Navy">Navy</button>
+        </div>
+      </section>
+
+      <!-- ── cart ───────────────────────────────────────────────────────── -->
+      <section data-gate="cart">
+        <h2>Add to Cart</h2>
+        <button class="cta" data-action="add-to-cart">Add to Cart</button>
+        <button class="cta solid" data-action="add-to-cart">Buy Now</button>
+      </section>
+
+      <!-- ── checkout ───────────────────────────────────────────────────── -->
+      <!--
+        On the real app, checkout lives on /cart and confirm-order on /checkout.
+        The stub keeps both on one page so H3 can exercise every action here.
+      -->
+      <section data-gate="checkout" id="cart">
+        <h2>Checkout</h2>
+        <p class="muted">Delivery to: Soong Shao Zhi · Blk 48D Jurong West St 41 · SG 640480</p>
+        <p>Order total: <strong data-field="order-total">S$40.40</strong></p>
+        <button class="cta" data-action="checkout">Check Out</button>
+        <button class="cta solid" data-action="confirm-order">Place Order</button>
+        <p class="ok" data-order-status hidden>✓ Order placed successfully.</p>
+      </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="polite">
+      <span class="ok">✓</span> Item has been added to your shopping cart
+    </div>
+
+    <script>
+      (function () {
+        var root = document.querySelector('[data-listing-id]')
+        var listingId = root ? root.getAttribute('data-listing-id') : null
+
+        // Emit the funnel signal both ways (see /funnel-actions.json).
+        function emit(action, stage) {
+          var detail = { action: action, stage: stage, listingId: listingId }
+          window.dispatchEvent(new CustomEvent('funnel:action', { detail: detail }))
+          try {
+            window.parent.postMessage({ source: 'shopee', type: 'funnel', ...detail }, '*')
+          } catch (e) {}
+        }
+
+        // look_at_photos
+        var gIndex = 1
+        var gTotal = 3
+        var gTypes = ['product', 'product', 'product']
+        document.querySelector('[data-action="scroll-gallery"]').addEventListener('click', function () {
+          gIndex = (gIndex % gTotal) + 1
+          document.querySelector('[data-field="gallery-index"]').textContent = String(gIndex)
+          document.querySelector('[data-field="gallery-type"]').textContent = gTypes[gIndex - 1]
+          var thumbs = document.querySelectorAll('[data-gallery-thumbs] .thumb')
+          thumbs.forEach(function (t, i) { t.setAttribute('aria-selected', i === gIndex - 1 ? 'true' : 'false') })
+          emit('look_at_photos', 'photos')
+        })
+
+        // read_reviews
+        var reviewsBtn = document.querySelector('[data-action="open-reviews"]')
+        reviewsBtn.addEventListener('click', function () {
+          var body = document.querySelector('[data-reviews-body]')
+          var open = body.hasAttribute('hidden')
+          if (open) body.removeAttribute('hidden')
+          else body.setAttribute('hidden', '')
+          reviewsBtn.setAttribute('aria-expanded', String(open))
+          emit('read_reviews', 'reviews')
+        })
+
+        // check_price (select a colour variant)
+        document.querySelectorAll('[data-action="select-variant"]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            document.querySelectorAll('[data-variant-group] .variant').forEach(function (b) {
+              b.setAttribute('aria-pressed', 'false')
+            })
+            btn.setAttribute('aria-pressed', 'true')
+            document.querySelector('[data-field="selected-variant"]').textContent =
+              btn.getAttribute('data-variant')
+            emit('check_price', 'price')
+          })
+        })
+
+        // add_to_cart
+        var count = 0
+        var toast = document.getElementById('toast')
+        document.querySelectorAll('[data-action="add-to-cart"]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            count += 1
+            document.querySelector('[data-field="cart-count"]').textContent = String(count)
+            toast.classList.add('show')
+            setTimeout(function () { toast.classList.remove('show') }, 1200)
+            emit('add_to_cart', 'cart')
+          })
+        })
+
+        // checkout
+        document.querySelector('[data-action="checkout"]').addEventListener('click', function () {
+          document.getElementById('cart').scrollIntoView({ behavior: 'smooth' })
+          emit('checkout', 'checkout')
+        })
+
+        // confirm_purchase
+        document.querySelector('[data-action="confirm-order"]').addEventListener('click', function () {
+          document.querySelector('[data-order-status]').removeAttribute('hidden')
+          emit('confirm_purchase', 'bought')
+        })
+      })()
+    </script>
+  </body>
+</html>

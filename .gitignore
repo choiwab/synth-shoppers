@@ -11,6 +11,11 @@ frontend/node_modules/
 frontend/.next/
 frontend/dist/
 frontend/build/
+# Shopee storefront sub-app (frontend/shopee)
+frontend/shopee/node_modules/
+frontend/shopee/dist/
+frontend/shopee/.vite/
+.vite/
 
 # Env (never commit keys)
 .env
