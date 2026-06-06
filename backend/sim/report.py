@@ -122,6 +122,8 @@ def build_report(
         for reason, count in reason_counts.most_common()
     ]
 
+    competition = build_competition(agents)
+
     return ViabilityReport(
         run_id=run_id,
         market_fit_score=market_fit_score,
@@ -141,7 +143,45 @@ def build_report(
         purchase_reasons=purchase_reasons,
         diagnostics=diagnostics,
         dropoff_reasons=dropoff_reasons,
+        competition=competition,
     )
+
+
+def build_competition(agents: list[AgentTrace]) -> dict:
+    """Competitive attribution for the tracked listing (real-mode free browsing).
+
+    Returns ``{}`` in mock mode / for legacy traces — where every agent defaults to
+    ``landed_on_target=True`` with no competitor — so the field stays empty unless
+    there is genuine competitive signal."""
+    total = len(agents)
+    lost = [agent for agent in agents if agent.competitor_id]
+    diverted = [agent for agent in agents if agent.divert_stage]
+    not_landed = [agent for agent in agents if not agent.landed_on_target]
+    if not total or (not lost and not diverted and not not_landed):
+        return {}
+
+    landed = sum(1 for agent in agents if agent.landed_on_target)
+    breakdown = Counter((agent.competitor_id, agent.competitor_title) for agent in lost)
+    lost_total = len(lost)
+    competitor_breakdown = [
+        {
+            "competitor_id": competitor_id,
+            "title": title,
+            "wins": wins,
+            "share": round(wins / lost_total, 3) if lost_total else 0.0,
+        }
+        for (competitor_id, title), wins in breakdown.most_common()
+    ]
+    divert_counts = Counter(agent.divert_stage for agent in diverted)
+    divert_by_stage = [{"stage": stage, "count": count} for stage, count in divert_counts.most_common()]
+    left_without_buying = sum(1 for agent in agents if agent.outcome == "bailed" and not agent.competitor_id)
+    return {
+        "landed_rate": round(landed / total, 3),
+        "lost_to_competitors": lost_total,
+        "left_without_buying": left_without_buying,
+        "competitor_breakdown": competitor_breakdown,
+        "divert_by_stage": divert_by_stage,
+    }
 
 
 def build_browsing_metrics(

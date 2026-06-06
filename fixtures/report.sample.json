@@ -1,45 +1,40 @@
 {
   "run_id": "run_sample",
-  "market_fit_score": 46,
-  "recommended_price": 29.9,
+  "market_fit_score": 60,
+  "recommended_price": 39.9,
   "go_no_go": {
-    "decision": "no_go",
+    "decision": "go",
     "confidence": 0.71
   },
   "browsing_metrics": {
-    "unique_buyers": 8,
-    "orders": 8,
+    "unique_buyers": 12,
+    "orders": 12,
     "buyer_uplift": null,
     "order_uplift": null,
     "click_rate": 0.964,
-    "read_rate": 0.643,
+    "read_rate": 0.714,
     "engagement_rate": 0.964,
     "average_basket_cost": null,
     "dropoff_reason_distribution": [
       {
         "reason": "Photos",
-        "count": 9,
-        "share": 0.45
-      },
-      {
-        "reason": "Price",
-        "count": 5,
-        "share": 0.25
+        "count": 7,
+        "share": 0.438
       },
       {
         "reason": "Reviews",
-        "count": 4,
-        "share": 0.2
+        "count": 5,
+        "share": 0.312
+      },
+      {
+        "reason": "Price",
+        "count": 3,
+        "share": 0.188
       },
       {
         "reason": "Title",
         "count": 1,
-        "share": 0.05
-      },
-      {
-        "reason": "Authenticity",
-        "count": 1,
-        "share": 0.05
+        "share": 0.062
       }
     ],
     "objection_resolution_rate": null,
@@ -55,32 +50,32 @@
     {
       "stage": "photos",
       "entered": 27,
-      "bailed": 9,
-      "bail_rate": 0.333
+      "bailed": 7,
+      "bail_rate": 0.259
     },
     {
       "stage": "reviews",
-      "entered": 18,
-      "bailed": 4,
-      "bail_rate": 0.222
+      "entered": 20,
+      "bailed": 5,
+      "bail_rate": 0.25
     },
     {
       "stage": "price",
-      "entered": 14,
-      "bailed": 5,
-      "bail_rate": 0.357
+      "entered": 15,
+      "bailed": 3,
+      "bail_rate": 0.2
     },
     {
       "stage": "cart",
-      "entered": 9,
+      "entered": 12,
       "bailed": 0,
       "bail_rate": 0.0
     },
     {
       "stage": "checkout",
-      "entered": 9,
-      "bailed": 1,
-      "bail_rate": 0.111
+      "entered": 12,
+      "bailed": 0,
+      "bail_rate": 0.0
     }
   ],
   "archetypes": [
@@ -90,26 +85,122 @@
       "bought": 1,
       "bailed": 3,
       "buy_rate": 0.25,
-      "avg_retention_s": 3.6,
-      "top_objection": "Hmm, not feeling this shop page."
+      "avg_retention_s": 3.9,
+      "top_objection": "Seller never reply reviews, not safe.",
+      "sentiment_arc": [
+        {
+          "stage": "land",
+          "avg_sentiment": 0.125,
+          "n": 4
+        },
+        {
+          "stage": "photos",
+          "avg_sentiment": 0.0,
+          "n": 3
+        },
+        {
+          "stage": "reviews",
+          "avg_sentiment": -0.833,
+          "n": 3
+        },
+        {
+          "stage": "price",
+          "avg_sentiment": 0.0,
+          "n": 1
+        },
+        {
+          "stage": "cart",
+          "avg_sentiment": 0.5,
+          "n": 1
+        },
+        {
+          "stage": "checkout",
+          "avg_sentiment": 0.0,
+          "n": 1
+        }
+      ]
     },
     {
       "archetype": "budget",
       "agents": 4,
-      "bought": 0,
-      "bailed": 4,
-      "buy_rate": 0.0,
-      "avg_retention_s": 4.2,
-      "top_objection": "Over budget liao, next."
+      "bought": 1,
+      "bailed": 3,
+      "buy_rate": 0.25,
+      "avg_retention_s": 4.8,
+      "top_objection": "Over budget liao, next.",
+      "sentiment_arc": [
+        {
+          "stage": "land",
+          "avg_sentiment": 0.5,
+          "n": 4
+        },
+        {
+          "stage": "photos",
+          "avg_sentiment": -0.25,
+          "n": 4
+        },
+        {
+          "stage": "reviews",
+          "avg_sentiment": 0.0,
+          "n": 3
+        },
+        {
+          "stage": "price",
+          "avg_sentiment": -0.833,
+          "n": 3
+        },
+        {
+          "stage": "cart",
+          "avg_sentiment": 0.5,
+          "n": 1
+        },
+        {
+          "stage": "checkout",
+          "avg_sentiment": 0.0,
+          "n": 1
+        }
+      ]
     },
     {
       "archetype": "geek",
       "agents": 4,
-      "bought": 1,
-      "bailed": 3,
-      "buy_rate": 0.25,
-      "avg_retention_s": 3.6,
-      "top_objection": "Can't tell the knit gauge from these."
+      "bought": 2,
+      "bailed": 2,
+      "buy_rate": 0.5,
+      "avg_retention_s": 4.8,
+      "top_objection": "Can't tell the knit gauge from these.",
+      "sentiment_arc": [
+        {
+          "stage": "land",
+          "avg_sentiment": 0.5,
+          "n": 4
+        },
+        {
+          "stage": "photos",
+          "avg_sentiment": -0.75,
+          "n": 4
+        },
+        {
+          "stage": "reviews",
+          "avg_sentiment": -0.5,
+          "n": 2
+        },
+        {
+          "stage": "price",
+          "avg_sentiment": -0.5,
+          "n": 2
+        },
+        {
+          "stage": "cart",
+          "avg_sentiment": 0.0,
+          "n": 2
+        },
+        {
+          "stage": "checkout",
+          "avg_sentiment": 0.5,
+          "n": 2
+        }
+      ]
     },
     {
       "archetype": "high_spender",
@@ -118,16 +209,80 @@
       "bailed": 2,
       "buy_rate": 0.5,
       "avg_retention_s": 5.1,
-      "top_objection": "Even I need some trust signal lah."
+      "top_objection": "Even I need some trust signal lah.",
+      "sentiment_arc": [
+        {
+          "stage": "land",
+          "avg_sentiment": 0.5,
+          "n": 4
+        },
+        {
+          "stage": "photos",
+          "avg_sentiment": 0.125,
+          "n": 4
+        },
+        {
+          "stage": "reviews",
+          "avg_sentiment": -0.333,
+          "n": 3
+        },
+        {
+          "stage": "price",
+          "avg_sentiment": 0.5,
+          "n": 2
+        },
+        {
+          "stage": "cart",
+          "avg_sentiment": 0.5,
+          "n": 2
+        },
+        {
+          "stage": "checkout",
+          "avg_sentiment": 0.5,
+          "n": 2
+        }
+      ]
     },
     {
       "archetype": "insecure",
       "agents": 4,
-      "bought": 1,
-      "bailed": 3,
-      "buy_rate": 0.25,
+      "bought": 2,
+      "bailed": 2,
+      "buy_rate": 0.5,
       "avg_retention_s": 5.4,
-      "top_objection": "Reviews don't make me feel safe."
+      "top_objection": "Reviews don't make me feel safe.",
+      "sentiment_arc": [
+        {
+          "stage": "land",
+          "avg_sentiment": 0.5,
+          "n": 4
+        },
+        {
+          "stage": "photos",
+          "avg_sentiment": 0.0,
+          "n": 4
+        },
+        {
+          "stage": "reviews",
+          "avg_sentiment": -0.75,
+          "n": 4
+        },
+        {
+          "stage": "price",
+          "avg_sentiment": 0.0,
+          "n": 2
+        },
+        {
+          "stage": "cart",
+          "avg_sentiment": 0.0,
+          "n": 2
+        },
+        {
+          "stage": "checkout",
+          "avg_sentiment": -0.5,
+          "n": 2
+        }
+      ]
     },
     {
       "archetype": "nerd",
@@ -135,49 +290,107 @@
       "bought": 1,
       "bailed": 3,
       "buy_rate": 0.25,
-      "avg_retention_s": 4.8,
-      "top_objection": "Price not justified by the specs."
+      "avg_retention_s": 4.2,
+      "top_objection": "Can't inspect the fabric properly from these photos.",
+      "sentiment_arc": [
+        {
+          "stage": "land",
+          "avg_sentiment": 0.5,
+          "n": 4
+        },
+        {
+          "stage": "photos",
+          "avg_sentiment": -0.5,
+          "n": 4
+        },
+        {
+          "stage": "reviews",
+          "avg_sentiment": -0.25,
+          "n": 2
+        },
+        {
+          "stage": "price",
+          "avg_sentiment": -0.5,
+          "n": 2
+        },
+        {
+          "stage": "cart",
+          "avg_sentiment": 0.5,
+          "n": 1
+        },
+        {
+          "stage": "checkout",
+          "avg_sentiment": 0.5,
+          "n": 1
+        }
+      ]
     },
     {
       "archetype": "xmm",
       "agents": 4,
-      "bought": 2,
-      "bailed": 2,
-      "buy_rate": 0.5,
-      "avg_retention_s": 4.8,
-      "top_objection": "Photos damn ugly leh, vibe not there."
+      "bought": 3,
+      "bailed": 1,
+      "buy_rate": 0.75,
+      "avg_retention_s": 6.0,
+      "top_objection": "Photos damn ugly leh, vibe not there.",
+      "sentiment_arc": [
+        {
+          "stage": "land",
+          "avg_sentiment": 0.5,
+          "n": 4
+        },
+        {
+          "stage": "photos",
+          "avg_sentiment": -0.625,
+          "n": 4
+        },
+        {
+          "stage": "reviews",
+          "avg_sentiment": -0.167,
+          "n": 3
+        },
+        {
+          "stage": "price",
+          "avg_sentiment": 0.0,
+          "n": 3
+        },
+        {
+          "stage": "cart",
+          "avg_sentiment": 0.5,
+          "n": 3
+        },
+        {
+          "stage": "checkout",
+          "avg_sentiment": 0.5,
+          "n": 3
+        }
+      ]
     }
   ],
   "objection_heatmap": [
     {
       "field": "Photos",
-      "bail_count": 9
-    },
-    {
-      "field": "Price",
-      "bail_count": 5
+      "bail_count": 7
     },
     {
       "field": "Reviews",
-      "bail_count": 4
+      "bail_count": 5
+    },
+    {
+      "field": "Price",
+      "bail_count": 3
     },
     {
       "field": "Title",
       "bail_count": 1
-    },
-    {
-      "field": "Authenticity",
-      "bail_count": 1
     }
   ],
-  "risk_archetypes": [
-    "budget"
-  ],
+  "risk_archetypes": [],
   "recommendations": [
     {
       "id": "rec_photos_lifestyle",
       "field": "Photos",
-      "issue": "9 agents bailed at Photos; XMM/Geek agents need stronger visual proof.",
+      "issue": "7 agents bailed at Photos; XMM/Geek agents need stronger visual proof.",
       "fix": "Add lifestyle model shots and close-up knit/detail photos before the product-only gallery.",
       "impact_estimate": "Est. +6-9% buy rate",
       "affected_archetypes": [
@@ -207,7 +420,7 @@
     {
       "id": "rec_price_promo",
       "field": "Price",
-      "issue": "5 agents objected around price/cart total.",
+      "issue": "3 agents objected around price/cart total.",
       "fix": "Test a launch promo price closer to baseline and absorb part of shipping into the displayed price.",
       "impact_estimate": "Est. +5-8% buy rate",
       "affected_archetypes": [
@@ -270,9 +483,27 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_1/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_1/land.png",
+          "sentiment": "reject",
+          "comment": "Hmm, not feeling this shop page."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "other",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 46,
+        "sex": "M",
+        "marital": "single",
+        "income": "comfortable",
+        "housing": "condo",
+        "hobby": "parenting & home",
+        "blurb": "46M, single, condo, comfortable income, into parenting & home"
+      }
     },
     {
       "agent_id": "auntie_2",
@@ -286,34 +517,62 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/reviews.png",
+          "sentiment": "dislike",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/price.png",
+          "sentiment": "neutral",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/cart.png",
+          "sentiment": "like",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_2/checkout.png",
+          "sentiment": "neutral",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a Auntie like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 47,
+        "sex": "F",
+        "marital": "married",
+        "income": "affluent",
+        "housing": "landed",
+        "hobby": "parenting & home",
+        "blurb": "47F, married, landed, affluent income, into parenting & home"
+      }
     },
     {
       "agent_id": "auntie_3",
@@ -327,40 +586,89 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_3/reviews.png",
+          "sentiment": "reject",
+          "comment": "Seller never reply reviews, not safe."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "social_proof_reviews",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 47,
+        "sex": "M",
+        "marital": "married",
+        "income": "comfortable",
+        "housing": "HDB",
+        "hobby": "hiking & outdoors",
+        "blurb": "47M, married, HDB, comfortable income, into hiking & outdoors"
+      }
     },
     {
       "agent_id": "auntie_4",
       "name": "Mdm Goh",
       "archetype": "auntie",
       "outcome": "bailed",
-      "bail_stage": "photos",
-      "objection": "Photos not convincing enough.",
-      "retention_time_s": 2.4,
+      "bail_stage": "reviews",
+      "objection": "Seller never reply reviews, not safe.",
+      "retention_time_s": 3.6,
       "stage_trace": [
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_4/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_4/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_4/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_4/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/auntie_4/reviews.png",
+          "sentiment": "reject",
+          "comment": "Seller never reply reviews, not safe."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "social_proof_reviews",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 46,
+        "sex": "M",
+        "marital": "married",
+        "income": "comfortable",
+        "housing": "condo",
+        "hobby": "gaming & tech",
+        "blurb": "46M, married, condo, comfortable income, into gaming & tech"
+      }
     },
     {
       "agent_id": "budget_1",
@@ -374,24 +682,48 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/reviews.png",
+          "sentiment": "neutral",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_1/price.png",
+          "sentiment": "reject",
+          "comment": "Over budget liao, next."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "price_value",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 32,
+        "sex": "F",
+        "marital": "single",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "thrift & deals",
+        "blurb": "32F, single, HDB, tight income, into thrift & deals"
+      }
     },
     {
       "agent_id": "budget_2",
@@ -405,24 +737,48 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/reviews.png",
+          "sentiment": "neutral",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_2/price.png",
+          "sentiment": "reject",
+          "comment": "Add shipping also? Forget it."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "price_value",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 28,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "comfortable",
+        "housing": "HDB",
+        "hobby": "cafe-hopping & food",
+        "blurb": "28F, married w/ kids, HDB, comfortable income, into cafe-hopping & food"
+      }
     },
     {
       "agent_id": "budget_3",
@@ -436,45 +792,103 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_3/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_3/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_3/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_3/photos.png",
+          "sentiment": "reject",
+          "comment": "Photos not convincing enough."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "visual_photos",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 28,
+        "sex": "M",
+        "marital": "married",
+        "income": "affluent",
+        "housing": "condo",
+        "hobby": "K-drama & fashion",
+        "blurb": "28M, married, condo, affluent income, into K-drama & fashion"
+      }
     },
     {
       "agent_id": "budget_4",
       "name": "Hui Min",
       "archetype": "budget",
-      "outcome": "bailed",
-      "bail_stage": "price",
-      "objection": "Over budget liao, next.",
-      "retention_time_s": 4.8,
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
       "stage_trace": [
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/reviews.png",
+          "sentiment": "neutral",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/price.png",
+          "sentiment": "dislike",
+          "comment": "Price still workable for now."
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/cart.png",
+          "sentiment": "like",
+          "comment": "Added to cart, still considering."
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/budget_4/checkout.png",
+          "sentiment": "neutral",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a Budget-tight like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 33,
+        "sex": "M",
+        "marital": "married",
+        "income": "affluent",
+        "housing": "landed",
+        "hobby": "gaming & tech",
+        "blurb": "33M, married, landed, affluent income, into gaming & tech"
+      }
     },
     {
       "agent_id": "geek_1",
@@ -488,14 +902,34 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_1/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_1/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_1/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_1/photos.png",
+          "sentiment": "reject",
+          "comment": "Can't tell the knit gauge from these."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "visual_photos",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 26,
+        "sex": "M",
+        "marital": "married",
+        "income": "affluent",
+        "housing": "condo",
+        "hobby": "K-drama & fashion",
+        "blurb": "26M, married, condo, affluent income, into K-drama & fashion"
+      }
     },
     {
       "agent_id": "geek_2",
@@ -509,14 +943,34 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_2/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_2/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_2/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_2/photos.png",
+          "sentiment": "reject",
+          "comment": "Can't tell the knit gauge from these."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "visual_photos",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 27,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "comfortable",
+        "housing": "condo",
+        "hobby": "gym & sports",
+        "blurb": "27F, married w/ kids, condo, comfortable income, into gym & sports"
+      }
     },
     {
       "agent_id": "geek_3",
@@ -530,55 +984,131 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/photos.png",
+          "sentiment": "dislike",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/reviews.png",
+          "sentiment": "dislike",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/price.png",
+          "sentiment": "dislike",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/cart.png",
+          "sentiment": "neutral",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_3/checkout.png",
+          "sentiment": "like",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a Geek like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 59,
+        "sex": "F",
+        "marital": "single",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "thrift & deals",
+        "blurb": "59F, single, HDB, tight income, into thrift & deals"
+      }
     },
     {
       "agent_id": "geek_4",
       "name": "Ben",
       "archetype": "geek",
-      "outcome": "bailed",
-      "bail_stage": "photos",
-      "objection": "Can't tell the knit gauge from these.",
-      "retention_time_s": 2.4,
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
       "stage_trace": [
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/photos.png",
+          "sentiment": "dislike",
+          "comment": "Photos are passable lah, let me see more."
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/reviews.png",
+          "sentiment": "dislike",
+          "comment": "Reviews so-so but okay, continue first."
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/price.png",
+          "sentiment": "dislike",
+          "comment": "Price still workable for now."
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/cart.png",
+          "sentiment": "neutral",
+          "comment": "Added to cart, still considering."
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/geek_4/checkout.png",
+          "sentiment": "like",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a Geek like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 45,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "K-drama & fashion",
+        "blurb": "45F, married w/ kids, HDB, tight income, into K-drama & fashion"
+      }
     },
     {
       "agent_id": "high_spender_1",
@@ -592,19 +1122,41 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/photos.png",
+          "sentiment": "like",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_1/reviews.png",
+          "sentiment": "reject",
+          "comment": "Even I need some trust signal lah."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "social_proof_reviews",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 34,
+        "sex": "F",
+        "marital": "single",
+        "income": "comfortable",
+        "housing": "condo",
+        "hobby": "K-drama & fashion",
+        "blurb": "34F, single, condo, comfortable income, into K-drama & fashion"
+      }
     },
     {
       "agent_id": "high_spender_2",
@@ -618,34 +1170,62 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/photos.png",
+          "sentiment": "like",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/reviews.png",
+          "sentiment": "neutral",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/price.png",
+          "sentiment": "like",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/cart.png",
+          "sentiment": "like",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_2/checkout.png",
+          "sentiment": "like",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a High-spender like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 49,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "comfortable",
+        "housing": "condo",
+        "hobby": "gaming & tech",
+        "blurb": "49F, married w/ kids, condo, comfortable income, into gaming & tech"
+      }
     },
     {
       "agent_id": "high_spender_3",
@@ -659,14 +1239,34 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_3/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_3/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_3/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_3/photos.png",
+          "sentiment": "reject",
+          "comment": "Photos not convincing enough."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "visual_photos",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 61,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "comfortable",
+        "housing": "condo",
+        "hobby": "cafe-hopping & food",
+        "blurb": "61F, married w/ kids, condo, comfortable income, into cafe-hopping & food"
+      }
     },
     {
       "agent_id": "high_spender_4",
@@ -680,34 +1280,62 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/photos.png",
+          "sentiment": "like",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/reviews.png",
+          "sentiment": "neutral",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/price.png",
+          "sentiment": "like",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/cart.png",
+          "sentiment": "like",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/high_spender_4/checkout.png",
+          "sentiment": "like",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a High-spender like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 20,
+        "sex": "M",
+        "marital": "single",
+        "income": "affluent",
+        "housing": "condo",
+        "hobby": "thrift & deals",
+        "blurb": "20M, single, condo, affluent income, into thrift & deals"
+      }
     },
     {
       "agent_id": "insecure_1",
@@ -721,34 +1349,62 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/reviews.png",
+          "sentiment": "dislike",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/price.png",
+          "sentiment": "neutral",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/cart.png",
+          "sentiment": "neutral",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_1/checkout.png",
+          "sentiment": "dislike",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a Insecure like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 19,
+        "sex": "M",
+        "marital": "married",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "gaming & tech",
+        "blurb": "19M, married, HDB, tight income, into gaming & tech"
+      }
     },
     {
       "agent_id": "insecure_2",
@@ -762,60 +1418,110 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_2/reviews.png",
+          "sentiment": "reject",
+          "comment": "Reviews don't make me feel safe."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "social_proof_reviews",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 32,
+        "sex": "M",
+        "marital": "married_kids",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "parenting & home",
+        "blurb": "32M, married w/ kids, HDB, tight income, into parenting & home"
+      }
     },
     {
       "agent_id": "insecure_3",
       "name": "Rachel",
       "archetype": "insecure",
-      "outcome": "bailed",
-      "bail_stage": "checkout",
-      "objection": "No authenticity proof, I scared kena fake.",
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
       "retention_time_s": 7.2,
       "stage_trace": [
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/reviews.png",
+          "sentiment": "dislike",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/price.png",
+          "sentiment": "neutral",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/cart.png",
+          "sentiment": "neutral",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_3/checkout.png",
+          "sentiment": "dislike",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a Insecure like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 34,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "comfortable",
+        "housing": "condo",
+        "hobby": "K-drama & fashion",
+        "blurb": "34F, married w/ kids, condo, comfortable income, into K-drama & fashion"
+      }
     },
     {
       "agent_id": "insecure_4",
@@ -829,50 +1535,82 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/insecure_4/reviews.png",
+          "sentiment": "reject",
+          "comment": "So many scams nowadays... what if fake?"
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "social_proof_reviews",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 35,
+        "sex": "F",
+        "marital": "single",
+        "income": "comfortable",
+        "housing": "HDB",
+        "hobby": "thrift & deals",
+        "blurb": "35F, single, HDB, comfortable income, into thrift & deals"
+      }
     },
     {
       "agent_id": "nerd_1",
       "name": "Wei Jie",
       "archetype": "nerd",
       "outcome": "bailed",
-      "bail_stage": "price",
-      "objection": "Price not justified by the specs.",
-      "retention_time_s": 4.8,
+      "bail_stage": "photos",
+      "objection": "Can't inspect the fabric properly from these photos.",
+      "retention_time_s": 2.4,
       "stage_trace": [
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/photos.png"
-        },
-        {
-          "stage": "reviews",
-          "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/reviews.png"
-        },
-        {
-          "stage": "price",
-          "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_1/photos.png",
+          "sentiment": "reject",
+          "comment": "Can't inspect the fabric properly from these photos."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "visual_photos",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 24,
+        "sex": "M",
+        "marital": "married",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "travel & lifestyle",
+        "blurb": "24M, married, HDB, tight income, into travel & lifestyle"
+      }
     },
     {
       "agent_id": "nerd_2",
@@ -886,14 +1624,34 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_2/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_2/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_2/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_2/photos.png",
+          "sentiment": "reject",
+          "comment": "Can't inspect the fabric properly from these photos."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "visual_photos",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 24,
+        "sex": "F",
+        "marital": "single",
+        "income": "affluent",
+        "housing": "condo",
+        "hobby": "cafe-hopping & food",
+        "blurb": "24F, single, condo, affluent income, into cafe-hopping & food"
+      }
     },
     {
       "agent_id": "nerd_3",
@@ -907,24 +1665,48 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/reviews.png",
+          "sentiment": "dislike",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_3/price.png",
+          "sentiment": "reject",
+          "comment": "Price not justified by the specs."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "price_value",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 51,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "gaming & tech",
+        "blurb": "51F, married w/ kids, HDB, tight income, into gaming & tech"
+      }
     },
     {
       "agent_id": "nerd_4",
@@ -938,34 +1720,62 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/photos.png",
+          "sentiment": "neutral",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/reviews.png",
+          "sentiment": "neutral",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/price.png",
+          "sentiment": "neutral",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/cart.png",
+          "sentiment": "like",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/nerd_4/checkout.png",
+          "sentiment": "like",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a Nerd like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 40,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "affluent",
+        "housing": "condo",
+        "hobby": "cafe-hopping & food",
+        "blurb": "40F, married w/ kids, condo, affluent income, into cafe-hopping & food"
+      }
     },
     {
       "agent_id": "xmm_1",
@@ -979,14 +1789,34 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_1/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_1/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_1/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_1/photos.png",
+          "sentiment": "reject",
+          "comment": "Photos damn ugly leh, vibe not there."
         }
-      ]
+      ],
+      "purchase_reason": null,
+      "bail_reason": "visual_photos",
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 52,
+        "sex": "M",
+        "marital": "married_kids",
+        "income": "comfortable",
+        "housing": "HDB",
+        "hobby": "K-drama & fashion",
+        "blurb": "52M, married w/ kids, HDB, comfortable income, into K-drama & fashion"
+      }
     },
     {
       "agent_id": "xmm_2",
@@ -1000,55 +1830,131 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/photos.png",
+          "sentiment": "dislike",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/reviews.png",
+          "sentiment": "neutral",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/price.png",
+          "sentiment": "neutral",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/cart.png",
+          "sentiment": "like",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_2/checkout.png",
+          "sentiment": "like",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a XMM like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 29,
+        "sex": "F",
+        "marital": "married_kids",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "travel & lifestyle",
+        "blurb": "29F, married w/ kids, HDB, tight income, into travel & lifestyle"
+      }
     },
     {
       "agent_id": "xmm_3",
       "name": "Mei Qi",
       "archetype": "xmm",
-      "outcome": "bailed",
-      "bail_stage": "photos",
-      "objection": "Photos damn ugly leh, vibe not there.",
-      "retention_time_s": 2.4,
+      "outcome": "bought",
+      "bail_stage": null,
+      "objection": null,
+      "retention_time_s": 7.2,
       "stage_trace": [
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/photos.png",
+          "sentiment": "dislike",
+          "comment": "Photos are passable lah, let me see more."
+        },
+        {
+          "stage": "reviews",
+          "time_s": 2.4,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/reviews.png",
+          "sentiment": "dislike",
+          "comment": "Reviews so-so but okay, continue first."
+        },
+        {
+          "stage": "price",
+          "time_s": 3.6,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/price.png",
+          "sentiment": "neutral",
+          "comment": "Price still workable for now."
+        },
+        {
+          "stage": "cart",
+          "time_s": 4.8,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/cart.png",
+          "sentiment": "like",
+          "comment": "Added to cart, still considering."
+        },
+        {
+          "stage": "checkout",
+          "time_s": 6.0,
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_3/checkout.png",
+          "sentiment": "like",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a XMM like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 56,
+        "sex": "M",
+        "marital": "married",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "cafe-hopping & food",
+        "blurb": "56M, married, HDB, tight income, into cafe-hopping & food"
+      }
     },
     {
       "agent_id": "xmm_4",
@@ -1062,34 +1968,1302 @@
         {
           "stage": "land",
           "time_s": 0.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/land.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/land.png",
+          "sentiment": "like",
+          "comment": "Okay, let me take a look at this."
         },
         {
           "stage": "photos",
           "time_s": 1.2,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/photos.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/photos.png",
+          "sentiment": "dislike",
+          "comment": "Photos are passable lah, let me see more."
         },
         {
           "stage": "reviews",
           "time_s": 2.4,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/reviews.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/reviews.png",
+          "sentiment": "neutral",
+          "comment": "Reviews so-so but okay, continue first."
         },
         {
           "stage": "price",
           "time_s": 3.6,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/price.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/price.png",
+          "sentiment": "neutral",
+          "comment": "Price still workable for now."
         },
         {
           "stage": "cart",
           "time_s": 4.8,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/cart.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/cart.png",
+          "sentiment": "like",
+          "comment": "Added to cart, still considering."
         },
         {
           "stage": "checkout",
           "time_s": 6.0,
-          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/checkout.png"
+          "screenshot_url": "/static/mock/matin_kim_beanie_sg/xmm_4/checkout.png",
+          "sentiment": "like",
+          "comment": "Alright, proceeding to checkout."
         }
-      ]
+      ],
+      "purchase_reason": "Good enough for a XMM like me — checking out.",
+      "bail_reason": null,
+      "landed_on_target": true,
+      "chosen_listing_id": null,
+      "divert_stage": null,
+      "competitor_id": null,
+      "competitor_title": null,
+      "profile": {
+        "age": 26,
+        "sex": "F",
+        "marital": "married",
+        "income": "tight",
+        "housing": "HDB",
+        "hobby": "gaming & tech",
+        "blurb": "26F, married, HDB, tight income, into gaming & tech"
+      }
     }
-  ]
+  ],
+  "comments": [
+    {
+      "agent_id": "auntie_1",
+      "name": "Auntie May",
+      "archetype": "auntie",
+      "stage": "land",
+      "sentiment": "reject",
+      "comment": "Hmm, not feeling this shop page."
+    },
+    {
+      "agent_id": "auntie_1",
+      "name": "Auntie May",
+      "archetype": "auntie",
+      "stage": "land",
+      "sentiment": "reject",
+      "comment": "Hmm, not feeling this shop page."
+    },
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "stage": "reviews",
+      "sentiment": "dislike",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "stage": "price",
+      "sentiment": "neutral",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "stage": "cart",
+      "sentiment": "like",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "stage": "checkout",
+      "sentiment": "neutral",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a Auntie like me — checking out."
+    },
+    {
+      "agent_id": "auntie_3",
+      "name": "Auntie Lee",
+      "archetype": "auntie",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "auntie_3",
+      "name": "Auntie Lee",
+      "archetype": "auntie",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "auntie_3",
+      "name": "Auntie Lee",
+      "archetype": "auntie",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "Seller never reply reviews, not safe."
+    },
+    {
+      "agent_id": "auntie_3",
+      "name": "Auntie Lee",
+      "archetype": "auntie",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "Seller never reply reviews, not safe."
+    },
+    {
+      "agent_id": "auntie_4",
+      "name": "Mdm Goh",
+      "archetype": "auntie",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "auntie_4",
+      "name": "Mdm Goh",
+      "archetype": "auntie",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "auntie_4",
+      "name": "Mdm Goh",
+      "archetype": "auntie",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "Seller never reply reviews, not safe."
+    },
+    {
+      "agent_id": "auntie_4",
+      "name": "Mdm Goh",
+      "archetype": "auntie",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "Seller never reply reviews, not safe."
+    },
+    {
+      "agent_id": "budget_1",
+      "name": "Farhan",
+      "archetype": "budget",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "budget_1",
+      "name": "Farhan",
+      "archetype": "budget",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "budget_1",
+      "name": "Farhan",
+      "archetype": "budget",
+      "stage": "reviews",
+      "sentiment": "neutral",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "budget_1",
+      "name": "Farhan",
+      "archetype": "budget",
+      "stage": "price",
+      "sentiment": "reject",
+      "comment": "Over budget liao, next."
+    },
+    {
+      "agent_id": "budget_1",
+      "name": "Farhan",
+      "archetype": "budget",
+      "stage": "price",
+      "sentiment": "reject",
+      "comment": "Over budget liao, next."
+    },
+    {
+      "agent_id": "budget_2",
+      "name": "Xin Yi",
+      "archetype": "budget",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "budget_2",
+      "name": "Xin Yi",
+      "archetype": "budget",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "budget_2",
+      "name": "Xin Yi",
+      "archetype": "budget",
+      "stage": "reviews",
+      "sentiment": "neutral",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "budget_2",
+      "name": "Xin Yi",
+      "archetype": "budget",
+      "stage": "price",
+      "sentiment": "reject",
+      "comment": "Add shipping also? Forget it."
+    },
+    {
+      "agent_id": "budget_2",
+      "name": "Xin Yi",
+      "archetype": "budget",
+      "stage": "price",
+      "sentiment": "reject",
+      "comment": "Add shipping also? Forget it."
+    },
+    {
+      "agent_id": "budget_3",
+      "name": "Aqil",
+      "archetype": "budget",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "budget_3",
+      "name": "Aqil",
+      "archetype": "budget",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Photos not convincing enough."
+    },
+    {
+      "agent_id": "budget_3",
+      "name": "Aqil",
+      "archetype": "budget",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Photos not convincing enough."
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "stage": "reviews",
+      "sentiment": "neutral",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "stage": "price",
+      "sentiment": "dislike",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "stage": "cart",
+      "sentiment": "like",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "stage": "checkout",
+      "sentiment": "neutral",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a Budget-tight like me — checking out."
+    },
+    {
+      "agent_id": "geek_1",
+      "name": "Kai",
+      "archetype": "geek",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "geek_1",
+      "name": "Kai",
+      "archetype": "geek",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Can't tell the knit gauge from these."
+    },
+    {
+      "agent_id": "geek_1",
+      "name": "Kai",
+      "archetype": "geek",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Can't tell the knit gauge from these."
+    },
+    {
+      "agent_id": "geek_2",
+      "name": "Zach",
+      "archetype": "geek",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "geek_2",
+      "name": "Zach",
+      "archetype": "geek",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Can't tell the knit gauge from these."
+    },
+    {
+      "agent_id": "geek_2",
+      "name": "Zach",
+      "archetype": "geek",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Can't tell the knit gauge from these."
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "stage": "photos",
+      "sentiment": "dislike",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "stage": "reviews",
+      "sentiment": "dislike",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "stage": "price",
+      "sentiment": "dislike",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "stage": "cart",
+      "sentiment": "neutral",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "stage": "checkout",
+      "sentiment": "like",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a Geek like me — checking out."
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "stage": "photos",
+      "sentiment": "dislike",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "stage": "reviews",
+      "sentiment": "dislike",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "stage": "price",
+      "sentiment": "dislike",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "stage": "cart",
+      "sentiment": "neutral",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "stage": "checkout",
+      "sentiment": "like",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a Geek like me — checking out."
+    },
+    {
+      "agent_id": "high_spender_1",
+      "name": "Ethan",
+      "archetype": "high_spender",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "high_spender_1",
+      "name": "Ethan",
+      "archetype": "high_spender",
+      "stage": "photos",
+      "sentiment": "like",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "high_spender_1",
+      "name": "Ethan",
+      "archetype": "high_spender",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "Even I need some trust signal lah."
+    },
+    {
+      "agent_id": "high_spender_1",
+      "name": "Ethan",
+      "archetype": "high_spender",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "Even I need some trust signal lah."
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "stage": "photos",
+      "sentiment": "like",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "stage": "reviews",
+      "sentiment": "neutral",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "stage": "price",
+      "sentiment": "like",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "stage": "cart",
+      "sentiment": "like",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "stage": "checkout",
+      "sentiment": "like",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a High-spender like me — checking out."
+    },
+    {
+      "agent_id": "high_spender_3",
+      "name": "Brandon",
+      "archetype": "high_spender",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "high_spender_3",
+      "name": "Brandon",
+      "archetype": "high_spender",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Photos not convincing enough."
+    },
+    {
+      "agent_id": "high_spender_3",
+      "name": "Brandon",
+      "archetype": "high_spender",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Photos not convincing enough."
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "stage": "photos",
+      "sentiment": "like",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "stage": "reviews",
+      "sentiment": "neutral",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "stage": "price",
+      "sentiment": "like",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "stage": "cart",
+      "sentiment": "like",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "stage": "checkout",
+      "sentiment": "like",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a High-spender like me — checking out."
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "stage": "reviews",
+      "sentiment": "dislike",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "stage": "price",
+      "sentiment": "neutral",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "stage": "cart",
+      "sentiment": "neutral",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "stage": "checkout",
+      "sentiment": "dislike",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a Insecure like me — checking out."
+    },
+    {
+      "agent_id": "insecure_2",
+      "name": "Nadia",
+      "archetype": "insecure",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "insecure_2",
+      "name": "Nadia",
+      "archetype": "insecure",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "insecure_2",
+      "name": "Nadia",
+      "archetype": "insecure",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "Reviews don't make me feel safe."
+    },
+    {
+      "agent_id": "insecure_2",
+      "name": "Nadia",
+      "archetype": "insecure",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "Reviews don't make me feel safe."
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "stage": "reviews",
+      "sentiment": "dislike",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "stage": "price",
+      "sentiment": "neutral",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "stage": "cart",
+      "sentiment": "neutral",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "stage": "checkout",
+      "sentiment": "dislike",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a Insecure like me — checking out."
+    },
+    {
+      "agent_id": "insecure_4",
+      "name": "Yun Xuan",
+      "archetype": "insecure",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "insecure_4",
+      "name": "Yun Xuan",
+      "archetype": "insecure",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "insecure_4",
+      "name": "Yun Xuan",
+      "archetype": "insecure",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "So many scams nowadays... what if fake?"
+    },
+    {
+      "agent_id": "insecure_4",
+      "name": "Yun Xuan",
+      "archetype": "insecure",
+      "stage": "reviews",
+      "sentiment": "reject",
+      "comment": "So many scams nowadays... what if fake?"
+    },
+    {
+      "agent_id": "nerd_1",
+      "name": "Wei Jie",
+      "archetype": "nerd",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "nerd_1",
+      "name": "Wei Jie",
+      "archetype": "nerd",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Can't inspect the fabric properly from these photos."
+    },
+    {
+      "agent_id": "nerd_1",
+      "name": "Wei Jie",
+      "archetype": "nerd",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Can't inspect the fabric properly from these photos."
+    },
+    {
+      "agent_id": "nerd_2",
+      "name": "Daryl",
+      "archetype": "nerd",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "nerd_2",
+      "name": "Daryl",
+      "archetype": "nerd",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Can't inspect the fabric properly from these photos."
+    },
+    {
+      "agent_id": "nerd_2",
+      "name": "Daryl",
+      "archetype": "nerd",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Can't inspect the fabric properly from these photos."
+    },
+    {
+      "agent_id": "nerd_3",
+      "name": "Jun Hao",
+      "archetype": "nerd",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "nerd_3",
+      "name": "Jun Hao",
+      "archetype": "nerd",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "nerd_3",
+      "name": "Jun Hao",
+      "archetype": "nerd",
+      "stage": "reviews",
+      "sentiment": "dislike",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "nerd_3",
+      "name": "Jun Hao",
+      "archetype": "nerd",
+      "stage": "price",
+      "sentiment": "reject",
+      "comment": "Price not justified by the specs."
+    },
+    {
+      "agent_id": "nerd_3",
+      "name": "Jun Hao",
+      "archetype": "nerd",
+      "stage": "price",
+      "sentiment": "reject",
+      "comment": "Price not justified by the specs."
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "stage": "photos",
+      "sentiment": "neutral",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "stage": "reviews",
+      "sentiment": "neutral",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "stage": "price",
+      "sentiment": "neutral",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "stage": "cart",
+      "sentiment": "like",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "stage": "checkout",
+      "sentiment": "like",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a Nerd like me — checking out."
+    },
+    {
+      "agent_id": "xmm_1",
+      "name": "Jia En",
+      "archetype": "xmm",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "xmm_1",
+      "name": "Jia En",
+      "archetype": "xmm",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Photos damn ugly leh, vibe not there."
+    },
+    {
+      "agent_id": "xmm_1",
+      "name": "Jia En",
+      "archetype": "xmm",
+      "stage": "photos",
+      "sentiment": "reject",
+      "comment": "Photos damn ugly leh, vibe not there."
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "stage": "photos",
+      "sentiment": "dislike",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "stage": "reviews",
+      "sentiment": "neutral",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "stage": "price",
+      "sentiment": "neutral",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "stage": "cart",
+      "sentiment": "like",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "stage": "checkout",
+      "sentiment": "like",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a XMM like me — checking out."
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "stage": "photos",
+      "sentiment": "dislike",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "stage": "reviews",
+      "sentiment": "dislike",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "stage": "price",
+      "sentiment": "neutral",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "stage": "cart",
+      "sentiment": "like",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "stage": "checkout",
+      "sentiment": "like",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a XMM like me — checking out."
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "stage": "land",
+      "sentiment": "like",
+      "comment": "Okay, let me take a look at this."
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "stage": "photos",
+      "sentiment": "dislike",
+      "comment": "Photos are passable lah, let me see more."
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "stage": "reviews",
+      "sentiment": "neutral",
+      "comment": "Reviews so-so but okay, continue first."
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "stage": "price",
+      "sentiment": "neutral",
+      "comment": "Price still workable for now."
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "stage": "cart",
+      "sentiment": "like",
+      "comment": "Added to cart, still considering."
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "stage": "checkout",
+      "sentiment": "like",
+      "comment": "Alright, proceeding to checkout."
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "stage": "checkout",
+      "sentiment": "love",
+      "comment": "Good enough for a XMM like me — checking out."
+    }
+  ],
+  "purchase_reasons": [
+    {
+      "agent_id": "auntie_2",
+      "name": "Mdm Tan",
+      "archetype": "auntie",
+      "reason": "Good enough for a Auntie like me — checking out."
+    },
+    {
+      "agent_id": "budget_4",
+      "name": "Hui Min",
+      "archetype": "budget",
+      "reason": "Good enough for a Budget-tight like me — checking out."
+    },
+    {
+      "agent_id": "geek_3",
+      "name": "Ryan",
+      "archetype": "geek",
+      "reason": "Good enough for a Geek like me — checking out."
+    },
+    {
+      "agent_id": "geek_4",
+      "name": "Ben",
+      "archetype": "geek",
+      "reason": "Good enough for a Geek like me — checking out."
+    },
+    {
+      "agent_id": "high_spender_2",
+      "name": "Valerie",
+      "archetype": "high_spender",
+      "reason": "Good enough for a High-spender like me — checking out."
+    },
+    {
+      "agent_id": "high_spender_4",
+      "name": "Isabelle",
+      "archetype": "high_spender",
+      "reason": "Good enough for a High-spender like me — checking out."
+    },
+    {
+      "agent_id": "insecure_1",
+      "name": "Siti",
+      "archetype": "insecure",
+      "reason": "Good enough for a Insecure like me — checking out."
+    },
+    {
+      "agent_id": "insecure_3",
+      "name": "Rachel",
+      "archetype": "insecure",
+      "reason": "Good enough for a Insecure like me — checking out."
+    },
+    {
+      "agent_id": "nerd_4",
+      "name": "Marcus",
+      "archetype": "nerd",
+      "reason": "Good enough for a Nerd like me — checking out."
+    },
+    {
+      "agent_id": "xmm_2",
+      "name": "Chloe",
+      "archetype": "xmm",
+      "reason": "Good enough for a XMM like me — checking out."
+    },
+    {
+      "agent_id": "xmm_3",
+      "name": "Mei Qi",
+      "archetype": "xmm",
+      "reason": "Good enough for a XMM like me — checking out."
+    },
+    {
+      "agent_id": "xmm_4",
+      "name": "Shermin",
+      "archetype": "xmm",
+      "reason": "Good enough for a XMM like me — checking out."
+    }
+  ],
+  "diagnostics": {
+    "review_read_rate": 0.714,
+    "engagement_rate": 0.536,
+    "click_rate": null
+  },
+  "dropoff_reasons": [
+    {
+      "reason": "visual_photos",
+      "count": 7,
+      "share": 0.438
+    },
+    {
+      "reason": "social_proof_reviews",
+      "count": 5,
+      "share": 0.312
+    },
+    {
+      "reason": "price_value",
+      "count": 3,
+      "share": 0.188
+    },
+    {
+      "reason": "other",
+      "count": 1,
+      "share": 0.062
+    }
+  ],
+  "competition": {}
 }

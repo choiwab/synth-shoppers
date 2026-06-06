@@ -5,10 +5,10 @@
     "name": "Matin Kim Official Store",
     "verified": true,
     "rating": 4.8,
-    "response_rate": 96
+    "response_rate": 58
   },
   "price": 45.9,
-  "base_price": 45.9,
+  "base_price": 39.9,
   "variants": [
     {
       "name": "Colour",
@@ -25,10 +25,10 @@
       "type": "product"
     }
   ],
-  "description": "Matin Kim Logo Beanie — official Korean label. Soft midweight knit with the signature jacquard MATIN logo band. Unisex one-size. 100% authentic, ships with brand tag + authenticity card.\n\n• Authentic Matin Kim (Korea)\n• Midweight ribbed knit, double-fold band\n• Unisex one-size\n\nReady stock in Singapore.",
+  "description": "Matin Kim Logo Beanie — official Korean label. Soft midweight knit with the signature jacquard MATIN logo band. Unisex one-size.\n\n• Matin Kim (Korea) design\n• Midweight ribbed knit, double-fold band\n• Unisex one-size\n\nReady stock in Singapore.",
   "rating": {
-    "score": 4.8,
-    "count": 312
+    "score": 4.4,
+    "count": 16
   },
   "reviews": [
     {
@@ -52,9 +52,9 @@
     }
   ],
   "authenticity": {
-    "certificate": true,
-    "serial": true,
-    "unboxing": true
+    "certificate": false,
+    "serial": false,
+    "unboxing": false
   },
   "category": ["Women Clothes", "Hats & Caps", "Beanies"],
   "shipping": {

@@ -3,6 +3,7 @@ import { FunnelDropChart } from './FunnelDropChart'
 import { ObjectionHeatmap } from './ObjectionHeatmap'
 import { ArchetypeTable } from './ArchetypeTable'
 import { AgentJourneyLog } from './AgentJourneyLog'
+import { CompetitionPanel } from './CompetitionPanel'
 
 interface AnalyticsViewProps {
   report: ViabilityReport
@@ -16,6 +17,8 @@ export function AnalyticsView({ report }: AnalyticsViewProps) {
         <FunnelDropChart funnel={report.funnel} />
         <ObjectionHeatmap heatmap={report.objection_heatmap} />
       </div>
+      {/* Real-mode only: where we lose shoppers to other beanies (empty in mock). */}
+      <CompetitionPanel competition={report.competition} />
       <ArchetypeTable archetypes={report.archetypes} />
       <AgentJourneyLog agents={report.agents} />
     </div>

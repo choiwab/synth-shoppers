@@ -28,10 +28,31 @@ export async function loadListing(id: string): Promise<ListingConfig | null> {
   return COMPETITORS.find((c) => c.id === id) ?? null
 }
 
-/** All 10 listings for /search and home (Matin Kim first). */
+/** All listings for /search and home (Matin Kim first). Honors the sessionStorage
+ * override so a mutated/simulated Matin Kim card shows the right price on reruns. */
 export async function loadCatalog(): Promise<ListingConfig[]> {
-  const matin = await fetchFixture()
+  const matin = getListingOverride(MATINKIM_ID) ?? (await fetchFixture())
   return matin ? [matin, ...COMPETITORS] : [...COMPETITORS]
+}
+
+const MK_CONFIG_PARAM = 'mk_config'
+
+/**
+ * One-time bootstrap for the browser-use runtime. The runner enters the storefront
+ * at `/?…&mk_config=<base64 JSON>`; in-app links (withSimSession) don't carry the
+ * config, so we stash it in the Matin Kim sessionStorage override here. The tracked
+ * PDP and its search card then render the exact simulated/mutated listing as the
+ * agent navigates home → search → product.
+ */
+export function bootstrapListingOverrideFromUrl(): void {
+  try {
+    const raw = new URLSearchParams(window.location.search).get(MK_CONFIG_PARAM)
+    if (!raw) return
+    const cfg = JSON.parse(decodeURIComponent(escape(atob(raw)))) as ListingConfig
+    if (cfg && cfg.id) setListingOverride(MATINKIM_ID, cfg)
+  } catch {
+    /* malformed param — ignore, fall back to the committed fixture */
+  }
 }
 
 async function fetchFixture(): Promise<ListingConfig | null> {

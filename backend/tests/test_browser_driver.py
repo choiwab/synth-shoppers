@@ -57,32 +57,47 @@ async def test_runner_streams_live_for_emit_aware_driver_without_replay() -> Non
     assert run.agents[0].outcome == "bought"
 
 
-def test_task_prompt_reuses_persona_blurb_facts_and_objection_pool() -> None:
-    listing = load_listing()
-    driver = BrowserUseAgenticDriver(listing)
-    task = driver._task("Farhan", "budget", driver.listing, "http://localhost:8080/?listing=x")
+async def _noop(_event):  # pragma: no cover - trivial emit sink
+    return None
+
+
+def _ctx(driver: BrowserUseAgenticDriver, *, run_id="run_abc", agent_id="budget_1", archetype="budget") -> _Journey:
+    return _Journey(run_id=run_id, agent_id=agent_id, name="Farhan", archetype=archetype, listing=driver.listing, emit=_noop)
+
+
+def test_task_prompt_starts_at_home_mandates_search_and_keeps_persona_voice() -> None:
+    driver = BrowserUseAgenticDriver(load_listing(), base_url="http://localhost:5174")
+    task = driver._task(_ctx(driver))
 
     assert "Farhan" in task and "Budget-tight" in task
     assert "scrutinize every dollar" in task  # persona blurb from sim.agents
-    assert f"S${listing.price:.2f}" in task and f"S${listing.base_price:.2f}" in task  # listing facts surfaced
+    # Mandatory storefront entry route: home first, then search "beanie".
+    assert "http://localhost:5174/?" in task
+    assert "beanie" in task.lower() and "/search?keyword=beanie" in task
     assert "Over budget liao, next." in task  # objection style example from the pool
 
 
-def test_page_url_scopes_browser_session_per_agent() -> None:
+def test_storefront_urls_carry_sim_session_and_scope_config_to_home() -> None:
     driver = BrowserUseAgenticDriver(load_listing(), base_url="http://localhost:5174")
-    url = driver._page_url(
-        driver.listing.id,
-        driver.listing,
-        agent_id="budget_1",
-        run_id="run_abc",
-        archetype="budget",
-    )
+    ctx = _ctx(driver)
 
-    assert url.startswith(f"http://localhost:5174/shopee/{driver.listing.id}?")
-    assert "agent_id=budget_1" in url
-    assert "run_id=run_abc" in url
-    assert "persona=budget" in url
-    assert "config=" in url
+    home = driver._home_url(ctx)
+    assert home.startswith("http://localhost:5174/?")
+    assert "agent_id=budget_1" in home and "run_id=run_abc" in home and "persona=budget" in home
+    assert "mk_config=" in home  # the listing config bootstraps the override on entry
+
+    search = driver._search_url(ctx)
+    assert search.startswith("http://localhost:5174/search?") and "keyword=beanie" in search
+
+    product = driver._product_url(ctx, driver.listing.id)
+    assert product.startswith(f"http://localhost:5174/shopee/{driver.listing.id}?")
+    assert "mk_config=" not in product  # config rides only on the home entry
+
+
+def test_default_base_url_targets_vite_port() -> None:
+    driver = BrowserUseAgenticDriver(load_listing())
+    assert driver.base_url == "http://localhost:5174"
+    assert driver.target_id == driver.listing.id
 
 
 def test_objection_examples_handle_bare_string_entries() -> None:
